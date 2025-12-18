@@ -1,0 +1,81 @@
+class Dummy {
+  static final List<Map<String, dynamic>> dummyDataJson = [
+    {
+      "no": 1,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "UGM",
+      "noHp": "628788823223",
+    },
+    {
+      "no": 2,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "UII",
+      "noHp": "628788823223",
+    },
+    {
+      "no": 3,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "UTY",
+      "noHp": "628788823223",
+    },
+    {
+      "no": 4,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "Sanata Dharma",
+      "noHp": "628788823223",
+    },
+    {
+      "no": 5,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "UMBY",
+      "noHp": "628788823223",
+    },
+    {
+      "no": 6,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "UAJY",
+      "noHp": "628788823223",
+    },
+    {
+      "no": 7,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "UKDW",
+      "noHp": "628788823223",
+    },
+    {
+      "no": 8,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "UKDW",
+      "noHp": "628788823223",
+    },
+    {
+      "no": 9,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "UKDW",
+      "noHp": "628788823223",
+    },
+    {
+      "no": 10,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "UKDW",
+      "noHp": "628788823223",
+    },
+    {
+      "no": 11,
+      "namaUser": "Anjana Yasa",
+      "email": "Anjas@mail.ugm.ac.id",
+      "universitas": "UKDW",
+      "noHp": "628788823223",
+    },
+  ];
+}
