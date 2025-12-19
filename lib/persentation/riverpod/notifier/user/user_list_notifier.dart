@@ -13,7 +13,8 @@ class UserListNotifier extends StateNotifier<UserListState> {
       final response = await getListUser.execute(page, limit,search: search,sort: sort);
       state = state.copyWith(
         isloading: false,
-        userData: response,
+        userData: response.users,
+        totaldata: response.totalUser,
         error: null
       );
     } catch (e) {
@@ -31,14 +32,14 @@ class UserListNotifier extends StateNotifier<UserListState> {
     state = state.copyWith(isloading: true);
     try {
       final response = await getListUser.execute(page, limit,search: search,sort: sort);
-      if (response.length<limit) {
+      if (response.users.length<limit) {
         state = state.copyWith(
           isloading: false,
           isreached: true
         );
       }
       state = state.appendData(
-        userData: response,
+        userData: response.users,
       );
     } catch (e) {
       state = state.copyWith(

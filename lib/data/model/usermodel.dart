@@ -1,6 +1,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wavenadmin/domain/entity/user.dart';
+import 'package:wavenadmin/domain/entity/user_list_data.dart';
 
 part 'usermodel.g.dart';
 
@@ -61,6 +62,14 @@ class UserDataWrapper {
     required this.listUser,
   });
 
+	List<User> toEntity() {
+		return listUser.map((e) => e.toEntity()).toList();
+	}
+
+  UserListData toEntityData() {
+    return UserListData(totalUser, activeUser, toEntity());
+  }
+
   factory UserDataWrapper.fromJson(Map<String, dynamic> json) => 
       _$UserDataWrapperFromJson(json);
       
@@ -68,7 +77,7 @@ class UserDataWrapper {
 }
 
 @JsonSerializable()
-class UserModel {
+class   UserModel {
   final String id;
   final String username;
   final String name;

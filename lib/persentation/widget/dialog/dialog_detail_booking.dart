@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wavenadmin/common/color.dart';
+import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
 
 class DialogDetailBooking extends StatelessWidget {
   const DialogDetailBooking({super.key});
@@ -58,7 +59,9 @@ class DialogDetailBooking extends StatelessWidget {
                                   value: 'Personal 3',
                                   child: Text('Personal 3'),
                                 ),
-                              ], initialValue: '', onChanged: (value) {  },
+                              ],
+                              initialValue: '',
+                              onChanged: (value) {},
                             ),
                           ),
                           ItemDetail(
@@ -78,14 +81,36 @@ class DialogDetailBooking extends StatelessWidget {
                       children: [
                         ItemDetail(
                           judul: 'Universitas',
-                          sub: DropDownOutlined(items: [], initialValue: '', onChanged: (value) {  },),
+                          sub: DropDownOutlined(
+                            items: [],
+                            initialValue: '',
+                            onChanged: (value) {},
+                          ),
                         ),
-                        ItemDetail(judul: 'Package', sub: DropDownOutlined(items: [], initialValue: '', onChanged: (value) {  },)),
+                        ItemDetail(
+                          judul: 'Package',
+                          sub: DropDownOutlined(
+                            items: [],
+                            initialValue: '',
+                            onChanged: (value) {},
+                          ),
+                        ),
                         ItemDetail(
                           judul: 'Waktu Foto',
-                          sub: DropDownOutlined(items: [], initialValue: '', onChanged: (value) {  },),
+                          sub: DropDownOutlined(
+                            items: [],
+                            initialValue: '',
+                            onChanged: (value) {},
+                          ),
                         ),
-                        ItemDetail(judul: 'Extra', sub: DropDownOutlined(items: [], initialValue: '', onChanged: (value) {  },)),
+                        ItemDetail(
+                          judul: 'Extra',
+                          sub: DropDownOutlined(
+                            items: [],
+                            initialValue: '',
+                            onChanged: (value) {},
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -94,15 +119,27 @@ class DialogDetailBooking extends StatelessWidget {
                       children: [
                         ItemDetail(
                           judul: 'Lokasi Foto',
-                          sub: DropDownOutlined(items: [], initialValue: '', onChanged: (value) {  },),
+                          sub: DropDownOutlined(
+                            items: [],
+                            initialValue: '',
+                            onChanged: (value) {},
+                          ),
                         ),
                         ItemDetail(
                           judul: 'Fotografer',
-                          sub: DropDownOutlined(items: [], initialValue: '', onChanged: (value) {  },),
+                          sub: DropDownOutlined(
+                            items: [],
+                            initialValue: '',
+                            onChanged: (value) {},
+                          ),
                         ),
                         ItemDetail(
                           judul: 'Status Foto',
-                          sub: DropDownOutlined(items: [], initialValue: '', onChanged: (value) {  },),
+                          sub: DropDownOutlined(
+                            items: [],
+                            initialValue: '',
+                            onChanged: (value) {},
+                          ),
                         ),
                         ItemDetail(
                           judul: 'Verifikasi',
@@ -142,88 +179,3 @@ class DialogDetailBooking extends StatelessWidget {
   }
 }
 
-class DropDownOutlined extends StatelessWidget {
-  final String initialValue;
-  final ValueChanged onChanged;
-  final List<DropdownMenuItem<String>> items;
-  const DropDownOutlined({super.key, required this.items, required this.initialValue, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      initialValue: initialValue,
-      items: items,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: MyColor.abudalamcontainer),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: MyColor.hijauaccent),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 14,
-        ),
-      ),
-    );
-  }
-}
-
-class ItemDetail extends StatelessWidget {
-  final String judul;
-  final Widget sub;
-  const ItemDetail({super.key, required this.judul, required this.sub});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          judul,
-          style: GoogleFonts.robotoFlex(
-            color: Color(0xFFE0E0E0),
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Container(padding: const EdgeInsets.all(2), child: sub),
-      ],
-    );
-  }
-}
-
-class ItemDetailOutline extends StatelessWidget {
-  final String judul;
-  final Widget sub;
-  const ItemDetailOutline({super.key, required this.judul, required this.sub});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          judul,
-          style: GoogleFonts.robotoFlex(
-            color: Color(0xFFE0E0E0),
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            border: Border.all(color: MyColor.abudalamcontainer),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: sub,
-        ),
-      ],
-    );
-  }
-}

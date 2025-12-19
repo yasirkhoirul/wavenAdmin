@@ -9,16 +9,20 @@ import 'package:wavenadmin/data/datasource/remote_data.dart';
 import 'package:wavenadmin/data/user_repository_impl.dart';
 import 'package:wavenadmin/domain/repository/auth_repository.dart';
 import 'package:wavenadmin/domain/repository/user_repositoty.dart';
+import 'package:wavenadmin/domain/usecase/create_admin.dart';
+import 'package:wavenadmin/domain/usecase/delete_admin.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
+import 'package:wavenadmin/domain/usecase/get_detail_user.dart';
 import 'package:wavenadmin/domain/usecase/get_list_admin.dart';
 import 'package:wavenadmin/domain/usecase/get_list_user.dart';
 import 'package:wavenadmin/domain/usecase/get_token.dart';
 import 'package:wavenadmin/domain/usecase/post_login.dart';
 import 'package:wavenadmin/domain/usecase/post_logout.dart';
+import 'package:wavenadmin/domain/usecase/put_detail_admin.dart';
 import 'package:wavenadmin/persentation/cubit/auth_cubit.dart';
 import 'package:http/http.dart'as http;
-import 'package:wavenadmin/persentation/riverpod/notifier/admin_list_notifier.dart';
-import 'package:wavenadmin/persentation/riverpod/notifier/user_list_notifier.dart';
+import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_list_notifier.dart';
+import 'package:wavenadmin/persentation/riverpod/notifier/user/user_list_notifier.dart';
 import 'package:wavenadmin/persentation/route/approuter.dart';
 
 
@@ -37,6 +41,10 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton(() => GetListUser(locator()),);
   locator.registerLazySingleton(() => GetListAdmin(locator()),);
   locator.registerLazySingleton(() => GetDetailAdmin(locator()),);
+  locator.registerLazySingleton(() => PutDetailAdmin(locator()),);
+  locator.registerLazySingleton(() => CreateAdmin(locator()),);
+  locator.registerLazySingleton(() => DeleteAdmin(locator()),);
+  locator.registerLazySingleton(() => GetDetailUser(locator()),);
   
   //repository
   locator.registerLazySingleton<AuthRepository>(() => AuthRepositoryimpl(locator(), localData: locator()),);

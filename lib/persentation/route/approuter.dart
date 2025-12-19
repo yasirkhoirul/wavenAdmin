@@ -79,7 +79,6 @@ class Approuter {
       ),
     ],
     redirect: (context, state) {
-      Logger().d(authCubit.state);
       final unsafepath = ['/login'];
       if (authCubit.state is AuthSucces && unsafepath.contains(state.uri.path)) {
         return '/dashboard';

@@ -50,7 +50,7 @@ final class AdminDetailProvider
   }
 }
 
-String _$adminDetailHash() => r'abb14e9001d3858f588ba63fdb872cc2488e0cba';
+String _$adminDetailHash() => r'f944a0a29c3bb81235f203864e154364c536c992';
 
 final class AdminDetailFamily extends $Family
     with

@@ -1,20 +1,21 @@
-class DetailAdmin {
+class DetailUser {
 	final String id;
 	final String username;
 	final String email;
 	final String name;
 	final String? phoneNumber;
-	final bool isActive;
+	final String? universityName;
+	final String? universityBriefName;
 	final DateTime createdAt;
-  final String? password;
 
-	const DetailAdmin(
+	const DetailUser(
 		this.id,
 		this.username,
 		this.email,
 		this.name,
 		this.phoneNumber,
-		this.isActive,
-		this.createdAt, {this.password}
+		this.universityName,
+		this.universityBriefName,
+		this.createdAt,
 	);
 }

@@ -1,41 +1,40 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'admin_detail_model.dart';
+part of 'user_detial_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-AdminDetailResponse _$AdminDetailResponseFromJson(Map<String, dynamic> json) =>
-    AdminDetailResponse(
+UserDetailResponse _$UserDetailResponseFromJson(Map<String, dynamic> json) =>
+    UserDetailResponse(
       message: json['message'] as String,
-      data: AdminDetailModel.fromJson(json['data'] as Map<String, dynamic>),
+      data: UserDetailModel.fromJson(json['data'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$AdminDetailResponseToJson(
-  AdminDetailResponse instance,
-) => <String, dynamic>{'message': instance.message, 'data': instance.data};
+Map<String, dynamic> _$UserDetailResponseToJson(UserDetailResponse instance) =>
+    <String, dynamic>{'message': instance.message, 'data': instance.data};
 
-AdminDetailModel _$AdminDetailModelFromJson(Map<String, dynamic> json) =>
-    AdminDetailModel(
+UserDetailModel _$UserDetailModelFromJson(Map<String, dynamic> json) =>
+    UserDetailModel(
       id: json['id'] as String,
       username: json['username'] as String,
       email: json['email'] as String,
       name: json['name'] as String,
       phoneNumber: json['phone_number'] as String?,
-      isActive: json['is_active'] as bool,
+      universityName: json['university_name'] as String?,
+      universityBriefName: json['university_brief_name'] as String?,
       createdAt: _createdAtFromJson(json['created_at'] as String),
-      pw: json['pw'] as String?,
     );
 
-Map<String, dynamic> _$AdminDetailModelToJson(AdminDetailModel instance) =>
+Map<String, dynamic> _$UserDetailModelToJson(UserDetailModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'username': instance.username,
       'email': instance.email,
       'name': instance.name,
-      'pw': instance.pw,
       'phone_number': instance.phoneNumber,
-      'is_active': instance.isActive,
+      'university_name': instance.universityName,
+      'university_brief_name': instance.universityBriefName,
       'created_at': _createdAtToJson(instance.createdAt),
     };

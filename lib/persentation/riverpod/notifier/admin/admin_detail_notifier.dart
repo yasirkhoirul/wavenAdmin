@@ -2,17 +2,12 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
-import 'package:wavenadmin/injection.dart';
 import 'package:wavenadmin/domain/entity/detailAdmin.dart';
+import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
 
 
 
 part 'admin_detail_notifier.g.dart';
-
-final getDetailAdminUsecaseProvider = Provider<GetDetailAdmin>((ref) {
-  return locator<GetDetailAdmin>();
-});
 
 @riverpod
 class AdminDetail extends _$AdminDetail {
@@ -28,5 +23,22 @@ class AdminDetail extends _$AdminDetail {
       final usecase = ref.read(getDetailAdminUsecaseProvider);
       return usecase.execute(adminId);
     });
+  }
+
+  Future<String> onUpdate(DetailAdmin payload) async {
+    final prevState = state;
+    state = const AsyncLoading();
+    final updateResult = await AsyncValue.guard(() async {
+      final usecase = ref.read(putDetailAdminUsecaseProvider);
+      return usecase.execute(payload, adminId);
+    });
+
+    if (updateResult is AsyncError<String>) {
+      state = prevState;
+      Error.throwWithStackTrace(updateResult.error, updateResult.stackTrace);
+    }
+    final message = updateResult.requireValue;
+    await refresh();
+    return message;
   }
 }

@@ -36,7 +36,7 @@ class AdminDetailModel {
 	final String username;
 	final String email;
 	final String name;
-
+  final String? pw;
 	@JsonKey(name: 'phone_number')
 	final String? phoneNumber;
 
@@ -57,11 +57,36 @@ class AdminDetailModel {
 		required this.name,
 		required this.phoneNumber,
 		required this.isActive,
-		required this.createdAt,
+		required this.createdAt, this.pw,
 	});
+
+	Map<String, dynamic> toCreateJson() {
+		return {
+			'username': username,
+			'email': email,
+			'name': name,
+			'phone_number': phoneNumber,
+			'is_active': isActive,
+		};
+	}
+
+	Map<String, dynamic> toUpdateJson() {
+		// Same fields as create for now; backend identifies resource by URL.
+		return {
+			'username': username,
+			'email': email,
+			'name': name,
+			'phone_number': phoneNumber,
+			'is_active': isActive,
+		};
+	}
 
   DetailAdmin toEntity(){
     return DetailAdmin(id, username, email, name, phoneNumber, isActive, createdAt);
+  }
+
+  factory AdminDetailModel.fromEntity(DetailAdmin data){
+    return AdminDetailModel(id: data.id, username: data.username, email: data.email, name: data.name, phoneNumber: data.phoneNumber, isActive: data.isActive, createdAt: DateTime.now(),pw: data.password);
   }
 
 	factory AdminDetailModel.fromJson(Map<String, dynamic> json) =>

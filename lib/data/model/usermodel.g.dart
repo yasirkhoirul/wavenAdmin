@@ -12,9 +12,9 @@ UserListResponse _$UserListResponseFromJson(Map<String, dynamic> json) =>
       metadata: json['metadata'] == null
           ? null
           : Metadata.fromJson(json['metadata'] as Map<String, dynamic>),
-      data:json['data'] is! List? json['data'] == null
+      data: json['data'] == null
           ? null
-          : UserDataWrapper.fromJson(json['data'] as Map<String, dynamic>):UserDataWrapper(totalUser: 0, activeUser: 0, listUser: []),
+          : UserDataWrapper.fromJson(json['data'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$UserListResponseToJson(UserListResponse instance) =>
