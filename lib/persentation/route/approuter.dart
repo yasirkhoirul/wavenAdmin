@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
-import 'package:logger/logger.dart';
 import 'package:wavenadmin/persentation/cubit/auth_cubit.dart';
+import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/auth_listen.dart';
 import 'package:wavenadmin/persentation/pages/admin_management_page.dart';
 import 'package:wavenadmin/persentation/pages/client_page.dart';
@@ -72,6 +72,14 @@ class Approuter {
               GoRoute(
                 path: '/adminManagement',
                 builder: (context, state) => const AdminManagementPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/photographermanagement',
+                builder: (context, state) => const PhotoGrapherManagementPage(),
               ),
             ],
           ),

@@ -11,14 +11,18 @@ import 'package:wavenadmin/domain/repository/auth_repository.dart';
 import 'package:wavenadmin/domain/repository/user_repositoty.dart';
 import 'package:wavenadmin/domain/usecase/create_admin.dart';
 import 'package:wavenadmin/domain/usecase/delete_admin.dart';
+import 'package:wavenadmin/domain/usecase/delete_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
+import 'package:wavenadmin/domain/usecase/get_detail_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_user.dart';
 import 'package:wavenadmin/domain/usecase/get_list_admin.dart';
+import 'package:wavenadmin/domain/usecase/get_list_photographer.dart';
 import 'package:wavenadmin/domain/usecase/get_list_user.dart';
 import 'package:wavenadmin/domain/usecase/get_token.dart';
 import 'package:wavenadmin/domain/usecase/post_login.dart';
 import 'package:wavenadmin/domain/usecase/post_logout.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_admin.dart';
+import 'package:wavenadmin/domain/usecase/put_detail_fotografer.dart';
 import 'package:wavenadmin/persentation/cubit/auth_cubit.dart';
 import 'package:http/http.dart'as http;
 import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_list_notifier.dart';
@@ -29,7 +33,7 @@ import 'package:wavenadmin/persentation/route/approuter.dart';
 final GetIt locator = GetIt.instance;
 Future<void> init(GetIt locator)async{
   //cubit
-  locator.registerFactory(() => AuthCubit(locator(), getToken: locator(), postLogout: locator()),);
+  locator.registerLazySingleton(() => AuthCubit(locator(), getToken: locator(), postLogout: locator()),);
   //riverpod
   locator.registerFactory(() => UserListNotifier(locator()),);
   locator.registerFactory(() => AdminListNotifier(getListAdmin: locator()),);
@@ -45,6 +49,10 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton(() => CreateAdmin(locator()),);
   locator.registerLazySingleton(() => DeleteAdmin(locator()),);
   locator.registerLazySingleton(() => GetDetailUser(locator()),);
+  locator.registerLazySingleton(() => GetListPhotographer(locator()),);
+  locator.registerLazySingleton(() => PutDetailFotografer(locator()),);
+  locator.registerLazySingleton(() => GetDetailFotografer(locator()),);
+  locator.registerLazySingleton(() => DeleteFotografer(locator()),);
   
   //repository
   locator.registerLazySingleton<AuthRepository>(() => AuthRepositoryimpl(locator(), localData: locator()),);
@@ -61,7 +69,9 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton(() => FlutterSecureStorage());
 
   //dio client
-  locator.registerLazySingleton(() => DioClient(locator()),);
+  locator.registerLazySingleton(() => DioClient(locator(),onUnauthorized: () {
+    locator<AuthCubit>().logOut();
+  },),);
   //dio
   locator.registerLazySingleton<Dio>(() =>Dio() ,);
   //router

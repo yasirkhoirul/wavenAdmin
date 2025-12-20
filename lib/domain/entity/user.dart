@@ -6,6 +6,7 @@ class User {
   final String? phoneNumber;
   final String? universityName;
   final bool isActive;
+  final String? role;
 
   const User(
     this.id,
@@ -15,5 +16,6 @@ class User {
     this.phoneNumber,
     this.universityName,
     this.isActive,
+    this.role
   );
 }

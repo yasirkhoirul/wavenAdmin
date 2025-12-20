@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/domain/entity/detailAdmin.dart';
+import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
 import 'package:wavenadmin/persentation/pages/schedule_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_detail_notifier.dart';
+import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_list_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_mutation_notifier.dart';
-import 'package:wavenadmin/persentation/riverpod/provider/admin_list_provider.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
@@ -45,14 +45,26 @@ class AdminManagementMainContent extends ConsumerStatefulWidget {
 
 class _AdminManagementMainContentState
     extends ConsumerState<AdminManagementMainContent> {
-  bool columnIsChecked = false;
-  int limit = 7;
-  int page = 0;
+  final TextEditingController searchController = TextEditingController();
+  int limit = 2;
+  bool isAsc = true;
+  SortAdmin sortBy = SortAdmin.name;
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(userAdminGetListProvider.notifier).getListAdminData(page, limit);
+      ref
+          .read(userAdminGetListProvider.notifier)
+          .getListAdminData(
+            limit,
+            sort: isAsc ? Sort.asc : Sort.desc,
+            sortAdmin: sortBy,
+          );
     });
     super.initState();
   }
@@ -63,13 +75,64 @@ class _AdminManagementMainContentState
     final List<DataColumn> datacolumn = [
       DataColumn(label: Text("No")),
       DataColumn(label: Text("Aksi")),
-      DataColumn(label: Text("Nama Admin")),
+      DataColumn(
+        label: ColumnSort(
+          label: "Nama Admin",
+          onTap: () {
+            setState(() {
+              sortBy = SortAdmin.name;
+              isAsc = !isAsc;
+            });
+            ref
+                .read(userAdminGetListProvider.notifier)
+                .getListAdminData(
+                  limit,
+                  sort: isAsc ? Sort.asc : Sort.desc,
+                  sortAdmin: sortBy,
+                );
+          },
+        ),
+      ),
       DataColumn(label: Text("Email")),
-      DataColumn(label: Text("Role")),
-      DataColumn(label: Text("Status")),
+      DataColumn(
+        label: ColumnSort(
+          label: "Role",
+          onTap: () {
+            setState(() {
+              sortBy = SortAdmin.type;
+              isAsc = !isAsc;
+            });
+            ref
+                .read(userAdminGetListProvider.notifier)
+                .getListAdminData(
+                  limit,
+                  sort: isAsc ? Sort.asc : Sort.desc,
+                  sortAdmin: sortBy,
+                );
+          },
+        ),
+      ),
+      DataColumn(
+        label: ColumnSort(
+          label: "Status",
+          onTap: () {
+            setState(() {
+              sortBy = SortAdmin.is_active;
+              isAsc = !isAsc;
+            });
+            ref
+                .read(userAdminGetListProvider.notifier)
+                .getListAdminData(
+                  limit,
+                  sort: isAsc ? Sort.asc : Sort.desc,
+                  sortAdmin: sortBy,
+                );
+          },
+        ),
+      ),
     ];
     final List<DataRow> dataRow = state.listAdmin
-        .skip(page * limit)
+        .skip(state.currentpage! * limit)
         .take(limit)
         .toList()
         .asMap()
@@ -77,15 +140,21 @@ class _AdminManagementMainContentState
         .map(
           (e) => DataRow(
             cells: [
-              DataCell(Text((e.key + 1).toString())),
+              DataCell(
+                Text(((state.currentpage! * limit) + e.key + 1).toString()),
+              ),
               DataCell(
                 PopupMenuButton(
                   onSelected: (value) async {
                     if (value == "Detail") {
                       showDialog(
                         context: context,
-                        builder: (context) =>
-                            Center(child: AdminFormDialog(adminId: e.value.id)),
+                        builder: (context) => Center(
+                          child: AdminFormDialog(
+                            adminId: e.value.id,
+                            limit: limit,
+                          ),
+                        ),
                       );
                     }
                     if (value == "Hapus") {
@@ -96,7 +165,7 @@ class _AdminManagementMainContentState
 
                         ref
                             .read(userAdminGetListProvider.notifier)
-                            .getListAdminData(0, 7);
+                            .getListAdminData(limit);
                       } catch (e) {
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -115,7 +184,7 @@ class _AdminManagementMainContentState
               ),
               DataCell(Text(e.value.name)),
               DataCell(Text(e.value.email)),
-              DataCell(Text(e.value.universityName ?? '')),
+              DataCell(Text(e.value.role ?? '')),
               DataCell(
                 e.value.isActive
                     ? _buildStatusChip("Aktif", color: MyColor.hijauaccent)
@@ -138,20 +207,30 @@ class _AdminManagementMainContentState
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(child: OutlinedSearcchBar(onSubmitted: (value) {})),
                 Flexible(
-                  child: MButtonWeb(
-                    ontap: () async {
-                        await showDialog<DetailAdmin>(
-                        context: context,
-                        builder: (context) =>
-                            const Center(child: AdminFormDialog()),
-                      );
-                    
+                  child: OutlinedSearcchBar(
+                    onSubmitted: (value) {
+                      ref
+                          .read(userAdminGetListProvider.notifier)
+                          .getListAdminData(
+                            limit,
+                            search: value,
+                            sort: isAsc ? Sort.asc : Sort.desc,
+                          );
                     },
-                    teks: "Tambah",
-                    icon: Icons.add,
+                    controller: searchController,
                   ),
+                ),
+                MButtonWeb(
+                  ontap: () async {
+                    await showDialog<DetailAdmin>(
+                      context: context,
+                      builder: (context) =>
+                          Center(child: AdminFormDialog(limit: limit)),
+                    );
+                  },
+                  teks: "Tambah",
+                  icon: Icons.add,
                 ),
               ],
             ),
@@ -159,84 +238,35 @@ class _AdminManagementMainContentState
               scrollDirection: Axis.horizontal,
               child: state.requestState == RequestState.loading
                   ? SizedBox(
-                      height: 500,
                       width: MediaQuery.of(context).size.width * 0.8127,
                       child: Center(child: CircularProgressIndicator()),
                     )
                   : TabelContent(dataColumnUser: datacolumn, datarow: dataRow),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text("jumlah baris"),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: MyColor.abudalamcontainer,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Center(child: Text(dataRow.length.toString())),
-                        ),
-                      ),
-
-                      _buildButtonNav("Sebelumnya", () {
-                        if (page > 0) {
-                          setState(() {
-                            page--;
-                          });
-                        }
-                      }, page > 0 ? Colors.white : MyColor.abucontainer),
-                      _buildButtonNav(
-                        "Setelahnya",
-
-                        () {
-                          if (dataRow.length >= limit) {
-                            setState(() {
-                              page++;
-                            });
-                          }
-
-                          if (!state.isReachedLastpage) {
-                            ref
-                                .read(userAdminGetListProvider.notifier)
-                                .appendAdminData(page, limit);
-                          }
-                        },
-                        dataRow.length >= limit
-                            ? Colors.white
-                            : MyColor.abucontainer,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            FooterTabel(
+              back: state.currentpage! > 0
+                  ? () {
+                      ref.read(userAdminGetListProvider.notifier).back();
+                    }
+                  : null,
+              next: state.metadata?.totalPages != state.currentpage && state.requestState != RequestState.loading
+                  ? () {
+                      ref
+                          .read(userAdminGetListProvider.notifier)
+                          .appendAdminData(
+                            limit,
+                            search: searchController.text,
+                            sort: isAsc ? Sort.asc : Sort.desc,
+                            sortAdmin: sortBy,
+                          );
+                    }
+                  : null,
+              jumlahPage: state.metadata?.totalPages ?? 0,
+              currentPage: state.currentpage! + 1,
             ),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildButtonNav(String label, VoidCallback? ontap, Color color) {
-    return InkWell(
-      onTap: ontap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: MyColor.abudalamcontainer,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Text(label, style: GoogleFonts.robotoFlex(color: color)),
-          ),
-        ),
-      ),
     );
   }
 
@@ -254,7 +284,8 @@ class _AdminManagementMainContentState
 
 class AdminFormDialog extends ConsumerStatefulWidget {
   final String? adminId;
-  const AdminFormDialog({super.key, this.adminId});
+  final int limit;
+  const AdminFormDialog({super.key, this.adminId, required this.limit});
 
   @override
   ConsumerState<AdminFormDialog> createState() => _AdminFormDialogState();
@@ -466,34 +497,35 @@ class _AdminFormDialogState extends ConsumerState<AdminFormDialog> {
                             if (_isCreate) {
                               try {
                                 await ref
-                                  .read(
-                                    adminMutationProvider(
-                                      widget.adminId ?? '',
-                                    ).notifier,
-                                  )
-                                  .createAdmin(
-                                    DetailAdmin(
-                                      '',
-                                      password: passwordController.text.trim(),
-                                      usernammeController.text.trim(),
-                                      emailController.text.trim(),
-                                      namedController.text.trim(),
-                                      phoneController.text.trim(),
-                                      false,
-                                      DateTime.now(),
-                                    ),
-                                  );
-                                   ref.read(userAdminGetListProvider.notifier).getListAdminData(0, 7);
+                                    .read(
+                                      adminMutationProvider(
+                                        widget.adminId ?? '',
+                                      ).notifier,
+                                    )
+                                    .createAdmin(
+                                      DetailAdmin(
+                                        '',
+                                        password: passwordController.text
+                                            .trim(),
+                                        usernammeController.text.trim(),
+                                        emailController.text.trim(),
+                                        namedController.text.trim(),
+                                        phoneController.text.trim(),
+                                        false,
+                                        DateTime.now(),
+                                      ),
+                                    );
+                                ref
+                                    .read(userAdminGetListProvider.notifier)
+                                    .getListAdminData(widget.limit);
                               } catch (error) {
                                 if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                     SnackBar(
-                                      backgroundColor: Colors.red,
-                                      content: Text(
-                                        error.toString(),
-                                      ),
-                                    ),
-                                  );
+                                  SnackBar(
+                                    backgroundColor: Colors.red,
+                                    content: Text(error.toString()),
+                                  ),
+                                );
                               }
                             } else {
                               try {
@@ -516,7 +548,9 @@ class _AdminFormDialogState extends ConsumerState<AdminFormDialog> {
                                     );
 
                                 if (context.mounted) {
-                                  ref.read(userAdminGetListProvider.notifier).getListAdminData(0, 7);
+                                  ref
+                                      .read(userAdminGetListProvider.notifier)
+                                      .getListAdminData(widget.limit);
                                   Navigator.of(context).pop();
                                 }
                               } catch (e) {

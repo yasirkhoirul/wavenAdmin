@@ -6,7 +6,10 @@ import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/dio.dart';
 import 'package:wavenadmin/data/model/admin_detail_model.dart';
 import 'package:wavenadmin/data/model/tokenmode.dart';
+import 'package:wavenadmin/data/model/user_admin_model.dart';
+import 'package:wavenadmin/data/model/user_detial_fotografer_model.dart';
 import 'package:wavenadmin/data/model/user_detial_model.dart';
+import 'package:wavenadmin/data/model/user_photographer_model.dart';
 import 'package:wavenadmin/data/model/usermodel.dart';
 
 class AppException implements Exception {
@@ -68,13 +71,17 @@ String _friendlyErrorMessage(Object error) {
 abstract class RemoteData {
   Future<Token> login(String email, String password);
   Future<bool> logout(String refreshToken);
-  Future<UserListResponse> getListUser(int page, int limit, {String? search,Sort? sort});
+  Future<UserListResponse> getListUser(int page, int limit, {String? search,Sort? sort,SortUser? sortBy});
+  Future<UserListResponseAdmin> getListUserAdmin(int page, int limit, {String? search,Sort? sort,SortAdmin? sortAdmin});
+  Future<UserFotograferListResponse> getListPhotographer(int page, int limit, {String? search,Sort? sort,SortPhotographer?  sortBy});
   Future<UserDetailResponse> getDetailUser(String idUser);
-  Future<UserListResponse> getListUserAdmin(int page, int limit, {String? search,Sort? sort});
+  Future<UserDetailFotograferResponse> getDetailUserFotografer(String idUser);
   Future<AdminDetailResponse> getUserAdminDetail(String id);
   Future<String> putDetailAdmin(AdminDetailModel payload,String idAdmin);
+  Future<String> putDetailFotografer(UserDetailFotograferModel payload,String idFotografer);
   Future<String> createAdmin(AdminDetailModel payload);
   Future<void> deleteAdmin(String idAdmin);
+  Future<String> deleteFotografer(String idFotografer);
 }
 
 class RemoteDataImpl implements RemoteData {
@@ -114,13 +121,14 @@ class RemoteDataImpl implements RemoteData {
   }
   
   @override
-  Future<UserListResponse> getListUser(int page, int limit, {String? search,Sort? sort}) async{
+  Future<UserListResponse> getListUser(int page, int limit, {String? search,Sort? sort,SortUser? sortBy}) async{
     try {
       final response = await dio.dio.get('v1/admin/users',queryParameters: {
         'page':page,
         'limit':limit,
         if(search!=null)'search':search,
-        if(sort!=null)'sort':sort.name
+        if(sort!=null)'sort':sort.name,
+        if(sortBy!= null)'sort_by':sortBy.name
       });
       if (response.statusCode != 200) {
         throw AppException('Request gagal (HTTP ${response.statusCode}).');
@@ -154,19 +162,20 @@ class RemoteDataImpl implements RemoteData {
   }
   
   @override
-  Future<UserListResponse> getListUserAdmin(int page, int limit, {String? search, Sort? sort}) async{
+  Future<UserListResponseAdmin> getListUserAdmin(int page, int limit, {String? search, Sort? sort,SortAdmin? sortAdmin}) async{
     try {
       final response = await dio.dio.get('v1/admin/admins',
       queryParameters: {
         'page':page,
         'limit':limit,
         if(search!=null)'search':search,
-        if(sort!=null)'sort':sort.name
+        if(sort!=null)'sort':sort.name,
+        if(sortAdmin!=null)'sort_by':sortAdmin.name
       });
       if (response.statusCode != 200) {
         throw AppException('Request gagal (HTTP ${response.statusCode}).');
       }
-      return UserListResponse.fromJson(response.data);
+      return UserListResponseAdmin.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }
@@ -263,4 +272,69 @@ class RemoteDataImpl implements RemoteData {
       throw AppException(_friendlyErrorMessage(e));
     }
   }
+  
+  @override
+  Future<UserFotograferListResponse> getListPhotographer(int page, int limit, {String? search, Sort? sort, SortPhotographer? sortBy}) async{
+     try {
+      final response = await dio.dio.get('v1/admin/photographers',
+      queryParameters: {
+        'page':page,
+        'limit':limit,
+        if(search!=null)'search':search,
+        if(sort!=null)'sort':sort.name,
+        if(sortBy!=null)'sort_by':sortBy.name
+      });
+      if (response.statusCode != 200) {
+        throw AppException('Request gagal (HTTP ${response.statusCode}).');
+      }
+      return UserFotograferListResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<UserDetailFotograferResponse> getDetailUserFotografer(String idUser) async{
+    try {
+      final response = await dio.dio.get('v1/admin/photographers/$idUser');
+      if (response.statusCode == 200) {
+        
+      return UserDetailFotograferResponse.fromJson(response.data);
+      }else{
+        throw AppException("${response.statusCode}");
+      }
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<String> putDetailFotografer(UserDetailFotograferModel payload, String idFotografer)async {
+    try {
+      final response = await dio.dio.put('v1/admin/photographers/$idFotografer',data: payload.toJson());
+      if (response.statusCode == 200) {
+        return response.data['message'];
+      }else{
+        throw AppException("${response.statusCode}");
+      }
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<String> deleteFotografer(String idFotografer) async{
+    try {
+      final response = await dio.dio.delete('v1/admin/photographers/$idFotografer');
+      if (response.statusCode == 200) {
+        return "Foto Grafer Berhasil Di Hapus";
+      }
+      else{
+        throw AppException(response.statusCode.toString());
+      }
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
 }

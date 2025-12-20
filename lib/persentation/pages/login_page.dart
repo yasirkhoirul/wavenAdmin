@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wavenadmin/common/lottie.dart';
 import 'package:wavenadmin/persentation/cubit/auth_cubit.dart';
-import 'package:wavenadmin/persentation/pages/slide_direction.dart';
+import 'package:wavenadmin/persentation/widget/slide_direction.dart';
 import 'package:wavenadmin/persentation/widget/animateddivider.dart';
 import 'package:wavenadmin/persentation/widget/fade_in_up_text.dart';
 import 'package:wavenadmin/persentation/widget/frostglass.dart';

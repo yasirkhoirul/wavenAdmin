@@ -5,27 +5,33 @@ import 'package:wavenadmin/common/color.dart';
 class XlButtonWeb extends StatelessWidget {
   final IconData? icon;
   final String teks;
+  final Color? color;
   final VoidCallback ontap;
   const XlButtonWeb({
     required this.ontap,
     super.key,
     this.icon,
     required this.teks,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
-      width: 170,
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: 47, minWidth: 168),
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: MyColor.hijauaccent),
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          backgroundColor: color ?? MyColor.hijauaccent,
+        ),
         onPressed: ontap,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            icon != null ? Icon(icon, color: Colors.white,size: 30,) : Container(),
+            icon != null
+                ? Icon(icon, color: Colors.white, size: 30)
+                : Container(),
             Text(
               teks,
               style: GoogleFonts.robotoFlex(
@@ -40,31 +46,37 @@ class XlButtonWeb extends StatelessWidget {
     );
   }
 }
-class LButtonWeb extends StatelessWidget {
+
+class XlButtonMobile extends StatelessWidget {
   final IconData? icon;
   final String teks;
+  final Color? color;
   final VoidCallback ontap;
-  const LButtonWeb({
+  const XlButtonMobile({
     required this.ontap,
     super.key,
     this.icon,
     required this.teks,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-       height: 42,
-      width: 157,
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: 42, minWidth: 157),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: MyColor.hijauaccent),
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          backgroundColor: color ?? MyColor.hijauaccent,
+        ),
         onPressed: ontap,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            icon != null ? Icon(icon, color: Colors.white,size: 24,) : Container(),
+            icon != null
+                ? Icon(icon, color: Colors.white, size: 24)
+                : Container(),
             Text(
               teks,
               style: GoogleFonts.robotoFlex(
@@ -79,41 +91,226 @@ class LButtonWeb extends StatelessWidget {
     );
   }
 }
+
+class LButtonWeb extends StatelessWidget {
+  final IconData? icon;
+  final String teks;
+  final VoidCallback? ontap;
+  const LButtonWeb({
+    required this.ontap,
+    super.key,
+    this.icon,
+    required this.teks,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minWidth: 163, minHeight: 42),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            backgroundColor: MyColor.hijauaccent,
+          ),
+          onPressed: ontap,
+          child: Row(
+            spacing: 8,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: icon != null
+                ? <Widget>[
+                    Icon(icon, color: Colors.white, size: 24),
+                    Text(
+                      teks,
+                      style: GoogleFonts.robotoFlex(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ]
+                : [
+                    Text(
+                      teks,
+                      style: GoogleFonts.robotoFlex(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LBUttonMobile extends StatelessWidget {
+  final IconData? icon;
+  final String teks;
+  final VoidCallback? ontap;
+  const LBUttonMobile({
+    required this.ontap,
+    super.key,
+    this.icon,
+    required this.teks,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minWidth: 121, minHeight: 36),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            backgroundColor: MyColor.hijauaccent,
+          ),
+          onPressed: ontap,
+          child: Row(
+            spacing: 8,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: icon != null
+                ? <Widget>[
+                    Icon(icon, color: Colors.white, size: 18),
+                    Text(
+                      teks,
+                      style: GoogleFonts.robotoFlex(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ]
+                : [
+                    Text(
+                      teks,
+                      style: GoogleFonts.robotoFlex(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class MButtonWeb extends StatelessWidget {
   final IconData? icon;
   final String teks;
-  final VoidCallback ontap;
+  final VoidCallback? ontap;
   final Color? color;
   const MButtonWeb({
     required this.ontap,
     super.key,
     this.icon,
     required this.teks,
-    this.color 
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 35,
-      width: 122,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: color??MyColor.hijauaccent),
-        onPressed: ontap,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minWidth: 122, minHeight: 21),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            backgroundColor: color ?? MyColor.hijauaccent,
+          ),
+          onPressed: ontap,
+          child: Row(
+            spacing: 4,
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            icon != null ? Icon(icon, color: Colors.white,size: 17,) : Container(),
-            Text(
-              teks,
-              style: GoogleFonts.robotoFlex(
-                color: Colors.white,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+            children: icon != null
+                ? <Widget>[
+                    Icon(icon, color: Colors.white, size: 17),
+
+                    Text(
+                      teks,
+                      style: GoogleFonts.robotoFlex(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ]
+                : [
+                    Text(
+                      teks,
+                      style: GoogleFonts.robotoFlex(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MButtonMobile extends StatelessWidget {
+  final IconData? icon;
+  final String teks;
+  final VoidCallback? ontap;
+  final Color? color;
+  const MButtonMobile({
+    required this.ontap,
+    super.key,
+    this.icon,
+    required this.teks,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minWidth: 78),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            backgroundColor: color ?? MyColor.hijauaccent,
+          ),
+          onPressed: ontap,
+          child: Row(
+            spacing: 4,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: icon != null
+                ? <Widget>[
+                    Icon(icon, color: Colors.white, size: 17),
+                    Text(
+                      teks,
+                      style: GoogleFonts.robotoFlex(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ]
+                : [
+                    Text(
+                      teks,
+                      style: GoogleFonts.robotoFlex(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+          ),
         ),
       ),
     );

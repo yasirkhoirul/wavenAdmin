@@ -75,6 +75,12 @@ class SideNavigation extends StatelessWidget {
                   onTap: () => statefulNavigationShell.goBranch(5),
                   aset: MyIcon.iconusers,
                 ),
+                ItemSideNavigation(
+                  judul: "Photographer",
+                  isActive: statefulNavigationShell.currentIndex == 6,
+                  onTap: () => statefulNavigationShell.goBranch(6),
+                  aset: MyIcon.iconusers,
+                ),
               ],
             ),
             ItemSideNavigation(

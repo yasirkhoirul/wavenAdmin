@@ -25,3 +25,30 @@ enum Status{
   aktif,
   tidakaktif
 }
+enum SortPhotographer{
+  id,
+  name,
+  phone_number,
+  account_number,
+  bank_account,
+  fee_per_hour,
+  gears,
+  instagram,
+  location,
+}
+
+enum SortAdmin{
+  name,
+  email,
+  is_active,
+  type
+}
+
+enum SortUser{
+  username,
+  name,
+  email,
+  type,
+  university_name
+}
+

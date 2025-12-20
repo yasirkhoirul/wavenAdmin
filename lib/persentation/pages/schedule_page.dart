@@ -105,10 +105,9 @@ class HeaderPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      width: 200,
-      child: Center(
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
         child: Row(
           spacing: 10,
           children: [

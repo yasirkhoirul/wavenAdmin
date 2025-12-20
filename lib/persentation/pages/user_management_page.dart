@@ -6,9 +6,10 @@ import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/domain/entity/detailUser.dart';
+import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
 import 'package:wavenadmin/persentation/pages/schedule_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/userDetail.dart';
-import 'package:wavenadmin/persentation/riverpod/provider/user_list_provider.dart';
+import 'package:wavenadmin/persentation/riverpod/notifier/user/user_list_notifier.dart';
 import 'package:wavenadmin/persentation/widget/carditemcontainer.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
@@ -22,13 +23,11 @@ class UserManagementpage extends ConsumerStatefulWidget {
 }
 
 class _UserManagementpageState extends ConsumerState<UserManagementpage> {
-  
+  int limit = 3;
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref
-          .read(userGetListProvider.notifier)
-          .getListUsers(0 + 1, 3);
+      ref.read(userGetListProvider.notifier).getListUsers(limit);
     });
     super.initState();
   }
@@ -47,18 +46,25 @@ class _UserManagementpageState extends ConsumerState<UserManagementpage> {
               ),
               Row(
                 children: [
-                  SizedBox(
-                    width: 400,
-                    child: CardItemContainer(
-                      aset: MyIcon.iconusers,
-                      judul: "Total Users",
-                      content: state.totaldata == null?"Loading":state.totaldata.toString(),
-                      color: MyColor.oren,
+                  Flexible(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: 400,
+                        minWidth: 200
+                      ) ,
+                      child: CardItemContainer(
+                        aset: MyIcon.iconusers,
+                        judul: "Total Users",
+                        content: state.totaldata == null
+                            ? "Loading"
+                            : state.totaldata.toString(),
+                        color: MyColor.oren,
+                      ),
                     ),
                   ),
                 ],
               ),
-              Expanded(child: TabelUser()),
+              Expanded(child: TabelUser(limit: limit)),
             ],
           ),
         ),
@@ -68,41 +74,59 @@ class _UserManagementpageState extends ConsumerState<UserManagementpage> {
 }
 
 class TabelUser extends ConsumerStatefulWidget {
-  const TabelUser({super.key});
+  final int limit;
+  const TabelUser({super.key, required this.limit});
 
   @override
   ConsumerState<TabelUser> createState() => _TabelUserState();
 }
 
 class _TabelUserState extends ConsumerState<TabelUser> {
+  final TextEditingController searchController = TextEditingController();
   bool columnIsChecked = false;
   List<String> _idCheck = [];
-  int limit = 3;
-  int page = 0;
-  int heighestPage = 0;
+  SortUser sortBy = SortUser.name;
+  bool isAsc = true;
+  
   @override
   void initState() {
-    
     super.initState();
+    ref.listenManual(userGetListProvider, (previous, next) {
+      if (previous?.userData != next.userData) {
+        setState(() {
+          columnIsChecked = false;
+          _idCheck = [];
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    Logger().d(_idCheck);
     final state = ref.watch(userGetListProvider);
-
     final List<DataRow> datarow = state.userData != null
         ? state.userData!
-              .skip(page * limit)
-              .take(limit)
+              .skip(state.currentpage * widget.limit)
+              .take(widget.limit)
               .toList()
               .asMap()
               .entries
               .map((values) {
                 return DataRow(
                   cells: [
-						DataCell(
-							Text(((page * limit) + values.key + 1).toString()),
-						),
+                    DataCell(
+                      Text(
+                        ((state.currentpage * widget.limit) + values.key + 1)
+                            .toString(),
+                      ),
+                    ),
                     DataCell(
                       Checkbox(
                         value: _idCheck.contains(values.value.id),
@@ -110,8 +134,8 @@ class _TabelUserState extends ConsumerState<TabelUser> {
                           setState(() {
                             if (_idCheck.contains(values.value.id)) {
                               _idCheck = _idCheck
-                                  .skip(page * limit)
-                                  .take(limit)
+                                  .skip(state.currentpage * widget.limit)
+                                  .take(widget.limit)
                                   .where(
                                     (element) => element != values.value.id,
                                   )
@@ -152,7 +176,6 @@ class _TabelUserState extends ConsumerState<TabelUser> {
               })
               .toList()
         : [];
-    final int count = datarow.length;
     final List<DataColumn> dataColumnUser = [
       DataColumn(label: Text("No")),
       DataColumn(
@@ -164,8 +187,8 @@ class _TabelUserState extends ConsumerState<TabelUser> {
               if (columnIsChecked == true) {
                 _idCheck = [
                   ...state.userData
-                          ?.skip(page * limit)
-                          .take(limit)
+                          ?.skip(state.currentpage * widget.limit)
+                          .take(widget.limit)
                           .map((e) => e.id) ??
                       [],
                 ];
@@ -177,9 +200,27 @@ class _TabelUserState extends ConsumerState<TabelUser> {
         ),
       ),
       DataColumn(label: Text("Aksi")),
-      DataColumn(label: Text("Nama User")),
-      DataColumn(label: Text("Email")),
-      DataColumn(label: Text("Universitas")),
+      DataColumn(label: ColumnSort(label: "Nama User", onTap: (){
+        setState(() {
+          isAsc = !isAsc;
+          sortBy = SortUser.name;
+        });
+        ref.read(userGetListProvider.notifier).getListUsers(widget.limit,search: searchController.text,sort: isAsc?Sort.asc:Sort.desc,sortBy: sortBy);
+      })),
+      DataColumn(label: ColumnSort(label: "Email", onTap: () {
+        setState(() {
+          isAsc = !isAsc;
+          sortBy = SortUser.email;
+        });
+        ref.read(userGetListProvider.notifier).getListUsers(widget.limit,search: searchController.text,sort: isAsc?Sort.asc:Sort.desc,sortBy: sortBy);
+      },)),
+      DataColumn(label: ColumnSort(label: "Universitas", onTap: (){
+        setState(() {
+          isAsc = !isAsc;
+          sortBy = SortUser.university_name;
+        });
+        ref.read(userGetListProvider.notifier).getListUsers(widget.limit,search: searchController.text,sort: isAsc?Sort.asc:Sort.desc,sortBy: sortBy);
+      })),
       DataColumn(label: Text("No Hp")),
     ];
     return LayoutBuilder(
@@ -191,9 +232,16 @@ class _TabelUserState extends ConsumerState<TabelUser> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: OutlinedSearcchBar(onSubmitted: (String p1) {}),
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: OutlinedSearcchBar(
+                      onSubmitted: (String p1) {
+                        ref.read(userGetListProvider.notifier).getListUsers(widget.limit,search: p1);
+                      },
+                      controller: searchController,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -216,44 +264,20 @@ class _TabelUserState extends ConsumerState<TabelUser> {
                 );
               },
             ),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: page > 0
-                      ? () {
-                          if (page > 0) {
-                            setState(() {
-                              _idCheck = [];
-                              columnIsChecked = false;
-                              page--;
-                            });
-                          }
-                          Logger().d("heghest page $heighestPage, page $page");
-                        }
-                      : null,
-                  icon: Icon(Icons.arrow_back),
-                ),
-                IconButton(
-                  onPressed: count == limit
-                      ? () {
-                          if (limit == count) {
-                            setState(() {
-                              columnIsChecked = false;
-                              _idCheck = [];
-                              if (heighestPage == page) {
-                                heighestPage++;
-                                ref
-                                    .read(userGetListProvider.notifier)
-                                    .appendData(heighestPage + 1, limit);
-                              }
-                              page++;
-                            });
-                          }
-                        }
-                      : null,
-                  icon: Icon(Icons.arrow_forward),
-                ),
-              ],
+            FooterTabel(
+              back: state.currentpage > 0
+                  ? () {
+                      ref.read(userGetListProvider.notifier).back();
+                    }
+                  : null,
+              next: (state.metadata?.totalPages??0) > state.currentpage + 1 && !(state.isloading??true)
+                  ? () {
+                    
+                    ref.read(userGetListProvider.notifier).appendData(widget.limit,search: searchController.text,sort: isAsc?Sort.asc:Sort.desc,sortBy: sortBy);
+                  }
+                  : null,
+              jumlahPage: state.metadata?.totalPages??0,
+              currentPage: state.currentpage+1,
             ),
           ],
         );

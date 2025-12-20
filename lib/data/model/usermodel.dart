@@ -17,6 +17,10 @@ class UserListResponse {
     required this.data,
   });
 
+
+  UserDataWrapperEntity toEntity(){
+    return UserDataWrapperEntity(data?.toEntityData()??UserListData(0, 0, []),metadata);
+  }
   factory UserListResponse.fromJson(Map<String, dynamic> json) => 
       _$UserListResponseFromJson(json);
       
@@ -79,9 +83,10 @@ class UserDataWrapper {
 @JsonSerializable()
 class   UserModel {
   final String id;
-  final String username;
+  final String? username;
   final String name;
   final String email;
+  final String? role;
   
   @JsonKey(name: 'is_active')
   final bool isActive;
@@ -93,7 +98,7 @@ class   UserModel {
   @JsonKey(name: 'university_name')
   final String? universityName; 
    User toEntity(){
-    return User(id, username, name, email, phoneNumber, universityName, isActive);
+    return User(id, username??'', name, email, phoneNumber, universityName, isActive,role);
   }
   UserModel({
     required this.id,
@@ -103,6 +108,7 @@ class   UserModel {
     required this.isActive,
     this.phoneNumber,
     this.universityName,
+    this.role
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => 

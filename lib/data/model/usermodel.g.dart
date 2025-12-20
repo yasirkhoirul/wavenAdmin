@@ -56,12 +56,13 @@ Map<String, dynamic> _$UserDataWrapperToJson(UserDataWrapper instance) =>
 
 UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   id: json['id'] as String,
-  username: json['username'] as String,
+  username: json['username'] as String?,
   name: json['name'] as String,
   email: json['email'] as String,
   isActive: json['is_active'] as bool,
   phoneNumber: json['phone_number'] as String?,
   universityName: json['university_name'] as String?,
+  role: json['role'] as String?,
 );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -69,6 +70,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'username': instance.username,
   'name': instance.name,
   'email': instance.email,
+  'role': instance.role,
   'is_active': instance.isActive,
   'phone_number': instance.phoneNumber,
   'university_name': instance.universityName,

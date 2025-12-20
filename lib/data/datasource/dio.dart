@@ -5,8 +5,10 @@ class DioClient {
   late Dio _dio;
   final baseurl = "https://waven-development.site/";
   final LocalData localData;
+  final Function()? onUnauthorized;
   bool _isRefreshing = false;
-  DioClient(this.localData) {
+  
+  DioClient(this.localData, {this.onUnauthorized}) {
     _dio = Dio(
       BaseOptions(
         baseUrl: baseurl,
@@ -52,6 +54,7 @@ class DioClient {
                   return handler.next(error);
                 }
               } else {
+                onUnauthorized?.call();
                 return handler.next(error);
               }
             }
@@ -67,7 +70,6 @@ class DioClient {
 
   Future<String?> _refreshTokenApi() async {
     try {
-      // Ambil refresh token lama
       String? refreshToken = await localData.getRefreshToken();
 
       // Pakai Dio baru (polos) agar tidak kena interceptor loop
@@ -79,19 +81,14 @@ class DioClient {
       );
       if (response.statusCode == 200) {
         final newAccessToken = response.headers.value('X-Access-Token');
-
-        // Ambil Refresh Token Baru (Biasanya ikut dirotasi juga)
         final newRefreshToken = response.headers.value('X-Refresh-Token');
         if (newAccessToken != null) {
-          // Simpan token baru.
-          // Jika newRefreshToken ada, simpan juga. Jika null, pakai yang lama.
           await localData.saveToken(
             newAccessToken,
             newRefreshToken ??
-                refreshToken!, // Fallback ke lama jika header kosong
+                refreshToken!,
           );
         }
-        // Ambil token baru dari JSON (Sesuaikan dengan respon API bapak)
         return newAccessToken;
       }
       return null;
