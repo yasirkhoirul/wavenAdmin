@@ -5,6 +5,7 @@ import 'package:wavenadmin/domain/usecase/delete_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_user.dart';
+import 'package:wavenadmin/domain/usecase/get_list_booking.dart';
 import 'package:wavenadmin/domain/usecase/get_list_photographer.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_fotografer.dart';
@@ -46,4 +47,8 @@ final putDetailFotografer = Provider<PutDetailFotografer>((ref) {
 
 final deleteFotograferUseCase = Provider<DeleteFotografer>((ref) {
   return locator<DeleteFotografer>();
+},);
+
+final getListBooking = Provider<GetListBooking>((ref) {
+  return locator<GetListBooking>();
 },);

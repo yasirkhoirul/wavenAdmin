@@ -52,3 +52,16 @@ enum SortUser{
   university_name
 }
 
+enum VerificationStatus{
+  PENDING,
+  REJECTED,
+  APPROVED
+}
+
+enum StatusBooking{
+  PENDING,
+  DP,
+  LUNAS,
+  CANCEL
+}
+

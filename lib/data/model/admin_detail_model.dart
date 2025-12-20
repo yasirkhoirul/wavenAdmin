@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:wavenadmin/domain/entity/detailAdmin.dart';
+import 'package:wavenadmin/domain/entity/detail_admin.dart';
 
 part 'admin_detail_model.g.dart';
 

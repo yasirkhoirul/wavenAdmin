@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:wavenadmin/domain/entity/detailFotografer.dart';
+import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
 import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
 
 part 'fotografer_detail.g.dart';

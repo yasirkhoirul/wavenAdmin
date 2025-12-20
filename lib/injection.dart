@@ -3,11 +3,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:wavenadmin/data/auth_repositoryimpl.dart';
+import 'package:wavenadmin/data/booking_repository_impl.dart';
 import 'package:wavenadmin/data/datasource/dio.dart';
 import 'package:wavenadmin/data/datasource/local_data.dart';
 import 'package:wavenadmin/data/datasource/remote_data.dart';
 import 'package:wavenadmin/data/user_repository_impl.dart';
 import 'package:wavenadmin/domain/repository/auth_repository.dart';
+import 'package:wavenadmin/domain/repository/booking_repository.dart';
 import 'package:wavenadmin/domain/repository/user_repositoty.dart';
 import 'package:wavenadmin/domain/usecase/create_admin.dart';
 import 'package:wavenadmin/domain/usecase/delete_admin.dart';
@@ -16,6 +18,7 @@ import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_user.dart';
 import 'package:wavenadmin/domain/usecase/get_list_admin.dart';
+import 'package:wavenadmin/domain/usecase/get_list_booking.dart';
 import 'package:wavenadmin/domain/usecase/get_list_photographer.dart';
 import 'package:wavenadmin/domain/usecase/get_list_user.dart';
 import 'package:wavenadmin/domain/usecase/get_token.dart';
@@ -53,10 +56,12 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton(() => PutDetailFotografer(locator()),);
   locator.registerLazySingleton(() => GetDetailFotografer(locator()),);
   locator.registerLazySingleton(() => DeleteFotografer(locator()),);
+  locator.registerLazySingleton(() => GetListBooking(locator()),);
   
   //repository
   locator.registerLazySingleton<AuthRepository>(() => AuthRepositoryimpl(locator(), localData: locator()),);
   locator.registerLazySingleton<UserRepositoty>(() => UserRepositoryImpl(locator()),);
+  locator.registerLazySingleton<BookingRepository>(() => BookingRepositoryImpl(locator()),);
 
   //datasource
   locator.registerLazySingleton<RemoteData>(() =>RemoteDataImpl(locator(), locator()) ,);

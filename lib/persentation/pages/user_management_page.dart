@@ -5,7 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
-import 'package:wavenadmin/domain/entity/detailUser.dart';
+import 'package:wavenadmin/domain/entity/detail_user.dart';
 import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
 import 'package:wavenadmin/persentation/pages/schedule_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/userDetail.dart';

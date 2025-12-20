@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wavenadmin/domain/entity/detailAdmin.dart';
+import 'package:wavenadmin/domain/entity/detail_admin.dart';
 import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
 
 final adminMutationProvider =

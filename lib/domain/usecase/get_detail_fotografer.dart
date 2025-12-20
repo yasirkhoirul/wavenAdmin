@@ -1,4 +1,4 @@
-import 'package:wavenadmin/domain/entity/detailFotografer.dart';
+import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
 import 'package:wavenadmin/domain/repository/user_repositoty.dart';
 
 class GetDetailFotografer {

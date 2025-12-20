@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:wavenadmin/common/constant.dart';
-import 'package:wavenadmin/data/model/usermodel.dart';
+import 'package:wavenadmin/common/constant.dart'; 
 import 'package:wavenadmin/domain/usecase/get_list_user.dart';
 import 'package:wavenadmin/injection.dart';
 import 'package:wavenadmin/persentation/riverpod/state/user_list_state.dart';
@@ -43,7 +42,7 @@ class UserListNotifier extends StateNotifier<UserListState> {
   Future<void> appendData( int limit, {String? search,Sort? sort,SortUser? sortBy})async{
     if(state.isloading == true||state.currentpage>state.highestpage)return;
     state = state.copyWith(currentPage: state.currentpage+1);
-    if(state.currentpage<state.highestpage)return;
+    if(state.currentpage<=state.highestpage)return;
     if(state.isreached == true)return;
     state = state.copyWith(isloading: true);
     try {

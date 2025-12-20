@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wavenadmin/domain/entity/detailFotografer.dart';
+import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/fotografer_detail.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/photographer_list.dart';
 import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';

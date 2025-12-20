@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/dio.dart';
 import 'package:wavenadmin/data/model/admin_detail_model.dart';
+import 'package:wavenadmin/data/model/booking_model.dart';
 import 'package:wavenadmin/data/model/tokenmode.dart';
 import 'package:wavenadmin/data/model/user_admin_model.dart';
 import 'package:wavenadmin/data/model/user_detial_fotografer_model.dart';
@@ -74,6 +75,7 @@ abstract class RemoteData {
   Future<UserListResponse> getListUser(int page, int limit, {String? search,Sort? sort,SortUser? sortBy});
   Future<UserListResponseAdmin> getListUserAdmin(int page, int limit, {String? search,Sort? sort,SortAdmin? sortAdmin});
   Future<UserFotograferListResponse> getListPhotographer(int page, int limit, {String? search,Sort? sort,SortPhotographer?  sortBy});
+  Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort});
   Future<UserDetailResponse> getDetailUser(String idUser);
   Future<UserDetailFotograferResponse> getDetailUserFotografer(String idUser);
   Future<AdminDetailResponse> getUserAdminDetail(String id);
@@ -332,6 +334,27 @@ class RemoteDataImpl implements RemoteData {
       else{
         throw AppException(response.statusCode.toString());
       }
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort}) async {
+    try {
+      final response = await dio.dio.get(
+        'v1/admin/bookings',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (search != null) 'search': search,
+          if (sort != null) 'sort': sort.name,
+        },
+      );
+      if (response.statusCode != 200) {
+        throw AppException('Request gagal (HTTP ${response.statusCode}).');
+      }
+      return BookingListResponse.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }

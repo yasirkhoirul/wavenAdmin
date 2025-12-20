@@ -4,7 +4,8 @@ import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
 
 class DialogDetailBooking extends StatelessWidget {
-  const DialogDetailBooking({super.key});
+  final String idBooking;
+  const DialogDetailBooking({super.key, required this.idBooking});
   @override
   Widget build(BuildContext context) {
     return Card(

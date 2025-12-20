@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:wavenadmin/domain/entity/detailUser.dart';
+import 'package:wavenadmin/domain/entity/detail_user.dart';
 import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
 
 part 'userDetail.g.dart';

@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:wavenadmin/domain/entity/detailFotografer.dart';
+import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
 
 part 'user_detial_fotografer_model.g.dart';
 

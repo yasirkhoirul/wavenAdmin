@@ -1,7 +1,7 @@
 import 'package:wavenadmin/common/constant.dart';
-import 'package:wavenadmin/domain/entity/detailAdmin.dart';
-import 'package:wavenadmin/domain/entity/detailFotografer.dart';
-import 'package:wavenadmin/domain/entity/detailUser.dart';
+import 'package:wavenadmin/domain/entity/detail_admin.dart';
+import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
+import 'package:wavenadmin/domain/entity/detail_user.dart';
 import 'package:wavenadmin/domain/entity/user_admin.dart';
 import 'package:wavenadmin/domain/entity/user_fotografer.dart';
 import 'package:wavenadmin/domain/entity/user_list_data.dart';
