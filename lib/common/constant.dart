@@ -70,3 +70,13 @@ enum VerifyStatus{
   rejected
 }
 
+enum TransactionPayType{
+  lunas,
+  pelunasan,
+  dp
+}
+enum TransactionPayMethod{
+  qris,
+  transfer,
+  cash
+}

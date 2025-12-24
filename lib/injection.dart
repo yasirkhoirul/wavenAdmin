@@ -38,6 +38,7 @@ import 'package:wavenadmin/domain/usecase/post_logout.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/update_booking.dart';
+import 'package:wavenadmin/domain/usecase/create_transaction_usecase.dart';
 import 'package:wavenadmin/domain/usecase/upload_edited_photo_usecase.dart';
 import 'package:wavenadmin/domain/usecase/upload_photo_result_usecase.dart';
 import 'package:wavenadmin/domain/usecase/verify_booking_usecase.dart';
@@ -75,7 +76,8 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton(() => GetListBooking(locator()),);
   locator.registerLazySingleton(() => GetDetailBooking(locator()),);
   locator.registerLazySingleton(() => UpdateBooking(locator()),);
-  locator.registerLazySingleton(() => VerifyBookingUsecase(locator()),);  locator.registerLazySingleton(() => VerifyTransactionUsecase(locator()));  locator.registerLazySingleton(() => UploadPhotoResultUsecase(locator()),);
+  locator.registerLazySingleton(() => VerifyBookingUsecase(locator()),);  locator.registerLazySingleton(() => VerifyTransactionUsecase(locator()));  locator.registerLazySingleton(() => CreateTransactionUsecase(locator()),);
+  locator.registerLazySingleton(() => UploadPhotoResultUsecase(locator()),);
   locator.registerLazySingleton(() => UploadEditedPhotoUsecase(locator()),);
   locator.registerLazySingleton(() => GetListAddons(locator()),);
   locator.registerLazySingleton(() => GetPackageDropdown(locator()),);

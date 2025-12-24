@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wavenadmin/domain/usecase/create_admin.dart';
+import 'package:wavenadmin/domain/usecase/create_transaction_usecase.dart';
 import 'package:wavenadmin/domain/usecase/delete_admin.dart';
 import 'package:wavenadmin/domain/usecase/delete_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
@@ -91,6 +92,10 @@ final verifyBooking = Provider<VerifyBookingUsecase>((ref) {
 
 final verifyTransactionUsecase = Provider<VerifyTransactionUsecase>((ref) {
   return locator<VerifyTransactionUsecase>();
+},);
+
+final createTransactionUsecaseProvider = Provider<CreateTransactionUsecase>((ref) {
+  return locator<CreateTransactionUsecase>();
 },);
 
 final uploadPhotoResult = Provider<UploadPhotoResultUsecase>((ref) {

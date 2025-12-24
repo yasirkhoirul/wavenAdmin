@@ -1,5 +1,7 @@
+import 'package:image_picker/image_picker.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/remote_data.dart';
+import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
 import 'package:wavenadmin/data/model/update_booking_request_model.dart';
 import 'package:wavenadmin/data/model/upload_photo_request_model.dart';
 import 'package:wavenadmin/data/model/verify_booking_request_model.dart';
@@ -63,7 +65,37 @@ class BookingRepositoryImpl implements BookingRepository {
   }
 
   @override
-  Future<UploadPhotoResponse> uploadPhotoResult(String idBooking, String photoUrl) async {
+  Future<CreateTransactionResponse> createTransaction(String idBooking, CreateTransactionRequest request, XFile? imageFile) async {
+    try {
+      final response = await remoteData.createTransaction(idBooking, request, imageFile);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<int>> getQrisImage(String gatewayTransactionId) async {
+    try {
+      final response = await remoteData.getQrisImage(gatewayTransactionId);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<QrisPaymentStatusResponse> checkQrisPaymentStatus(String bookingId, String gatewayTransactionId) async {
+    try {
+      final response = await remoteData.checkQrisPaymentStatus(bookingId, gatewayTransactionId);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<UploadPhotoResponse> uploadPhotoResult(String idBooking, String photoUrl) async{
     try {
       final response = await remoteData.uploadPhotoResult(idBooking, photoUrl);
       return response;

@@ -18,6 +18,7 @@ import 'package:wavenadmin/persentation/riverpod/notifier/package/get_package_dr
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/get_photographer_dropdown_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/university/get_university_dropdown_notifier.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
+import 'package:wavenadmin/persentation/widget/dialog/dialog_tambah_transaksi.dart';
 import 'package:wavenadmin/persentation/widget/dialog/dropdown_detail_booking.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
 
@@ -462,8 +463,6 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                                   Column(
                                     spacing: 10,
                                     children: [
-                                      // TODO: Fetch universitas list from API
-                                      // Display: university name, Value: {id, fee} Map
                                       DropDownUniv(
                                         stateUniversitas: stateUniversitas,
                                         selectedUniv: selectedUniversityId,
@@ -473,8 +472,6 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                                           });
                                         },
                                       ),
-                                      // TODO: Fetch package list from API
-                                      // Display: package name, Value: {id, fee} Map
                                       DropdownPackage(
                                         statePackage: statePackage,
                                         selectedPackage: selectedPackageId,
@@ -537,8 +534,6 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                                           textSub: data.location,
                                         ),
                                       ),
-                                      // TODO: Fetch photographer list from API
-                                      // Display: photographer name, Value: List<Map> with {id, fee}
                                       DropDownFotografer(
                                         stateFotografer: stateFotografer,
                                         selectedPhotographers:
@@ -676,8 +671,7 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                                             });
                                           },
                                         ),
-                                        // TODO: Fetch package list from API
-                                        // Display: package name, Value: {id, fee} Map
+                                      
                                         DropdownPackage(
                                           statePackage: statePackage,
                                           selectedPackage: selectedPackageId,
@@ -705,10 +699,7 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                                           sub: ItemDetailText(
                                             textSub: data.verificationStatus,
                                           ),
-                                        ),
-
-                                        // TODO: Fetch addon/extra list from API
-                                        
+                                        ),        
                                       ],
                                     ),
                                   ),
@@ -814,15 +805,80 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                         ],
                       ),
                       Divider(),
-                      Text("Detail Pembayaran"),
-
+                      !isSmallScreen? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Detail Pembayaran"),
+                          LBUttonMobile(
+                            ontap: () {
+                              if (data.status.toUpperCase() == StatusBooking.LUNAS.name) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Booking Sudah Lunas'),
+                                    content: Text('Booking ini sudah lunas. Tidak dapat menambahkan transaksi baru.'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                return;
+                              }
+                              showDialog(
+                                context: context,
+                                builder: (context) => DialogTambahTransaksi(
+                                  idBooking: widget.idBooking,
+                                ),
+                              );
+                            },
+                            teks: "Tambah Transaksi",
+                            icon: Icons.add,
+                          )
+                        ],
+                      ):Column(
+                        spacing: 10,
+                        children: [
+                           Text("Detail Pembayaran"),
+                          LBUttonMobile(
+                            ontap: () {
+                              if (data.status.toUpperCase() == StatusBooking.LUNAS.name) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Booking Sudah Lunas'),
+                                    content: Text('Booking ini sudah lunas. Tidak dapat menambahkan transaksi baru.'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                return;
+                              }
+                              showDialog(
+                                context: context,
+                                builder: (context) => DialogTambahTransaksi(
+                                  idBooking: widget.idBooking,
+                                ),
+                              );
+                            },
+                            teks: "Tambah Transaksi",
+                            icon: Icons.add,
+                          )
+                        ],
+                      ),
                       LayoutBuilder(
                         builder: (context,constrains) {
                           return SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
-                                minWidth: 800,
+                                
                                 maxWidth: constrains.maxWidth<800?800:constrains.maxWidth
                               ),
                               child: Row(
@@ -919,7 +975,7 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                                           Row(
                                             children: [
                                               // Tombol verifikasi dan tolak hanya muncul saat status PENDING
-                                              if (transaction.status.toUpperCase() == VerificationStatus.PENDING.name && data.status.toString() == StatusBooking.PENDING.name) ...[
+                                              if (transaction.status.toUpperCase() == VerificationStatus.PENDING.name && (data.status.toString() == StatusBooking.PENDING.name || data.status.toString() == StatusBooking.DP.name)&&transaction.method.toString() != "QRIS") ...[
                                                 ElevatedButton.icon(
                                                   onPressed: () {
                                                     _handleVerifyTransaction(transaction.id);

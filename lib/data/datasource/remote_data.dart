@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/dio.dart';
@@ -10,6 +11,7 @@ import 'package:wavenadmin/data/model/detail_booking_model.dart';
 import 'package:wavenadmin/data/model/list_addons_model.dart';
 import 'package:wavenadmin/data/model/package_dropdown_model.dart';
 import 'package:wavenadmin/data/model/university_dropdown_model.dart';
+import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
 import 'package:wavenadmin/data/model/update_booking_request_model.dart';
 import 'package:wavenadmin/data/model/upload_photo_request_model.dart';
 import 'package:wavenadmin/data/model/verify_booking_request_model.dart';
@@ -93,6 +95,9 @@ abstract class RemoteData {
   Future<UpdateBookingResponse> updateBooking(String idBooking, UpdateBookingRequest request);
   Future<VerifyBookingResponse> verifyBooking(String idBooking, VerifyStatus status, {String? remarks});
   Future<VerifyBookingResponse> verifyTransaction(String idTransaction, VerifyStatus status, {String? remarks});
+  Future<CreateTransactionResponse> createTransaction(String idBooking, CreateTransactionRequest request, XFile? imageFile);
+  Future<List<int>> getQrisImage(String gatewayTransactionId);
+  Future<QrisPaymentStatusResponse> checkQrisPaymentStatus(String bookingId, String gatewayTransactionId);
   Future<UploadPhotoResponse> uploadPhotoResult(String idBooking, String photoUrl);
   Future<UploadPhotoResponse> uploadEditedPhoto(String idBooking, String photoUrl);
   Future<UserDetailFotograferResponse> getDetailUserFotografer(String idUser);
@@ -444,6 +449,81 @@ class RemoteDataImpl implements RemoteData {
         throw AppException('Failed to verify transaction');
       }
       return VerifyBookingResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<CreateTransactionResponse> createTransaction(String idBooking, CreateTransactionRequest request, XFile? imageFile) async {
+    Logger().d("Creating transaction for booking: $idBooking");
+    try {
+      final formData = FormData();
+      
+      // Add JSON data as string
+      formData.fields.add(MapEntry('data', json.encode(request.toJson())));
+      
+      // Add image file if exists
+      if (imageFile != null) {
+        final bytes = await imageFile.readAsBytes();
+        formData.files.add(
+          MapEntry(
+            'image',
+            MultipartFile.fromBytes(
+              bytes,
+              filename: imageFile.name,
+            ),
+          ),
+        );
+      }
+      
+      final response = await dio.dio.post(
+        'v1/admin/bookings/$idBooking/transactions',
+        data: formData,
+      );
+      
+      if (response.statusCode != 201 && response.statusCode != 200) {
+        throw AppException('Failed to create transaction');
+      }
+      
+      return CreateTransactionResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<List<int>> getQrisImage(String gatewayTransactionId) async {
+    Logger().d("Getting QRIS image for: $gatewayTransactionId");
+    try {
+      final response = await dio.dio.get(
+        'v1/bookings/$gatewayTransactionId/qris',
+        options: Options(responseType: ResponseType.bytes),
+      );
+      
+      if (response.statusCode != 200) {
+        throw AppException('Failed to get QRIS image');
+      }
+      
+      return response.data as List<int>;
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<QrisPaymentStatusResponse> checkQrisPaymentStatus(String bookingId, String gatewayTransactionId) async {
+    Logger().d("Checking QRIS payment status for booking: $bookingId, gateway: $gatewayTransactionId");
+    try {
+      final response = await dio.dio.get(
+        'v1/bookings/$bookingId/qris/$gatewayTransactionId',
+      );
+      
+      if (response.statusCode != 200) {
+        throw AppException('Failed to check payment status');
+      }
+      
+      return QrisPaymentStatusResponse.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }

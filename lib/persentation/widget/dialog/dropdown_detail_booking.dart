@@ -80,7 +80,7 @@ class DropDownAddons extends ConsumerWidget {
                 itemAsString: (item) => item.title,
                 items: (filter, loadProps) {
                   // Trigger search dengan debouncing saat user mengetik
-                  if (filter != null && filter.isNotEmpty) {
+                  if (filter.isNotEmpty) {
                     ref
                         .read(
                           getListAddonsProvider(
@@ -211,7 +211,7 @@ class _DropDownFotograferState extends ConsumerState<DropDownFotografer> {
                           "${item.name}, fee : ${item.feePerHour} ",
                       items: (filter, loadProps) {
                         // Trigger search dengan debouncing saat user mengetik
-                        if (filter != null && filter.isNotEmpty) {
+                        if (filter.isNotEmpty) {
                           ref
                               .read(
                                 getPhotographerDropdownProvider(
@@ -262,7 +262,7 @@ class _DropDownFotograferState extends ConsumerState<DropDownFotografer> {
             )
           ],
         ),
-        MediaQuery.of(context).size.width>700?  LButtonWeb(ontap: () {
+        MediaQuery.of(context).size.width>700?  LBUttonMobile(ontap: () {
           if (selectedPhotographer?.id == null||fee.text.isEmpty) return;
           widget.onChanged(PhotographerDropdownItem(
             id: selectedPhotographer!.id,
@@ -303,7 +303,7 @@ class DropDownUniv extends ConsumerWidget {
             itemAsString: (item) => item.name,
             items: (filter, loadProps) {
               // Trigger search dengan debouncing saat user mengetik
-              if (filter != null && filter.isNotEmpty) {
+              if (filter.isNotEmpty) {
                 ref
                     .read(
                       getUniversityDropdownProvider(
@@ -365,7 +365,7 @@ class DropdownPackage extends ConsumerWidget {
             itemAsString: (item) => item.title,
             items: (filter, loadProps) {
               // Trigger search dengan debouncing saat user mengetik
-              if (filter != null && filter.isNotEmpty) {
+              if (filter.isNotEmpty) {
                 ref
                     .read(
                       getPackageDropdownProvider(
