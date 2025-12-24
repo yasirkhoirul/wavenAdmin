@@ -29,13 +29,13 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authCubit = context.read<AuthCubit>();
-     final brightness = View.of(context).platformDispatcher.platformBrightness;
+     
 
     TextTheme textTheme = createTextTheme(context, "Roboto Flex", "Roboto Flex");
 
     MaterialTheme theme = MaterialTheme(textTheme);
     return  MaterialApp.router(
-      theme: brightness == Brightness.light ? theme.light() : theme.dark(),
+      theme: theme.dark(),
       routerConfig: injection.locator<Approuter>().myRouter(authCubit),
     );
   }
