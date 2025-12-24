@@ -62,6 +62,11 @@ enum StatusBooking{
   PENDING,
   DP,
   LUNAS,
-  CANCEL
+  CANCELLED
+}
+
+enum VerifyStatus{
+  approved,
+  rejected
 }
 

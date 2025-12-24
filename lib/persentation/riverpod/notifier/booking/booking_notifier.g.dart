@@ -50,7 +50,7 @@ final class BookingNotifierProvider
   }
 }
 
-String _$bookingNotifierHash() => r'e539967905eee289ff3a2710090d741fb425d8e1';
+String _$bookingNotifierHash() => r'7466fe3f35f65a229e113fa81df693098c87b358';
 
 final class BookingNotifierFamily extends $Family
     with

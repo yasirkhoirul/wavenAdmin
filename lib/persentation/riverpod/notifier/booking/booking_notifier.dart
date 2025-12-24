@@ -29,32 +29,39 @@ class BookingNotifier extends _$BookingNotifier {
   Future<void> loadMore({String? search, Sort? sort}) async {
     final current = state.asData?.value;
     if (current == null) return;
-    if (current.isLoadingMore || !current.hasMore) return;
+    
+    if (current.isLoadingMore) return;
 
     final nextPage = current.currentPage + 1;
     
-    // Cek apakah sudah pernah load page ini
+
     if (nextPage <= current.highestPage) {
-      state = AsyncValue.data(current.copyWith(currentPage: nextPage));
+      state = AsyncValue.data(current.copyWith(currentPage: nextPage,isLoading: false));
       return;
     }
-
-    // Set loading more
-    state = AsyncValue.data(current.copyWith(isLoadingMore: true));
+    if (!current.hasMore)return;
+    // Update highestPage dan set loading more sekaligus
+    state = AsyncValue.data(current.copyWith(
+      highestPage: nextPage,
+      isLoadingMore: true,
+    ));
+    Logger().d("highestPage setelah update = $nextPage, currentPage = ${current.currentPage}");
 
     final response = await AsyncValue.guard(() {
       final usecase = ref.read(getListBooking);
-      return usecase.execute(nextPage, limit, search: search, sort: sort);
+      return usecase.execute(nextPage + 1, limit, search: search, sort: sort);
     });
 
     if (response.hasError) {
+      final latest = state.asData?.value ?? current;
       state = AsyncValue.data(
-        current.copyWith(isLoadingMore: false, error: response.error),
+        latest.copyWith(isLoadingMore: false, error: response.error),
       );
       return;
     }
 
-    state = AsyncValue.data(current.appendData(response.requireValue));
+    final latest = state.asData?.value ?? current;
+    state = AsyncValue.data(latest.appendData(response.requireValue));
   }
 
   void prevPage() {

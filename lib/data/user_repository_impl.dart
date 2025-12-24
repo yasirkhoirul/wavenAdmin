@@ -5,6 +5,7 @@ import 'package:wavenadmin/data/model/user_detial_fotografer_model.dart';
 import 'package:wavenadmin/domain/entity/detail_admin.dart';
 import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
 import 'package:wavenadmin/domain/entity/detail_user.dart';
+import 'package:wavenadmin/domain/entity/photographer_dropdown.dart';
 import 'package:wavenadmin/domain/entity/user_admin.dart';
 import 'package:wavenadmin/domain/entity/user_fotografer.dart';
 import 'package:wavenadmin/domain/entity/user_list_data.dart';
@@ -100,6 +101,15 @@ class UserRepositoryImpl implements UserRepositoty {
     return response;
   }
   
+  @override
+  Future<PhotographerDropdown> getPhotographerDropdown(int page, int limit, {String? search}) async {
+    try {
+      final response = await remoteData.getPhotographerDropdown(page, limit, search: search);
+      return response.toEntity();
+    } catch (e) {
+      rethrow;
+    }
+  }
 
 
 }

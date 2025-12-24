@@ -96,22 +96,23 @@ class LButtonWeb extends StatelessWidget {
   final IconData? icon;
   final String teks;
   final VoidCallback? ontap;
+  final Color? color;
   const LButtonWeb({
     required this.ontap,
     super.key,
     this.icon,
-    required this.teks,
+    required this.teks, this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: BoxConstraints(minWidth: 163, minHeight: 42),
+        constraints: BoxConstraints( minHeight: 42),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            backgroundColor: MyColor.hijauaccent,
+            backgroundColor: color??MyColor.hijauaccent,
           ),
           onPressed: ontap,
           child: Row(
@@ -151,11 +152,12 @@ class LBUttonMobile extends StatelessWidget {
   final IconData? icon;
   final String teks;
   final VoidCallback? ontap;
+  final Color? color;
   const LBUttonMobile({
     required this.ontap,
     super.key,
     this.icon,
-    required this.teks,
+    required this.teks, this.color,
   });
 
   @override
@@ -166,7 +168,7 @@ class LBUttonMobile extends StatelessWidget {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            backgroundColor: MyColor.hijauaccent,
+            backgroundColor:color?? MyColor.hijauaccent,
           ),
           onPressed: ontap,
           child: Row(

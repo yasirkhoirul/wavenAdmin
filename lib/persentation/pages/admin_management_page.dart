@@ -72,6 +72,7 @@ class _AdminManagementMainContentState
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(userAdminGetListProvider);
+    
     final List<DataColumn> datacolumn = [
       DataColumn(label: Text("No")),
       DataColumn(label: Text("Aksi")),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
@@ -45,7 +44,7 @@ class _ClientPageState extends ConsumerState<ClientPage> {
           return MyColor.hijauaccent;
         case 'DP':
           return MyColor.birutua;
-        case 'CANCEL':
+        case 'CANCELLED':
           return Colors.red;
         case 'PENDING':
         default:
@@ -54,89 +53,212 @@ class _ClientPageState extends ConsumerState<ClientPage> {
     }
   }
 
+  List<DataColumn> dataColum = [
+    DataColumn(label: Text('No')),
+    DataColumn(label: Text('Aksi')),
+    DataColumn(label: Text('Nama Client')),
+    DataColumn(label: Text('Universitas')),
+    DataColumn(label: Text('No HP')),
+    DataColumn(label: Text('Package')),
+    DataColumn(label: Text('Tanggal')),
+    DataColumn(label: Text('Waktu')),
+    DataColumn(label: Text('Sudah Bayar')),
+    DataColumn(label: Text('Status Bayar')),
+    DataColumn(label: Text('Verifikasi')),
+    DataColumn(label: Text('Status Foto')),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final isSmallScreen = width < 700;
+    final isVerySmallScreen = width < 300;
+    
     final bookingState = ref.watch(bookingProvider());
-
     return bookingState.when(
       loading: () => Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(child: Text('Error: $error')),
       data: (state) {
-        Logger().d("ini data dari ui ${state.items.first.clientName}");
         return SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
-              HeaderPage(
-                judul: "Client",
-                icon: MyIcon.iconmanajemenclien,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: CardItemContainer(
-                      aset: MyIcon.iconusers,
-                      judul: "Total Bookings",
-                      content: state.totalBooking.toString(),
-                      color: MyColor.oren,
-                      subcontent: "Clients",
+              HeaderPage(judul: "Client", icon: MyIcon.iconmanajemenclien),
+              isVerySmallScreen
+                  ? Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CardItemContainer(
+                                aset: MyIcon.iconusers,
+                                judul: "Total Bookings",
+                                content: state.totalBooking.toString(),
+                                color: MyColor.oren,
+                                subcontent: "Clients",
+                              ),
+                            ),
+                            Expanded(
+                              child: CardItemContainer(
+                                aset: MyIcon.icondompet,
+                                judul: "Belum Lunas",
+                                content: state.totalPending.toString(),
+                                color: MyColor.birutua,
+                                subcontent: "Clients",
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CardItemContainer(
+                                aset: MyIcon.icondompet,
+                                judul: "Lunas",
+                                content: state.totalLunas.toString(),
+                                color: MyColor.hijauaccent,
+                                subcontent: "Clients",
+                              ),
+                            ),
+                            Expanded(
+                              child: CardItemContainer(
+                                aset: MyIcon.iconcancel,
+                                judul: "Perlu Verifikasi",
+                                content: state.totalNeedVerified.toString(),
+                                color: MyColor.oren,
+                                subcontent: "Clients",
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CardItemContainer(
+                                aset: MyIcon.iconcheck,
+                                judul: "Terverifikasi",
+                                content: state.totalVerified.toString(),
+                                color: MyColor.hijauaccent,
+                                subcontent: "Clients",
+                              ),
+                            ),
+                            Expanded(child: SizedBox()),
+                          ],
+                        ),
+                      ],
+                    )
+                  : isSmallScreen
+                  ? Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CardItemContainer(
+                                aset: MyIcon.iconusers,
+                                judul: "Total Bookings",
+                                content: state.totalBooking.toString(),
+                                color: MyColor.oren,
+                                subcontent: "Clients",
+                              ),
+                            ),
+                            Expanded(
+                              child: CardItemContainer(
+                                aset: MyIcon.icondompet,
+                                judul: "Belum Lunas",
+                                content: state.totalPending.toString(),
+                                color: MyColor.birutua,
+                                subcontent: "Clients",
+                              ),
+                            ),
+                            Expanded(
+                              child: CardItemContainer(
+                                aset: MyIcon.icondompet,
+                                judul: "Lunas",
+                                content: state.totalLunas.toString(),
+                                color: MyColor.hijauaccent,
+                                subcontent: "Clients",
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CardItemContainer(
+                                aset: MyIcon.iconcancel,
+                                judul: "Perlu Verifikasi",
+                                content: state.totalNeedVerified.toString(),
+                                color: MyColor.oren,
+                                subcontent: "Clients",
+                              ),
+                            ),
+                            Expanded(
+                              child: CardItemContainer(
+                                aset: MyIcon.iconcheck,
+                                judul: "Terverifikasi",
+                                content: state.totalVerified.toString(),
+                                color: MyColor.hijauaccent,
+                                subcontent: "Clients",
+                              ),
+                            ),
+                            Expanded(child: SizedBox()),
+                          ],
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: CardItemContainer(
+                            aset: MyIcon.iconusers,
+                            judul: "Total Bookings",
+                            content: state.totalBooking.toString(),
+                            color: MyColor.oren,
+                            subcontent: "Clients",
+                          ),
+                        ),
+                        Expanded(
+                          child: CardItemContainer(
+                            aset: MyIcon.icondompet,
+                            judul: "Belum Lunas",
+                            content: state.totalPending.toString(),
+                            color: MyColor.birutua,
+                            subcontent: "Clients",
+                          ),
+                        ),
+                        Expanded(
+                          child: CardItemContainer(
+                            aset: MyIcon.icondompet,
+                            judul: "Lunas",
+                            content: state.totalLunas.toString(),
+                            color: MyColor.hijauaccent,
+                            subcontent: "Clients",
+                          ),
+                        ),
+                        Expanded(
+                          child: CardItemContainer(
+                            aset: MyIcon.iconcancel,
+                            judul: "Perlu Verifikasi",
+                            content: state.totalNeedVerified.toString(),
+                            color: MyColor.oren,
+                            subcontent: "Clients",
+                          ),
+                        ),
+                        Expanded(
+                          child: CardItemContainer(
+                            aset: MyIcon.iconcheck,
+                            judul: "Terverifikasi",
+                            content: state.totalVerified.toString(),
+                            color: MyColor.hijauaccent,
+                            subcontent: "Clients",
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Expanded(
-                    child: CardItemContainer(
-                      aset: MyIcon.icondompet,
-                      judul: "Belum Lunas",
-                      content: state.totalPending.toString(),
-                      color: MyColor.birutua,
-                      subcontent: "Clients",
-                    ),
-                  ),
-                  Expanded(
-                    child: CardItemContainer(
-                      aset: MyIcon.icondompet,
-                      judul: "Lunas",
-                      content: state.totalLunas.toString(),
-                      color: MyColor.hijauaccent,
-                      subcontent: "Clients",
-                    ),
-                  ),
-                  Expanded(
-                    child: CardItemContainer(
-                      aset: MyIcon.iconcancel,
-                      judul: "Perlu Verifikasi",
-                      content: state.totalNeedVerified.toString(),
-                      color: MyColor.oren,
-                      subcontent: "Clients",
-                    ),
-                  ),
-                  Expanded(
-                    child: CardItemContainer(
-                      aset: MyIcon.iconcheck,
-                      judul: "Terverifikasi",
-                      content: state.totalVerified.toString(),
-                      color: MyColor.hijauaccent,
-                      subcontent: "Clients",
-                    ),
-                  ),
-                ],
-              ),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('No')),
-                    DataColumn(label: Text('Aksi')),
-                    DataColumn(label: Text('Nama Client')),
-                    DataColumn(label: Text('Universitas')),
-                    DataColumn(label: Text('No HP')),
-                    DataColumn(label: Text('Package')),
-                    DataColumn(label: Text('Tanggal')),
-                    DataColumn(label: Text('Waktu')),
-                    DataColumn(label: Text('Sudah Bayar')),
-                    DataColumn(label: Text('Status Bayar')),
-                    DataColumn(label: Text('Verifikasi')),
-                    DataColumn(label: Text('Status Foto')),
-                  ],
+                  columns: dataColum,
                   rows: state.items
                       .skip(state.currentPage * BookingNotifier.limit)
                       .take(BookingNotifier.limit)
@@ -146,9 +268,14 @@ class _ClientPageState extends ConsumerState<ClientPage> {
                       .map(
                         (e) => DataRow(
                           cells: [
-                            DataCell(Text(
-                              ((state.currentPage * BookingNotifier.limit) + e.key + 1).toString(),
-                            )),
+                            DataCell(
+                              Text(
+                                ((state.currentPage * BookingNotifier.limit) +
+                                        e.key +
+                                        1)
+                                    .toString(),
+                              ),
+                            ),
                             DataCell(
                               PopupMenuButton<AksiBooking>(
                                 borderRadius: BorderRadius.circular(14),
@@ -156,18 +283,23 @@ class _ClientPageState extends ConsumerState<ClientPage> {
                                   if (value == AksiBooking.detail) {
                                     showDialog(
                                       context: context,
-                                      builder: (context) => DialogDetailBooking(
-                                        idBooking: e.value.id,
+                                      builder: (context) => Center(
+                                        child: DialogDetailBooking(
+                                          idBooking: e.value.id,
+                                        ),
                                       ),
                                     );
                                   }
                                 },
-                                itemBuilder: (BuildContext context) => AksiBooking.values
-                                    .map((e) => PopupMenuItem(
-                                          value: e,
-                                          child: Text(e.name),
-                                        ))
-                                    .toList(),
+                                itemBuilder: (BuildContext context) =>
+                                    AksiBooking.values
+                                        .map(
+                                          (e) => PopupMenuItem(
+                                            value: e,
+                                            child: Text(e.name),
+                                          ),
+                                        )
+                                        .toList(),
                               ),
                             ),
                             DataCell(Text(e.value.clientName)),
@@ -175,20 +307,37 @@ class _ClientPageState extends ConsumerState<ClientPage> {
                             DataCell(Text(e.value.phoneNumber)),
                             DataCell(Text(e.value.packageName)),
                             DataCell(Text(e.value.eventDate)),
-                            DataCell(Text('${e.value.eventStartTime}-${e.value.eventEndTime}')),
+                            DataCell(
+                              Text(
+                                '${e.value.eventStartTime}-${e.value.eventEndTime}',
+                              ),
+                            ),
                             DataCell(Text('Rp ${e.value.paidAmount}')),
-                            DataCell(_buildStatusChip(
-                              e.value.status,
-                              color: _getStatusColor(e.value.status, false),
-                            )),
-                            DataCell(_buildStatusChip(
-                              e.value.verificationStatus,
-                              color: _getStatusColor(e.value.verificationStatus, true),
-                            )),
-                            DataCell(_buildStatusChip(
-                              e.value.alreadyPhoto ? 'Sudah Foto' : 'Belum Foto',
-                              color: e.value.alreadyPhoto ? MyColor.hijauaccent : MyColor.oren,
-                            )),
+                            DataCell(
+                              _buildStatusChip(
+                                e.value.status,
+                                color: _getStatusColor(e.value.status, false),
+                              ),
+                            ),
+                            DataCell(
+                              _buildStatusChip(
+                                e.value.verificationStatus,
+                                color: _getStatusColor(
+                                  e.value.verificationStatus,
+                                  true,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              _buildStatusChip(
+                                e.value.alreadyPhoto
+                                    ? 'Sudah Foto'
+                                    : 'Belum Foto',
+                                color: e.value.alreadyPhoto
+                                    ? MyColor.hijauaccent
+                                    : MyColor.oren,
+                              ),
+                            ),
                           ],
                         ),
                       )
@@ -202,7 +351,7 @@ class _ClientPageState extends ConsumerState<ClientPage> {
                         ref.read(bookingProvider().notifier).prevPage();
                       }
                     : null,
-                next: state.hasMore && !state.isLoadingMore
+                next: (state.metadata?.totalPages??0)>state.currentPage+1 && !state.isLoadingMore
                     ? () {
                         ref.read(bookingProvider().notifier).loadMore();
                       }

@@ -3,12 +3,22 @@ import 'package:wavenadmin/domain/usecase/create_admin.dart';
 import 'package:wavenadmin/domain/usecase/delete_admin.dart';
 import 'package:wavenadmin/domain/usecase/delete_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
+import 'package:wavenadmin/domain/usecase/get_detail_booking.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_user.dart';
+import 'package:wavenadmin/domain/usecase/get_list_addons.dart';
 import 'package:wavenadmin/domain/usecase/get_list_booking.dart';
 import 'package:wavenadmin/domain/usecase/get_list_photographer.dart';
+import 'package:wavenadmin/domain/usecase/get_package_dropdown.dart';
+import 'package:wavenadmin/domain/usecase/get_photographer_dropdown.dart';
+import 'package:wavenadmin/domain/usecase/get_university_dropdown.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_fotografer.dart';
+import 'package:wavenadmin/domain/usecase/update_booking.dart';
+import 'package:wavenadmin/domain/usecase/upload_edited_photo_usecase.dart';
+import 'package:wavenadmin/domain/usecase/upload_photo_result_usecase.dart';
+import 'package:wavenadmin/domain/usecase/verify_booking_usecase.dart';
+import 'package:wavenadmin/domain/usecase/verify_transaction_usecase.dart';
 import 'package:wavenadmin/injection.dart';
 
 
@@ -51,4 +61,42 @@ final deleteFotograferUseCase = Provider<DeleteFotografer>((ref) {
 
 final getListBooking = Provider<GetListBooking>((ref) {
   return locator<GetListBooking>();
+},);
+
+final getDetailBooking = Provider<GetDetailBooking>((ref) {
+  return locator<GetDetailBooking>();
+},);
+
+final getListAddons = Provider<GetListAddons>((ref) {
+  return locator<GetListAddons>();
+},);
+
+final getUniversityDropdown = Provider<GetUniversityDropdown>((ref) {
+  return locator<GetUniversityDropdown>();
+},);
+final getPhotographerDropdown = Provider<GetPhotographerDropdown>((ref) {
+  return locator<GetPhotographerDropdown>();
+},);
+final getPackageDropdown = Provider<GetPackageDropdown>((ref) {
+  return locator<GetPackageDropdown>();
+},);
+
+final updateBooking = Provider<UpdateBooking>((ref) {
+  return locator<UpdateBooking>();
+},);
+
+final verifyBooking = Provider<VerifyBookingUsecase>((ref) {
+  return locator<VerifyBookingUsecase>();
+},);
+
+final verifyTransactionUsecase = Provider<VerifyTransactionUsecase>((ref) {
+  return locator<VerifyTransactionUsecase>();
+},);
+
+final uploadPhotoResult = Provider<UploadPhotoResultUsecase>((ref) {
+  return locator<UploadPhotoResultUsecase>();
+},);
+
+final uploadEditedPhoto = Provider<UploadEditedPhotoUsecase>((ref) {
+  return locator<UploadEditedPhotoUsecase>();
 },);

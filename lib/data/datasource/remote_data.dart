@@ -6,6 +6,14 @@ import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/dio.dart';
 import 'package:wavenadmin/data/model/admin_detail_model.dart';
 import 'package:wavenadmin/data/model/booking_model.dart';
+import 'package:wavenadmin/data/model/detail_booking_model.dart';
+import 'package:wavenadmin/data/model/list_addons_model.dart';
+import 'package:wavenadmin/data/model/package_dropdown_model.dart';
+import 'package:wavenadmin/data/model/university_dropdown_model.dart';
+import 'package:wavenadmin/data/model/update_booking_request_model.dart';
+import 'package:wavenadmin/data/model/upload_photo_request_model.dart';
+import 'package:wavenadmin/data/model/verify_booking_request_model.dart';
+import 'package:wavenadmin/data/model/user_photographer_dropdown.dart';
 import 'package:wavenadmin/data/model/tokenmode.dart';
 import 'package:wavenadmin/data/model/user_admin_model.dart';
 import 'package:wavenadmin/data/model/user_detial_fotografer_model.dart';
@@ -76,7 +84,17 @@ abstract class RemoteData {
   Future<UserListResponseAdmin> getListUserAdmin(int page, int limit, {String? search,Sort? sort,SortAdmin? sortAdmin});
   Future<UserFotograferListResponse> getListPhotographer(int page, int limit, {String? search,Sort? sort,SortPhotographer?  sortBy});
   Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort});
+  Future<ListAddonsResponse> getListAddons(int page, int limit, {String? search});
+  Future<PackageDropdownResponse> getPackageDropdown(int page, int limit, {String? search});
+  Future<UniversityDropdownResponse> getUniversityDropdown(int page, int limit, {String? search});
+  Future<PhotographerDropdownResponse> getPhotographerDropdown(int page, int limit, {String? search});
   Future<UserDetailResponse> getDetailUser(String idUser);
+  Future<DetailBookingResponse> getDetailBooking(String idBooking);
+  Future<UpdateBookingResponse> updateBooking(String idBooking, UpdateBookingRequest request);
+  Future<VerifyBookingResponse> verifyBooking(String idBooking, VerifyStatus status, {String? remarks});
+  Future<VerifyBookingResponse> verifyTransaction(String idTransaction, VerifyStatus status, {String? remarks});
+  Future<UploadPhotoResponse> uploadPhotoResult(String idBooking, String photoUrl);
+  Future<UploadPhotoResponse> uploadEditedPhoto(String idBooking, String photoUrl);
   Future<UserDetailFotograferResponse> getDetailUserFotografer(String idUser);
   Future<AdminDetailResponse> getUserAdminDetail(String id);
   Future<String> putDetailAdmin(AdminDetailModel payload,String idAdmin);
@@ -355,6 +373,186 @@ class RemoteDataImpl implements RemoteData {
         throw AppException('Request gagal (HTTP ${response.statusCode}).');
       }
       return BookingListResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<DetailBookingResponse> getDetailBooking(String idBooking) async{
+    Logger().d("$idBooking ini adalah id booking");
+    try {
+      final response = await dio.dio.get(
+        'v1/admin/bookings/$idBooking',
+      );
+      Logger().i(response.data);
+      if (response.statusCode != 200) {
+        throw AppException('Request gagal (HTTP ${response.statusCode}).');
+      }
+      return DetailBookingResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<UpdateBookingResponse> updateBooking(String idBooking, UpdateBookingRequest request) async{
+    Logger().d("Updating booking: $idBooking");
+    try {
+      final response = await dio.dio.put(
+        'v1/admin/bookings/$idBooking',
+        data: request.toJson(),
+      );
+      Logger().i(response.data);
+      if (response.statusCode != 200) {
+        throw AppException('Request gagal (HTTP ${response.statusCode}).');
+      }
+      return UpdateBookingResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<VerifyBookingResponse> verifyBooking(String idBooking, VerifyStatus status, {String? remarks}) async {
+    Logger().d("Verifying booking: $idBooking with status: ${status.name}");
+    try {
+      final request = VerifyBookingRequest.fromEnum(status, remarks: remarks??'');
+      final response = await dio.dio.patch(
+        'v1/admin/bookings/$idBooking/verify',
+        data: request.toJson(),
+      );
+      if (response.statusCode != 200) {
+        throw AppException('Failed to verify booking');
+      }
+      return VerifyBookingResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<VerifyBookingResponse> verifyTransaction(String idTransaction, VerifyStatus status, {String? remarks}) async {
+    Logger().d("Verifying transaction: $idTransaction with status: ${status.name}");
+    try {
+      final request = VerifyBookingRequest.fromEnum(status, remarks: remarks??'');
+      final response = await dio.dio.patch(
+        'v1/admin/transactions/$idTransaction/verify',
+        data: request.toJson(),
+      );
+      if (response.statusCode != 200) {
+        throw AppException('Failed to verify transaction');
+      }
+      return VerifyBookingResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<UploadPhotoResponse> uploadPhotoResult(String idBooking, String photoUrl) async {
+    Logger().d("Uploading photo result for booking: $idBooking");
+    try {
+      final request = UploadPhotoResultRequest(photoResultUrl: photoUrl);
+      final response = await dio.dio.patch(
+        'v1/admin/bookings/$idBooking/photo-result',
+        data: request.toJson(),
+      );
+      if (response.statusCode != 200) {
+        throw AppException('Failed to upload photo result');
+      }
+      return UploadPhotoResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<UploadPhotoResponse> uploadEditedPhoto(String idBooking, String photoUrl) async {
+    Logger().d("Uploading edited photo for booking: $idBooking");
+    try {
+      final request = UploadEditedPhotoRequest(editedPhotoUrl: photoUrl);
+      final response = await dio.dio.patch(
+        'v1/admin/bookings/$idBooking/photo-edited',
+        data: request.toJson(),
+      );
+      if (response.statusCode != 200) {
+        throw AppException('Failed to upload edited photo');
+      }
+      return UploadPhotoResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<ListAddonsResponse> getListAddons(int page, int limit, {String? search}) async{
+    try {
+      final response = await dio.dio.get("v1/admin/addons",
+      queryParameters: {
+        'page':page,
+        'limit': limit,
+        if(search!=null)'search':search
+      }
+      );
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+      return ListAddonsResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<PackageDropdownResponse> getPackageDropdown(int page, int limit, {String? search}) async {
+    try {
+      final response = await dio.dio.get('v1/admin/packages/dropdown',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (search != null) 'search': search,
+        });
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+      return PackageDropdownResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<UniversityDropdownResponse> getUniversityDropdown(int page, int limit, {String? search}) async {
+    try {
+      final response = await dio.dio.get('v1/admin/master/universities',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (search != null) 'search': search,
+        });
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+      return UniversityDropdownResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<PhotographerDropdownResponse> getPhotographerDropdown(int page, int limit, {String? search}) async {
+    try {
+      final response = await dio.dio.get('v1/admin/photographers/dropdown',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (search != null) 'search': search,
+        });
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+      return PhotographerDropdownResponse.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }

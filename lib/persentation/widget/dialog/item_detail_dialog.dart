@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wavenadmin/common/color.dart';
 
@@ -59,7 +60,7 @@ class ItemDetail extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Container(padding: const EdgeInsets.all(2), child: sub),
       ],
     );
@@ -102,6 +103,7 @@ class ItemDetailInputOutline extends StatelessWidget {
   final TextEditingController controller;
   final FormFieldValidator<String>? validator;
   final TextInputType? keyboardType;
+  final TextInputFormatter? textInputFormatter;
   final bool enabled;
   const ItemDetailInputOutline({
     super.key,
@@ -109,7 +111,7 @@ class ItemDetailInputOutline extends StatelessWidget {
     required this.controller,
     this.validator,
     this.keyboardType,
-    this.enabled = true,
+    this.enabled = true, this.textInputFormatter,
   });
 
   @override
@@ -160,6 +162,7 @@ class ItemDetailInputOutlineGreenText extends StatelessWidget {
   final TextEditingController controller;
   final FormFieldValidator<String>? validator;
   final TextInputType? keyboardType;
+  final List<TextInputFormatter>? textInputFormatter;
   final bool enabled;
   const ItemDetailInputOutlineGreenText({
     super.key,
@@ -167,7 +170,7 @@ class ItemDetailInputOutlineGreenText extends StatelessWidget {
     required this.controller,
     this.validator,
     this.keyboardType,
-    this.enabled = true,
+    this.enabled = true, this.textInputFormatter,
   });
 
   @override
@@ -184,6 +187,7 @@ class ItemDetailInputOutlineGreenText extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextFormField(
+          inputFormatters: textInputFormatter,
           style: GoogleFonts.robotoFlex(
             color: MyColor.hijauaccent,
             fontWeight: FontWeight.w200,
@@ -212,3 +216,63 @@ class ItemDetailInputOutlineGreenText extends StatelessWidget {
     );
   }
 }
+
+
+class ItemDetailText extends StatelessWidget {
+  final String textSub;
+  const ItemDetailText({super.key, required this.textSub});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            textSub,
+            style: GoogleFonts.robotoFlex(
+              color: MyColor.abuinactivetulisan,
+              fontWeight: FontWeight.w200,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ItemDetailTextButton extends StatelessWidget {
+  final String textSub;
+  final VoidCallback ontap;
+  const ItemDetailTextButton({
+    super.key,
+    required this.textSub,
+    required this.ontap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+
+        children: [
+          InkWell(
+            onTap: ontap,
+            child: Text(
+              textSub,
+              style: GoogleFonts.robotoFlex(
+                color: MyColor.hijauaccent,
+                fontWeight: FontWeight.w200,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

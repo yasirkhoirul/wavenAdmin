@@ -25,6 +25,7 @@ dependencies:
   flutter_secure_storage: ^10.0.0
   lottie: ^3.3.2
   flutter_riverpod: ^3.0.3
+  dropdown_search: ^6.0.2
 
   riverpod_annotation: ^3.0.3
   
