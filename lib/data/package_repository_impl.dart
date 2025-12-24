@@ -1,4 +1,5 @@
 import 'package:wavenadmin/data/datasource/remote_data.dart';
+import 'package:wavenadmin/data/model/package_detail_model.dart';
 import 'package:wavenadmin/domain/entity/package_dropdown.dart';
 import 'package:wavenadmin/domain/repository/package_repository.dart';
 
@@ -11,6 +12,16 @@ class PackageRepositoryImpl implements PackageRepository {
     try {
       final response = await remoteData.getPackageDropdown(page, limit, search: search);
       return response.toEntity();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<PackageDetailResponse> getPackageDetail(String packageId) async {
+    try {
+      final response = await remoteData.getPackageDetail(packageId);
+      return response;
     } catch (e) {
       rethrow;
     }

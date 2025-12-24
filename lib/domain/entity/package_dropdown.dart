@@ -37,19 +37,23 @@ class PackageDropdown {
 class Package {
   final String id;
   final String title;
+  final int? price;
 
   Package({
     this.id = '',
     this.title = '',
+    this.price,
   });
 
   Package copyWith({
     String? id,
     String? title,
+    int? price,
   }) {
     return Package(
       id: id ?? this.id,
       title: title ?? this.title,
+      price: price ?? this.price,
     );
   }
 }

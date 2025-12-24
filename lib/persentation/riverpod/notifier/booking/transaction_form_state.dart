@@ -5,7 +5,6 @@ import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
-import 'package:wavenadmin/persentation/riverpod/notifier/booking/create_transaction_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/booking/detail_booking_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
 
@@ -226,7 +225,7 @@ class TransactionForm extends _$TransactionForm {
         amount: currentState.amount,
       );
 
-      final usecase = ref.read(createTransactionProvider.notifier);
+
       final response = await ref.read(createTransactionUsecaseProvider).execute(
         currentState.bookingId,
         request,

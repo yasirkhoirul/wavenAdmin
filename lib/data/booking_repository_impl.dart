@@ -1,6 +1,7 @@
 import 'package:image_picker/image_picker.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/remote_data.dart';
+import 'package:wavenadmin/data/model/create_booking_request_model.dart';
 import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
 import 'package:wavenadmin/data/model/update_booking_request_model.dart';
 import 'package:wavenadmin/data/model/upload_photo_request_model.dart';
@@ -108,6 +109,26 @@ class BookingRepositoryImpl implements BookingRepository {
   Future<UploadPhotoResponse> uploadEditedPhoto(String idBooking, String photoUrl) async {
     try {
       final response = await remoteData.uploadEditedPhoto(idBooking, photoUrl);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<CheckAvailabilityResponse> checkBookingAvailability(String date, String startTime, String endTime) async {
+    try {
+      final response = await remoteData.checkBookingAvailability(date, startTime, endTime);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<CreateBookingResponse> createBooking(CreateBookingRequest request, XFile? imageFile) async {
+    try {
+      final response = await remoteData.createBooking(request, imageFile);
       return response;
     } catch (e) {
       rethrow;

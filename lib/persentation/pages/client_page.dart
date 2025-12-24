@@ -5,8 +5,11 @@ import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
 import 'package:wavenadmin/persentation/pages/schedule_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/booking/booking_notifier.dart';
+import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/carditemcontainer.dart';
 import 'package:wavenadmin/persentation/widget/dialog/dialog_detail_booking.dart';
+import 'package:wavenadmin/persentation/widget/dialog/dialog_tambah_booking.dart';
+import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import '../../../common/color.dart';
 
 class ClientPage extends ConsumerStatefulWidget {
@@ -255,6 +258,33 @@ class _ClientPageState extends ConsumerState<ClientPage> {
                         ),
                       ],
                     ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: OutlinedSearcchBar(
+                        controller: searchController,
+                        onSubmitted: (value) {
+                          ref.invalidate(bookingProvider(search: value.isEmpty ? null : value));
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    LButtonWeb(
+                      icon: Icons.add,
+                      teks: 'Tambah Booking',
+                      ontap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => DialogTambahBooking(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(

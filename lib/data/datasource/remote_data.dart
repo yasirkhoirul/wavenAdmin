@@ -7,8 +7,10 @@ import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/dio.dart';
 import 'package:wavenadmin/data/model/admin_detail_model.dart';
 import 'package:wavenadmin/data/model/booking_model.dart';
+import 'package:wavenadmin/data/model/create_booking_request_model.dart';
 import 'package:wavenadmin/data/model/detail_booking_model.dart';
 import 'package:wavenadmin/data/model/list_addons_model.dart';
+import 'package:wavenadmin/data/model/package_detail_model.dart';
 import 'package:wavenadmin/data/model/package_dropdown_model.dart';
 import 'package:wavenadmin/data/model/university_dropdown_model.dart';
 import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
@@ -88,6 +90,7 @@ abstract class RemoteData {
   Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort});
   Future<ListAddonsResponse> getListAddons(int page, int limit, {String? search});
   Future<PackageDropdownResponse> getPackageDropdown(int page, int limit, {String? search});
+  Future<PackageDetailResponse> getPackageDetail(String packageId);
   Future<UniversityDropdownResponse> getUniversityDropdown(int page, int limit, {String? search});
   Future<PhotographerDropdownResponse> getPhotographerDropdown(int page, int limit, {String? search});
   Future<UserDetailResponse> getDetailUser(String idUser);
@@ -98,6 +101,8 @@ abstract class RemoteData {
   Future<CreateTransactionResponse> createTransaction(String idBooking, CreateTransactionRequest request, XFile? imageFile);
   Future<List<int>> getQrisImage(String gatewayTransactionId);
   Future<QrisPaymentStatusResponse> checkQrisPaymentStatus(String bookingId, String gatewayTransactionId);
+  Future<CreateBookingResponse> createBooking(CreateBookingRequest request, XFile? imageFile);
+  Future<CheckAvailabilityResponse> checkBookingAvailability(String date, String startTime, String endTime);
   Future<UploadPhotoResponse> uploadPhotoResult(String idBooking, String photoUrl);
   Future<UploadPhotoResponse> uploadEditedPhoto(String idBooking, String photoUrl);
   Future<UserDetailFotograferResponse> getDetailUserFotografer(String idUser);
@@ -601,7 +606,18 @@ class RemoteDataImpl implements RemoteData {
       throw AppException(_friendlyErrorMessage(e));
     }
   }
-  
+  @override
+  Future<PackageDetailResponse> getPackageDetail(String packageId) async {
+    try {
+      final response = await dio.dio.get('v1/admin/packages/$packageId');
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+      return PackageDetailResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }  
   @override
   Future<UniversityDropdownResponse> getUniversityDropdown(int page, int limit, {String? search}) async {
     try {
@@ -633,6 +649,63 @@ class RemoteDataImpl implements RemoteData {
         throw AppException(response.statusCode.toString());
       }
       return PhotographerDropdownResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<CreateBookingResponse> createBooking(CreateBookingRequest request, XFile? imageFile) async {
+    try {
+      final formData = FormData();
+      
+      // Add JSON data as string
+      formData.fields.add(MapEntry('data', json.encode(request.toJson())));
+      
+      // Add image file if provided
+      if (imageFile != null) {
+        final bytes = await imageFile.readAsBytes();
+        formData.files.add(MapEntry(
+          'image',
+          MultipartFile.fromBytes(bytes, filename: imageFile.name),
+        ));
+      }
+      
+      final response = await dio.dio.post(
+        'v1/admin/bookings',
+        data: formData,
+      );
+      
+      if (response.statusCode != 201) {
+        throw AppException(response.statusCode.toString());
+      }
+      
+      return CreateBookingResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<CheckAvailabilityResponse> checkBookingAvailability(
+    String date, 
+    String startTime, 
+    String endTime
+  ) async {
+    try {
+      final response = await dio.dio.get(
+        'v1/bookings/availibility',
+        queryParameters: {
+          'date': date,
+          'start_time': startTime,
+          'end_time': endTime,
+        },
+      );
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+      
+      return CheckAvailabilityResponse.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }

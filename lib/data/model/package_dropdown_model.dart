@@ -57,10 +57,12 @@ class Metadata {
 class PackageItem {
   final String id;
   final String title;
+  final int? price;
 
   PackageItem({
     required this.id,
     required this.title,
+    this.price,
   });
 
   factory PackageItem.fromJson(Map<String, dynamic> json) =>
@@ -72,6 +74,7 @@ class PackageItem {
     return Package(
       id: id,
       title: title,
+      price: price,
     );
   }
 }

@@ -38,8 +38,15 @@ Map<String, dynamic> _$MetadataToJson(Metadata instance) => <String, dynamic>{
   'limit': instance.limit,
 };
 
-PackageItem _$PackageItemFromJson(Map<String, dynamic> json) =>
-    PackageItem(id: json['id'] as String, title: json['title'] as String);
+PackageItem _$PackageItemFromJson(Map<String, dynamic> json) => PackageItem(
+  id: json['id'] as String,
+  title: json['title'] as String,
+  price: (json['price'] as num?)?.toInt(),
+);
 
 Map<String, dynamic> _$PackageItemToJson(PackageItem instance) =>
-    <String, dynamic>{'id': instance.id, 'title': instance.title};
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'price': instance.price,
+    };
