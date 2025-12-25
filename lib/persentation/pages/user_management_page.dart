@@ -5,11 +5,14 @@ import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
+import 'package:wavenadmin/data/model/update_user_request_model.dart';
 import 'package:wavenadmin/domain/entity/detail_user.dart';
 import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
 import 'package:wavenadmin/persentation/pages/schedule_page.dart';
+import 'package:wavenadmin/persentation/riverpod/notifier/user/update_user_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/userDetail.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/user_list_notifier.dart';
+import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/carditemcontainer.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
@@ -286,19 +289,41 @@ class _TabelUserState extends ConsumerState<TabelUser> {
   }
 }
 
-class DetailUserDialog extends ConsumerWidget {
+class DetailUserDialog extends ConsumerStatefulWidget {
   final String idUser;
   const DetailUserDialog({super.key, required this.idUser});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(userDetailProvider(idUser));
+  ConsumerState<DetailUserDialog> createState() => _DetailUserDialogState();
+}
+
+class _DetailUserDialogState extends ConsumerState<DetailUserDialog> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  bool isActive = true;
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    emailController.dispose();
+    nameController.dispose();
+    phoneController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(userDetailProvider(widget.idUser));
+    final updateState = ref.watch(updateUserProvider);
+
     return Center(
       child: Card(
         color: MyColor.abuDialog,
         child: SingleChildScrollView(
           child: SizedBox(
-            height: 500,
+            height: 600,
             width: 700,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -307,16 +332,25 @@ class DetailUserDialog extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "User Detail",
-                      style: GoogleFonts.robotoFlex(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Edit User",
+                          style: GoogleFonts.robotoFlex(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
-                    ),
+                      IconButton(
+                        icon: Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   Expanded(
@@ -328,6 +362,7 @@ class DetailUserDialog extends ConsumerWidget {
                     ),
                   ),
                   const Divider(),
+                  _buildFooter(context, updateState),
                 ],
               ),
             ),
@@ -338,55 +373,316 @@ class DetailUserDialog extends ConsumerWidget {
   }
 
   Widget _builForm(DetailUser user, BuildContext context) {
+    // Initialize controllers if empty
+    if (usernameController.text.isEmpty) {
+      usernameController.text = user.username;
+      emailController.text = user.email;
+      nameController.text = user.name;
+      phoneController.text = user.phoneNumber ?? '';
+    }
+
     return Padding(
       padding: EdgeInsets.all(10),
       child: MediaQuery.of(context).size.width < 650
-          ? Column(
-              children: [
-                ItemDetailOutline(judul: "Username", sub: Text(user.username)),
-                ItemDetailOutline(judul: "Email", sub: Text(user.email)),
-                ItemDetailOutline(judul: "Name", sub: Text(user.name)),
-                ItemDetailOutline(
-                  judul: "Phone",
-                  sub: Text(user.phoneNumber ?? ''),
-                ),
-                ItemDetailOutline(
-                  judul: "Universitas",
-                  sub: Text(user.universityName ?? ''),
-                ),
-              ],
-            )
-          : Row(
-              spacing: 10,
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      ItemDetailOutline(
-                        judul: "Username",
-                        sub: Text(user.username),
-                      ),
-                      ItemDetailOutline(judul: "Email", sub: Text(user.email)),
-                      ItemDetailOutline(judul: "Name", sub: Text(user.name)),
-                      ItemDetailOutline(
-                        judul: "Phone",
-                        sub: Text(user.phoneNumber ?? ''),
-                      ),
-                    ],
+          ? SingleChildScrollView(
+              child: Column(
+                children: [
+                  ItemDetailInputOutline(
+                    judul: "Username",
+                    controller: usernameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Username tidak boleh kosong';
+                      }
+                      return null;
+                    },
                   ),
+                  SizedBox(height: 12),
+                  ItemDetailInputOutline(
+                    judul: "Email",
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 12),
+                  ItemDetailInputOutline(
+                    judul: "Name",
+                    controller: nameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Name tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 12),
+                  ItemDetailInputOutline(
+                    judul: "Phone",
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                  ),
+                  SizedBox(height: 12),
+                  _buildUniversityField(user),
+                  SizedBox(height: 12),
+                  _buildActiveCheckbox(),
+                ],
+              ),
+            )
+          : SingleChildScrollView(
+              child: Row(
+                spacing: 10,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        ItemDetailInputOutline(
+                          judul: "Username",
+                          controller: usernameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Username tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 12),
+                        ItemDetailInputOutline(
+                          judul: "Email",
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Email tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 12),
+                        ItemDetailInputOutline(
+                          judul: "Name",
+                          controller: nameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Name tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        ItemDetailInputOutline(
+                          judul: "Phone",
+                          controller: phoneController,
+                          keyboardType: TextInputType.phone,
+                        ),
+                        SizedBox(height: 12),
+                        _buildUniversityField(user),
+                        SizedBox(height: 12),
+                        _buildActiveCheckbox(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+    );
+  }
+
+  Widget _buildUniversityField(DetailUser user) {
+    return ItemDetailOutline(
+      judul: "Universitas",
+      sub: ItemDetailText(
+        textSub: user.universityName ?? '-',
+      ),
+    );
+  }
+
+  Widget _buildActiveCheckbox() {
+    return Row(
+      children: [
+        Checkbox(
+          value: isActive,
+          onChanged: (value) {
+            setState(() {
+              isActive = value ?? true;
+            });
+          },
+        ),
+        Text(
+          "Active",
+          style: GoogleFonts.robotoFlex(
+            color: Color(0xFFE0E0E0),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooter(BuildContext context, AsyncValue<String?> updateState) {
+    return updateState.when(
+      data: (message) {
+        if (message != null) {
+          return Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green.shade300),
                 ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      ItemDetailOutline(
-                        judul: "Universitas",
-                        sub: Text(user.universityName ?? ''),
+                child: Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.green),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        message,
+                        style: TextStyle(
+                          color: Colors.green.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      ref.read(updateUserProvider.notifier).reset();
+                      ref.invalidate(userDetailProvider(widget.idUser));
+                      ref.invalidate(userGetListProvider);
+                      Navigator.pop(context);
+                    },
+                    child: Text('Tutup'),
+                  ),
+                ],
+              ),
+            ],
+          );
+        }
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Batal'),
+            ),
+            SizedBox(width: 12),
+            LButtonWeb(
+              icon: Icons.save,
+              teks: 'Simpan',
+              ontap: () async {
+                final request = UpdateUserRequest(
+                  username: usernameController.text,
+                  email: emailController.text,
+                  name: nameController.text,
+                  phoneNumber: phoneController.text,
+                  universityId: "019adf75-15c9-78ee-93d6-370db8303226",
+                  isActive: isActive,
+                );
+
+                await ref
+                    .read(updateUserProvider.notifier)
+                    .updateUser(widget.idUser, request);
+              },
+            ),
+          ],
+        );
+      },
+      loading: () {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 16),
+            Text(
+              'Menyimpan...',
+              style: GoogleFonts.robotoFlex(color: Colors.white),
+            ),
+          ],
+        );
+      },
+      error: (error, stack) {
+        return Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.shade300),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.error, color: Colors.red),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Error: $error',
+                      style: TextStyle(
+                        color: Colors.red.shade700,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    ref.read(updateUserProvider.notifier).reset();
+                  },
+                  child: Text('Batal'),
+                ),
+                SizedBox(width: 12),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final request = UpdateUserRequest(
+                      username: usernameController.text,
+                      email: emailController.text,
+                      name: nameController.text,
+                      phoneNumber: phoneController.text,
+                      universityId: "019adf75-15c9-78ee-93d6-370db8303226",
+                      isActive: isActive,
+                    );
+
+                    await ref
+                        .read(updateUserProvider.notifier)
+                        .updateUser(widget.idUser, request);
+                  },
+                  icon: Icon(Icons.refresh),
+                  label: Text('Coba Lagi'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
                   ),
                 ),
               ],
             ),
+          ],
+        );
+      },
     );
   }
 }

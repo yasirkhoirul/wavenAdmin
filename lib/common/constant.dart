@@ -23,6 +23,8 @@ enum Sort{
 }
 
 enum AksiBooking{
+  waclient,
+  wafotografer,
   detail,
   verifikasi,
   hapus

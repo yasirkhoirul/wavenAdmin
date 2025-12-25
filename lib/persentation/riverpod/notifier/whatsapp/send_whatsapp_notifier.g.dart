@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'booking_form_state.dart';
+part of 'send_whatsapp_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,45 +9,45 @@ part of 'booking_form_state.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(BookingForm)
-const bookingFormProvider = BookingFormProvider._();
+@ProviderFor(SendWhatsappNotifier)
+const sendWhatsappProvider = SendWhatsappNotifierProvider._();
 
-final class BookingFormProvider
-    extends $AsyncNotifierProvider<BookingForm, BookingFormState> {
-  const BookingFormProvider._()
+final class SendWhatsappNotifierProvider
+    extends $AsyncNotifierProvider<SendWhatsappNotifier, String?> {
+  const SendWhatsappNotifierProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'bookingFormProvider',
+        name: r'sendWhatsappProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$bookingFormHash();
+  String debugGetCreateSourceHash() => _$sendWhatsappNotifierHash();
 
   @$internal
   @override
-  BookingForm create() => BookingForm();
+  SendWhatsappNotifier create() => SendWhatsappNotifier();
 }
 
-String _$bookingFormHash() => r'221e39630190ebfcd49d395fad20e99301193ee1';
+String _$sendWhatsappNotifierHash() =>
+    r'7abda18a1ed5f847481d16a45af3bdf7090532a3';
 
-abstract class _$BookingForm extends $AsyncNotifier<BookingFormState> {
-  FutureOr<BookingFormState> build();
+abstract class _$SendWhatsappNotifier extends $AsyncNotifier<String?> {
+  FutureOr<String?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref =
-        this.ref as $Ref<AsyncValue<BookingFormState>, BookingFormState>;
+    final ref = this.ref as $Ref<AsyncValue<String?>, String?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<BookingFormState>, BookingFormState>,
-              AsyncValue<BookingFormState>,
+              AnyNotifier<AsyncValue<String?>, String?>,
+              AsyncValue<String?>,
               Object?,
               Object?
             >;

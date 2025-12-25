@@ -12,6 +12,8 @@ import 'package:wavenadmin/data/model/detail_booking_model.dart';
 import 'package:wavenadmin/data/model/list_addons_model.dart';
 import 'package:wavenadmin/data/model/package_detail_model.dart';
 import 'package:wavenadmin/data/model/package_dropdown_model.dart';
+import 'package:wavenadmin/data/model/send_whatsapp_request_model.dart';
+import 'package:wavenadmin/data/model/update_user_request_model.dart';
 import 'package:wavenadmin/data/model/university_dropdown_model.dart';
 import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
 import 'package:wavenadmin/data/model/update_booking_request_model.dart';
@@ -112,6 +114,8 @@ abstract class RemoteData {
   Future<String> createAdmin(AdminDetailModel payload);
   Future<void> deleteAdmin(String idAdmin);
   Future<String> deleteFotografer(String idFotografer);
+  Future<SendWhatsappResponse> sendWhatsappMessage(String target, String message);
+  Future<UpdateUserResponse> updateUser(String userId, UpdateUserRequest request);
 }
 
 class RemoteDataImpl implements RemoteData {
@@ -710,5 +714,33 @@ class RemoteDataImpl implements RemoteData {
       throw AppException(_friendlyErrorMessage(e));
     }
   }
-  
+
+  @override
+  Future<SendWhatsappResponse> sendWhatsappMessage(String target, String message) async {
+    try {
+      final request = SendWhatsappRequest(target: target, message: message);
+      final response = await dio.dio.post(
+        'v1/admin/whatsapp/send-message',
+        data: request.toJson(),
+      );
+      
+      return SendWhatsappResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<UpdateUserResponse> updateUser(String userId, UpdateUserRequest request) async {
+    try {
+      final response = await dio.dio.put(
+        'v1/admin/users/$userId',
+        data: request.toJson(),
+      );
+      
+      return UpdateUserResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
 }

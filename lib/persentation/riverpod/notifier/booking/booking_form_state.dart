@@ -233,6 +233,9 @@ class BookingForm extends _$BookingForm {
         selectedPackage: updatedPackage,
         isFetchingPackageDetail: false,
       ));
+      
+      // Automatically calculate amount after package is set
+      calculateAmount();
     } catch (e) {
       Logger().e('Error fetching package detail: $e');
       final errorState = state.value;
@@ -286,6 +289,9 @@ class BookingForm extends _$BookingForm {
     state = AsyncValue.data(currentState.copyWith(
       selectedPaymentType: type,
     ));
+    
+    // Automatically recalculate when payment type changes
+    calculateAmount();
   }
 
   void addAddon(Addon addon) {
@@ -299,6 +305,9 @@ class BookingForm extends _$BookingForm {
       state = AsyncValue.data(currentState.copyWith(
         selectedAddons: newAddons,
       ));
+      
+      // Automatically calculate amount after adding addon
+      calculateAmount();
     }
   }
 
@@ -312,6 +321,9 @@ class BookingForm extends _$BookingForm {
     state = AsyncValue.data(currentState.copyWith(
       selectedAddons: newAddons,
     ));
+    
+    // Automatically calculate amount after removing addon
+    calculateAmount();
   }
 
   void setUniversity(University? university) {

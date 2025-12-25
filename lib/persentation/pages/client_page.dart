@@ -8,6 +8,8 @@ import 'package:wavenadmin/persentation/riverpod/notifier/booking/booking_notifi
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/carditemcontainer.dart';
 import 'package:wavenadmin/persentation/widget/dialog/dialog_detail_booking.dart';
+import 'package:wavenadmin/persentation/widget/dialog/dialog_kirim_wa_client.dart';
+import 'package:wavenadmin/persentation/widget/dialog/dialog_kirim_wa_fotografer.dart';
 import 'package:wavenadmin/persentation/widget/dialog/dialog_tambah_booking.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import '../../../common/color.dart';
@@ -272,7 +274,7 @@ class _ClientPageState extends ConsumerState<ClientPage> {
                       ),
                     ),
                     SizedBox(width: 16),
-                    LButtonWeb(
+                    LBUttonMobile(
                       icon: Icons.add,
                       teks: 'Tambah Booking',
                       ontap: () {
@@ -310,6 +312,22 @@ class _ClientPageState extends ConsumerState<ClientPage> {
                               PopupMenuButton<AksiBooking>(
                                 borderRadius: BorderRadius.circular(14),
                                 onSelected: (value) {
+                                  if (value == AksiBooking.waclient) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => DialogKirimWAClient(
+                                        idBooking: e.value.id,
+                                      ),
+                                    );
+                                  }
+                                  if (value == AksiBooking.wafotografer) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => DialogKirimWAFotografer(
+                                        idBooking: e.value.id,
+                                      ),
+                                    );
+                                  }
                                   if (value == AksiBooking.detail) {
                                     showDialog(
                                       context: context,

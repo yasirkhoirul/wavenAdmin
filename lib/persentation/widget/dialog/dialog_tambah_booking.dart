@@ -188,21 +188,9 @@ class _DialogTambahBookingState extends ConsumerState<DialogTambahBooking> {
                   _buildPaymentTypeDropdown(state, notifier),
                   SizedBox(height: 16),
                   
-                  // Calculate Button
-                  ElevatedButton.icon(
-                    onPressed: () => notifier.calculateAmount(),
-                    icon: Icon(Icons.calculate),
-                    label: Text('Hitung Total'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: MyColor.birutua,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  
                   // Amount (Read-only)
                   TextFormField(
+                  key: ValueKey(state.calculatedAmount),
                     initialValue: state.calculatedAmount > 0 
                         ? 'Rp ${state.calculatedAmount.toStringAsFixed(0)}' 
                         : '',
@@ -210,7 +198,7 @@ class _DialogTambahBookingState extends ConsumerState<DialogTambahBooking> {
                       labelText: 'Jumlah Bayar *',
                       border: OutlineInputBorder(),
                       filled: true,
-                      fillColor: Colors.grey.shade100,
+                     
                     ),
                     readOnly: true,
                   ),
