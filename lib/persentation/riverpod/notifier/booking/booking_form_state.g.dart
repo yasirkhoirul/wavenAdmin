@@ -33,7 +33,7 @@ final class BookingFormProvider
   BookingForm create() => BookingForm();
 }
 
-String _$bookingFormHash() => r'221e39630190ebfcd49d395fad20e99301193ee1';
+String _$bookingFormHash() => r'a895abc3e72e40170bbeb510d426a8bbbf54184d';
 
 abstract class _$BookingForm extends $AsyncNotifier<BookingFormState> {
   FutureOr<BookingFormState> build();

@@ -234,7 +234,6 @@ class BookingForm extends _$BookingForm {
         isFetchingPackageDetail: false,
       ));
       
-      // Automatically calculate amount after package is set
       calculateAmount();
     } catch (e) {
       Logger().e('Error fetching package detail: $e');

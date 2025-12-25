@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:wavenadmin/persentation/cubit/auth_cubit.dart';
 import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
+import 'package:wavenadmin/persentation/pages/universitas_reference_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/auth_listen.dart';
 import 'package:wavenadmin/persentation/pages/admin_management_page.dart';
 import 'package:wavenadmin/persentation/pages/client_page.dart';
@@ -83,6 +84,10 @@ class Approuter {
               ),
             ],
           ),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/universitas',
+            builder: (context, state) => const UniversitasReferencePage(),)
+          ])
         ],
       ),
     ],

@@ -13,7 +13,9 @@ import 'package:wavenadmin/data/model/list_addons_model.dart';
 import 'package:wavenadmin/data/model/package_detail_model.dart';
 import 'package:wavenadmin/data/model/package_dropdown_model.dart';
 import 'package:wavenadmin/data/model/send_whatsapp_request_model.dart';
+import 'package:wavenadmin/data/model/universitas_list_model.dart';
 import 'package:wavenadmin/data/model/update_user_request_model.dart';
+import 'package:wavenadmin/data/model/university_detail_model.dart';
 import 'package:wavenadmin/data/model/university_dropdown_model.dart';
 import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
 import 'package:wavenadmin/data/model/update_booking_request_model.dart';
@@ -88,6 +90,7 @@ abstract class RemoteData {
   Future<bool> logout(String refreshToken);
   Future<UserListResponse> getListUser(int page, int limit, {String? search,Sort? sort,SortUser? sortBy});
   Future<UserListResponseAdmin> getListUserAdmin(int page, int limit, {String? search,Sort? sort,SortAdmin? sortAdmin});
+  Future<UniversitasListModel> getListUniversitas(int page,int limit,{String? search,Sort? sort});
   Future<UserFotograferListResponse> getListPhotographer(int page, int limit, {String? search,Sort? sort,SortPhotographer?  sortBy});
   Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort});
   Future<ListAddonsResponse> getListAddons(int page, int limit, {String? search});
@@ -116,6 +119,8 @@ abstract class RemoteData {
   Future<String> deleteFotografer(String idFotografer);
   Future<SendWhatsappResponse> sendWhatsappMessage(String target, String message);
   Future<UpdateUserResponse> updateUser(String userId, UpdateUserRequest request);
+  Future<UniversityDetailResponse> getDetailUniversity(String universityId);
+  Future<UpdateUniversityResponse> updateUniversity(String universityId, UpdateUniversityRequest request);
 }
 
 class RemoteDataImpl implements RemoteData {
@@ -739,6 +744,47 @@ class RemoteDataImpl implements RemoteData {
       );
       
       return UpdateUserResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<UniversityDetailResponse> getDetailUniversity(String universityId) async {
+    try {
+      final response = await dio.dio.get('v1/admin/master/universities/$universityId');
+      return UniversityDetailResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<UpdateUniversityResponse> updateUniversity(String universityId, UpdateUniversityRequest request) async {
+    try {
+      final response = await dio.dio.put(
+        'v1/admin/master/universities/$universityId',
+        data: request.toJson(),
+      );
+      return UpdateUniversityResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<UniversitasListModel> getListUniversitas(int page, int limit, {String? search, Sort? sort})async {
+    try {
+      final  response = await dio.dio.get("v1/admin/master/universities",queryParameters: {
+        'page':page,
+        'limit':limit,
+        if(search!=null)'search':search,
+        if(sort!=null)'sort':sort
+      });
+      if(response.statusCode!=200){
+        throw AppException(response.statusCode.toString());
+      }
+      return UniversitasListModel.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }

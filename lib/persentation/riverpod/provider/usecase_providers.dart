@@ -12,6 +12,7 @@ import 'package:wavenadmin/domain/usecase/get_list_booking.dart';
 import 'package:wavenadmin/domain/usecase/get_list_photographer.dart';
 import 'package:wavenadmin/domain/usecase/get_package_dropdown.dart';
 import 'package:wavenadmin/domain/usecase/get_photographer_dropdown.dart';
+import 'package:wavenadmin/domain/usecase/get_universitas_list.dart';
 import 'package:wavenadmin/domain/usecase/get_university_dropdown.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_fotografer.dart';
@@ -104,4 +105,8 @@ final uploadPhotoResult = Provider<UploadPhotoResultUsecase>((ref) {
 
 final uploadEditedPhoto = Provider<UploadEditedPhotoUsecase>((ref) {
   return locator<UploadEditedPhotoUsecase>();
+},);
+
+final getListUniversitasUseCse = Provider<GetUniversitasList>((ref) {
+  return locator<GetUniversitasList>();
 },);

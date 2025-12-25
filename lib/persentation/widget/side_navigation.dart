@@ -83,6 +83,19 @@ class SideNavigation extends StatelessWidget {
                 ),
               ],
             ),
+            ItemSideNavigationDropdown(
+              judul: "Reference Settings",
+              isActive: false,
+              aset: MyIcon.iconreferensi,
+              subitem: [
+                ItemSideNavigation(
+                  judul: "Universitas",
+                  isActive: statefulNavigationShell.currentIndex == 7,
+                  onTap: () => statefulNavigationShell.goBranch(7),
+                  aset: MyIcon.iconreferensi,
+                ),
+              ],
+            ),
             ItemSideNavigation(
               judul: "Logout",
               isActive: false,
