@@ -8,6 +8,7 @@ import 'package:wavenadmin/data/model/upload_photo_request_model.dart';
 import 'package:wavenadmin/data/model/verify_booking_request_model.dart';
 import 'package:wavenadmin/domain/entity/booking_list_data.dart';
 import 'package:wavenadmin/domain/entity/detail_booking.dart';
+import 'package:wavenadmin/domain/entity/schedule_entity.dart';
 import 'package:wavenadmin/domain/repository/booking_repository.dart';
 
 class BookingRepositoryImpl implements BookingRepository {
@@ -130,6 +131,16 @@ class BookingRepositoryImpl implements BookingRepository {
     try {
       final response = await remoteData.createBooking(request, imageFile);
       return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<ScheduleEntity>> getListSchedule(int month, int year, {VerificationStatus? status}) async{
+    try {
+      final data = await remoteData.getListSchedule(month, year,status: status);
+      return data.data.map((e) => e.toEntity(),).toList();
     } catch (e) {
       rethrow;
     }

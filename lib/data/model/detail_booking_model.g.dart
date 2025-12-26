@@ -51,6 +51,7 @@ DetailBookingData _$DetailBookingDataFromJson(Map<String, dynamic> json) =>
       photographerData: (json['photographer_data'] as List<dynamic>?)
           ?.map((e) => PhotographerItem.fromJson(e as Map<String, dynamic>))
           .toList(),
+      editedPhoto: json['edited_photo'] as String?,
     );
 
 Map<String, dynamic> _$DetailBookingDataToJson(DetailBookingData instance) =>
@@ -70,6 +71,7 @@ Map<String, dynamic> _$DetailBookingDataToJson(DetailBookingData instance) =>
       'note': instance.note,
       'verification_status': instance.verificationStatus,
       'already_photo': instance.alreadyPhoto,
+      'edited_photo': instance.editedPhoto,
       'photo_result_url': instance.photoResultUrl,
       'edited_photo_result_url': instance.editedPhotoResultUrl,
       'status': instance.status,

@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
+import 'package:wavenadmin/domain/entity/university_detail.dart';
 import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
-import 'package:wavenadmin/persentation/pages/schedule_page.dart';
+import 'package:wavenadmin/persentation/riverpod/notifier/university/create_university_notifier.dart';
+import 'package:wavenadmin/persentation/riverpod/notifier/university/delete_university_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/university/get_university_list_notifier.dart';
+import 'package:wavenadmin/persentation/riverpod/state/universitas_list_state.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
+import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
 import 'package:wavenadmin/persentation/widget/dialog/university_form_dialog.dart';
+import 'package:wavenadmin/persentation/widget/header_page.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import 'package:wavenadmin/persentation/widget/tabelcontent.dart';
 
@@ -22,7 +28,7 @@ class UniversitasReferencePage extends ConsumerStatefulWidget {
 class _UniversitasReferencePageState
     extends ConsumerState<UniversitasReferencePage> {
   final TextEditingController searchController = TextEditingController();
-  int limit = 10;
+  int limit = 2;
   bool isAsc = true;
   Sort? sortBy;
 
@@ -34,8 +40,7 @@ class _UniversitasReferencePageState
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(getUniversityListProvider(0, limit));
-
+    final state = ref.watch(getUniversityListProvider(0, limit,search: searchController.text,sort: sortBy));
     return SingleChildScrollView(
       child: SizedBox(
         height: 1200,
@@ -54,16 +59,23 @@ class _UniversitasReferencePageState
                       Flexible(
                         child: OutlinedSearcchBar(
                           onSubmitted: (value) {
-                            ref.invalidate(getUniversityListProvider(0, limit, search: value, sort: sortBy));
+                            ref.invalidate(
+                              getUniversityListProvider(
+                                0,
+                                limit,
+                                search: value,
+                                sort: sortBy,
+                              ),
+                            );
                           },
                           controller: searchController,
                         ),
                       ),
                       MButtonWeb(
                         ontap: () {
-                          // TODO: Implement add university
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Fitur tambah universitas belum tersedia')),
+                          showDialog(
+                            context: context,
+                            builder: (context) => DialogTambahUniv(),
                           );
                         },
                         teks: "Tambah",
@@ -84,7 +96,9 @@ class _UniversitasReferencePageState
                           Text('Error: $error'),
                           ElevatedButton(
                             onPressed: () {
-                              ref.invalidate(getUniversityListProvider(0, limit));
+                              ref.invalidate(
+                                getUniversityListProvider(1, limit),
+                              );
                             },
                             child: Text('Retry'),
                           ),
@@ -101,7 +115,7 @@ class _UniversitasReferencePageState
     );
   }
 
-  Widget _buildTable(BuildContext context, state) {
+  Widget _buildTable(BuildContext context, UniversitasListState state) {
     final List<DataColumn> dataColumns = [
       DataColumn(label: Text("No")),
       DataColumn(label: Text("Aksi")),
@@ -113,12 +127,14 @@ class _UniversitasReferencePageState
               isAsc = !isAsc;
               sortBy = isAsc ? Sort.asc : Sort.desc;
             });
-            ref.invalidate(getUniversityListProvider(
-              0,
-              limit,
-              search: searchController.text,
-              sort: sortBy,
-            ));
+            ref.invalidate(
+              getUniversityListProvider(
+                0,
+                limit,
+                search: searchController.text,
+                sort: sortBy,
+              ),
+            );
           },
         ),
       ),
@@ -132,12 +148,14 @@ class _UniversitasReferencePageState
               isAsc = !isAsc;
               sortBy = isAsc ? Sort.asc : Sort.desc;
             });
-            ref.invalidate(getUniversityListProvider(
-              0,
-              limit,
-              search: searchController.text,
-              sort: sortBy,
-            ));
+            ref.invalidate(
+              getUniversityListProvider(
+                0,
+                limit,
+                search: searchController.text,
+                sort: sortBy,
+              ),
+            );
           },
         ),
       ),
@@ -162,9 +180,7 @@ class _UniversitasReferencePageState
                       showDialog(
                         context: context,
                         builder: (context) => Center(
-                          child: UniversityFormDialog(
-                            universityId: e.value.id,
-                          ),
+                          child: UniversityFormDialog(universityId: e.value.id),
                         ),
                       );
                     }
@@ -172,24 +188,73 @@ class _UniversitasReferencePageState
                       showDialog(
                         context: context,
                         builder: (context) => Center(
-                          child: UniversityFormDialog(
-                            universityId: e.value.id,
-                          ),
+                          child: UniversityFormDialog(universityId: e.value.id),
                         ),
                       );
                     }
                     if (value == "Hapus") {
-                      // TODO: Delete confirmation
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Hapus: ${e.value.name}')),
+                      showDialog(
+                        context: context,
+                        builder: (dialogContext) => AlertDialog(
+                          title: Text('Konfirmasi Hapus'),
+                          content: Text(
+                            'Apakah Anda yakin ingin menghapus ${e.value.name}?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(dialogContext).pop(),
+                              child: Text('Batal'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.of(dialogContext).pop();
+                                
+                                try {
+                                  await ref.read(
+                                    deleteUniversityProvider(e.value.id).future,
+                                  );
+
+                                  if (!context.mounted) return;
+
+                                  // Refresh list
+                                  ref.invalidate(
+                                    getUniversityListProvider(0, limit),
+                                  );
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: Colors.green,
+                                      content: Text(
+                                        'Universitas berhasil dihapus',
+                                      ),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  if (!context.mounted) return;
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: Colors.red,
+                                      content: Text('Gagal menghapus: $e'),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Text(
+                                'Hapus',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
                       );
                     }
                   },
                   itemBuilder: (context) => ["Detail", "Edit", "Hapus"]
-                      .map((action) => PopupMenuItem(
-                            value: action,
-                            child: Text(action),
-                          ))
+                      .map(
+                        (action) =>
+                            PopupMenuItem(value: action, child: Text(action)),
+                      )
                       .toList(),
                 ),
               ),
@@ -222,10 +287,7 @@ class _UniversitasReferencePageState
       children: [
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: TabelContent(
-            dataColumnUser: dataColumns,
-            datarow: dataRows,
-          ),
+          child: TabelContent(dataColumnUser: dataColumns, datarow: dataRows),
         ),
         SizedBox(height: 20),
         FooterTabel(
@@ -236,16 +298,15 @@ class _UniversitasReferencePageState
               : null,
           next: state.metadata?.totalPages != (state.currentPage + 1)
               ? () {
-                  ref.read(getUniversityListProvider(0, limit).notifier).appendData(
-                        state.page + 1,
-                        limit,
-                        search: searchController.text,
-                        sort: sortBy,
+                  ref
+                      .read(getUniversityListProvider(0, limit).notifier)
+                      .appendData(
+                        
                       );
                 }
               : null,
           jumlahPage: state.metadata?.totalPages ?? 0,
-          currentPage: state.currentPage + 1,
+          currentPage: state.currentPage,
         ),
       ],
     );
@@ -258,10 +319,150 @@ class _UniversitasReferencePageState
         color: color ?? MyColor.hijauaccent,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(
-        label,
-        style: TextStyle(color: Colors.white, fontSize: 12),
+      child: Text(label, style: TextStyle(color: Colors.white, fontSize: 12)),
+    );
+  }
+}
+
+class DialogTambahUniv extends ConsumerStatefulWidget {
+  const DialogTambahUniv({super.key});
+
+  @override
+  ConsumerState<DialogTambahUniv> createState() => _DialogTambahUnivState();
+}
+
+class _DialogTambahUnivState extends ConsumerState<DialogTambahUniv> {
+  final TextEditingController nama = TextEditingController();
+  final TextEditingController singkatan = TextEditingController();
+  final TextEditingController alamat = TextEditingController();
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    nama.dispose();
+    singkatan.dispose();
+    alamat.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: 800,
+        height: 600,
+        child: Center(
+          child: Card(
+            color: MyColor.abuDialog,
+            child: Form(
+              key: _formkey,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 10,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Tambah Universitas",
+                      style: GoogleFonts.robotoFlex(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    ItemDetailInputOutline(
+                      judul: "Nama Universitas",
+                      controller: nama,
+                      validator: _validatorCheck,
+                    ),
+                    ItemDetailInputOutline(
+                      judul: "Singkatan",
+                      controller: singkatan,
+                      validator: _validatorCheck,
+                    ),
+                    ItemDetailInputOutline(
+                      judul: "Alamat",
+                      controller: alamat,
+                      validator: _validatorCheck,
+                    ),
+                    _isLoading
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        : LBUttonMobile(
+                            ontap: () async {
+                              if (_formkey.currentState!.validate()) {
+                                setState(() {
+                                  _isLoading = true;
+                                });
+
+                                try {
+                                  final dataready = UniversityDetail(
+                                    id: '',
+                                    name: nama.text,
+                                    briefName: singkatan.text,
+                                    address: alamat.text,
+                                    isActive: true,
+                                    createdAt: '',
+                                  );
+
+                                  await ref.read(
+                                    createUniversityProvider(dataready).future,
+                                  );
+
+                                  if (!context.mounted) return;
+
+                                  // Refresh list
+                                  ref.invalidate(
+                                    getUniversityListProvider(0, 10),
+                                  );
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: Colors.green,
+                                      content:
+                                          Text('Universitas berhasil ditambahkan'),
+                                    ),
+                                  );
+
+                                  Navigator.of(context).pop();
+                                } catch (e) {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+
+                                  if (!context.mounted) return;
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: Colors.red,
+                                      content: Text('Terjadi Kesalahan: $e'),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                            teks: "Simpan",
+                          ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
+  }
+
+  String? _validatorCheck(String? value) {
+    if (value == null || value.isEmpty) {
+      return "field tidak boleh kosong";
+    }
+    return null;
   }
 }

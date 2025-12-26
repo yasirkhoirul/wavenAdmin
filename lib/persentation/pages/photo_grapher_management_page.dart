@@ -6,12 +6,12 @@ import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
-import 'package:wavenadmin/persentation/pages/schedule_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/fotografer_detail.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/fotografer_mutation.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/photographer_list.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
+import 'package:wavenadmin/persentation/widget/header_page.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import 'package:wavenadmin/persentation/widget/tabelcontent.dart';
 

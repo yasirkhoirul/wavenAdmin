@@ -94,6 +94,12 @@ class SideNavigation extends StatelessWidget {
                   onTap: () => statefulNavigationShell.goBranch(7),
                   aset: MyIcon.iconreferensi,
                 ),
+                ItemSideNavigation(
+                  judul: "Package",
+                  isActive: statefulNavigationShell.currentIndex == 8,
+                  onTap: () => statefulNavigationShell.goBranch(8),
+                  aset: MyIcon.iconreferensi,
+                ),
               ],
             ),
             ItemSideNavigation(

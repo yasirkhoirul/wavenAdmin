@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
@@ -12,6 +13,7 @@ import 'package:wavenadmin/domain/usecase/get_package_dropdown.dart';
 import 'package:wavenadmin/injection.dart';
 import 'package:wavenadmin/domain/usecase/create_booking_usecase.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/userDetail.dart';
+import 'dart:html' as html;
 
 part 'booking_form_state.g.dart';
 
@@ -22,7 +24,7 @@ class BookingFormState {
   final TextEditingController fullNameController;
   final TextEditingController whatsappController;
   final TextEditingController instagramController;
-  
+
   // Booking Data
   final Package? selectedPackage;
   final DateTime? selectedDate;
@@ -33,18 +35,18 @@ class BookingFormState {
   final TransactionPayType? selectedPaymentType;
   final List<Addon> selectedAddons;
   final double calculatedAmount;
-  
+
   // Additional Data
   final University? selectedUniversity;
   final TextEditingController locationController;
   final TextEditingController noteController;
-  
+
   // Evidence Image
   final XFile? selectedImage;
-  
+
   // Package Detail Loading
   final bool isFetchingPackageDetail;
-  
+
   // Form State
   final bool isSubmitting;
   final String? errorMessage;
@@ -73,12 +75,12 @@ class BookingFormState {
     this.isSubmitting = false,
     this.errorMessage,
     GlobalKey<FormState>? formKey,
-  })  : fullNameController = fullNameController ?? TextEditingController(),
-        whatsappController = whatsappController ?? TextEditingController(),
-        instagramController = instagramController ?? TextEditingController(),
-        locationController = locationController ?? TextEditingController(),
-        noteController = noteController ?? TextEditingController(),
-        formKey = formKey ?? GlobalKey<FormState>();
+  }) : fullNameController = fullNameController ?? TextEditingController(),
+       whatsappController = whatsappController ?? TextEditingController(),
+       instagramController = instagramController ?? TextEditingController(),
+       locationController = locationController ?? TextEditingController(),
+       noteController = noteController ?? TextEditingController(),
+       formKey = formKey ?? GlobalKey<FormState>();
 
   BookingFormState copyWith({
     String? selectedUserId,
@@ -110,7 +112,8 @@ class BookingFormState {
       selectedTimeSlot: selectedTimeSlot ?? this.selectedTimeSlot,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
-      selectedPaymentMethod: selectedPaymentMethod ?? this.selectedPaymentMethod,
+      selectedPaymentMethod:
+          selectedPaymentMethod ?? this.selectedPaymentMethod,
       selectedPaymentType: selectedPaymentType ?? this.selectedPaymentType,
       selectedAddons: selectedAddons ?? this.selectedAddons,
       calculatedAmount: calculatedAmount ?? this.calculatedAmount,
@@ -118,7 +121,8 @@ class BookingFormState {
       locationController: locationController,
       noteController: noteController,
       selectedImage: clearImage ? null : (selectedImage ?? this.selectedImage),
-      isFetchingPackageDetail: isFetchingPackageDetail ?? this.isFetchingPackageDetail,
+      isFetchingPackageDetail:
+          isFetchingPackageDetail ?? this.isFetchingPackageDetail,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: errorMessage,
       formKey: formKey,
@@ -152,18 +156,15 @@ class BookingForm extends _$BookingForm {
       currentState.fullNameController.clear();
       currentState.whatsappController.clear();
       currentState.instagramController.clear();
-      
-      state = AsyncValue.data(currentState.copyWith(
-        selectedUserId: null,
-        selectedUserDetail: null,
-      ));
+
+      state = AsyncValue.data(
+        currentState.copyWith(selectedUserId: null, selectedUserDetail: null),
+      );
       return;
     }
 
     // Set user ID and fetch details
-    state = AsyncValue.data(currentState.copyWith(
-      selectedUserId: userId,
-    ));
+    state = AsyncValue.data(currentState.copyWith(selectedUserId: userId));
 
     // Fetch user detail
     _fetchUserDetail(userId);
@@ -180,14 +181,14 @@ class BookingForm extends _$BookingForm {
       currentState.whatsappController.text = userDetail.phoneNumber ?? '';
       currentState.instagramController.text = '';
 
-      state = AsyncValue.data(currentState.copyWith(
-        selectedUserDetail: userDetail,
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(selectedUserDetail: userDetail),
+      );
     } catch (e) {
       Logger().e('Error fetching user detail: $e');
-      state = AsyncValue.data(state.value!.copyWith(
-        errorMessage: 'Gagal mengambil detail user: $e',
-      ));
+      state = AsyncValue.data(
+        state.value!.copyWith(errorMessage: 'Gagal mengambil detail user: $e'),
+      );
     }
   }
 
@@ -195,10 +196,8 @@ class BookingForm extends _$BookingForm {
     final currentState = state.value;
     if (currentState == null) return;
 
-    state = AsyncValue.data(currentState.copyWith(
-      selectedPackage: package,
-    ));
-    
+    state = AsyncValue.data(currentState.copyWith(selectedPackage: package));
+
     // Fetch package detail to get accurate price
     if (package != null) {
       _fetchPackageDetail(package.id);
@@ -210,15 +209,14 @@ class BookingForm extends _$BookingForm {
     if (currentState == null) return;
 
     // Set loading state
-    state = AsyncValue.data(currentState.copyWith(
-      isFetchingPackageDetail: true,
-      errorMessage: null,
-    ));
+    state = AsyncValue.data(
+      currentState.copyWith(isFetchingPackageDetail: true, errorMessage: null),
+    );
 
     try {
       final usecase = locator<GetPackageDropdown>();
       final packageDetail = await usecase.getPackageDetail(packageId);
-      
+
       final updatedState = state.value;
       if (updatedState == null) return;
 
@@ -229,21 +227,25 @@ class BookingForm extends _$BookingForm {
         price: packageDetail.data.price,
       );
 
-      state = AsyncValue.data(updatedState.copyWith(
-        selectedPackage: updatedPackage,
-        isFetchingPackageDetail: false,
-      ));
-      
+      state = AsyncValue.data(
+        updatedState.copyWith(
+          selectedPackage: updatedPackage,
+          isFetchingPackageDetail: false,
+        ),
+      );
+
       calculateAmount();
     } catch (e) {
       Logger().e('Error fetching package detail: $e');
       final errorState = state.value;
       if (errorState == null) return;
-      
-      state = AsyncValue.data(errorState.copyWith(
-        isFetchingPackageDetail: false,
-        errorMessage: 'Gagal mengambil detail package: $e',
-      ));
+
+      state = AsyncValue.data(
+        errorState.copyWith(
+          isFetchingPackageDetail: false,
+          errorMessage: 'Gagal mengambil detail package: $e',
+        ),
+      );
     }
   }
 
@@ -251,9 +253,7 @@ class BookingForm extends _$BookingForm {
     final currentState = state.value;
     if (currentState == null) return;
 
-    state = AsyncValue.data(currentState.copyWith(
-      selectedDate: date,
-    ));
+    state = AsyncValue.data(currentState.copyWith(selectedDate: date));
   }
 
   void setTimeSlot(String? timeSlot) {
@@ -264,31 +264,33 @@ class BookingForm extends _$BookingForm {
     final times = timeSlot.split('-');
     if (times.length != 2) return;
 
-    state = AsyncValue.data(currentState.copyWith(
-      selectedTimeSlot: timeSlot,
-      startTime: times[0].trim(),
-      endTime: times[1].trim(),
-    ));
+    state = AsyncValue.data(
+      currentState.copyWith(
+        selectedTimeSlot: timeSlot,
+        startTime: times[0].trim(),
+        endTime: times[1].trim(),
+      ),
+    );
   }
 
   void setPaymentMethod(TransactionPayMethod? method) {
     final currentState = state.value;
     if (currentState == null) return;
 
-    state = AsyncValue.data(currentState.copyWith(
-      selectedPaymentMethod: method,
-      clearImage: method != TransactionPayMethod.transfer,
-    ));
+    state = AsyncValue.data(
+      currentState.copyWith(
+        selectedPaymentMethod: method,
+        clearImage: method != TransactionPayMethod.transfer,
+      ),
+    );
   }
 
   void setPaymentType(TransactionPayType? type) {
     final currentState = state.value;
     if (currentState == null) return;
 
-    state = AsyncValue.data(currentState.copyWith(
-      selectedPaymentType: type,
-    ));
-    
+    state = AsyncValue.data(currentState.copyWith(selectedPaymentType: type));
+
     // Automatically recalculate when payment type changes
     calculateAmount();
   }
@@ -300,11 +302,9 @@ class BookingForm extends _$BookingForm {
     final newAddons = List<Addon>.from(currentState.selectedAddons);
     if (!newAddons.any((a) => a.id == addon.id)) {
       newAddons.add(addon);
-      
-      state = AsyncValue.data(currentState.copyWith(
-        selectedAddons: newAddons,
-      ));
-      
+
+      state = AsyncValue.data(currentState.copyWith(selectedAddons: newAddons));
+
       // Automatically calculate amount after adding addon
       calculateAmount();
     }
@@ -316,11 +316,9 @@ class BookingForm extends _$BookingForm {
 
     final newAddons = List<Addon>.from(currentState.selectedAddons);
     newAddons.removeWhere((a) => a.id == addon.id);
-    
-    state = AsyncValue.data(currentState.copyWith(
-      selectedAddons: newAddons,
-    ));
-    
+
+    state = AsyncValue.data(currentState.copyWith(selectedAddons: newAddons));
+
     // Automatically calculate amount after removing addon
     calculateAmount();
   }
@@ -329,9 +327,9 @@ class BookingForm extends _$BookingForm {
     final currentState = state.value;
     if (currentState == null) return;
 
-    state = AsyncValue.data(currentState.copyWith(
-      selectedUniversity: university,
-    ));
+    state = AsyncValue.data(
+      currentState.copyWith(selectedUniversity: university),
+    );
   }
 
   void calculateAmount() {
@@ -341,7 +339,8 @@ class BookingForm extends _$BookingForm {
     double amount = 0;
 
     // Add package price
-    if (currentState.selectedPackage != null && currentState.selectedPackage!.price != null) {
+    if (currentState.selectedPackage != null &&
+        currentState.selectedPackage!.price != null) {
       amount += currentState.selectedPackage!.price!.toDouble();
     }
 
@@ -355,9 +354,7 @@ class BookingForm extends _$BookingForm {
       amount = amount / 2;
     }
 
-    state = AsyncValue.data(currentState.copyWith(
-      calculatedAmount: amount,
-    ));
+    state = AsyncValue.data(currentState.copyWith(calculatedAmount: amount));
   }
 
   Future<void> pickImage(ImageSource source) async {
@@ -368,14 +365,12 @@ class BookingForm extends _$BookingForm {
         maxHeight: 1080,
         imageQuality: 85,
       );
-      
+
       if (image != null) {
         final currentState = state.value;
         if (currentState == null) return;
 
-        state = AsyncValue.data(currentState.copyWith(
-          selectedImage: image,
-        ));
+        state = AsyncValue.data(currentState.copyWith(selectedImage: image));
       }
     } catch (e) {
       Logger().e('Error picking image: $e');
@@ -392,78 +387,78 @@ class BookingForm extends _$BookingForm {
     }
 
     if (currentState.selectedUserId == null) {
-      state = AsyncValue.data(currentState.copyWith(
-        errorMessage: 'Silakan pilih user',
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(errorMessage: 'Silakan pilih user'),
+      );
       return false;
     }
 
     if (currentState.selectedPackage == null) {
-      state = AsyncValue.data(currentState.copyWith(
-        errorMessage: 'Silakan pilih package',
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(errorMessage: 'Silakan pilih package'),
+      );
       return false;
     }
 
     if (currentState.selectedDate == null) {
-      state = AsyncValue.data(currentState.copyWith(
-        errorMessage: 'Silakan pilih tanggal',
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(errorMessage: 'Silakan pilih tanggal'),
+      );
       return false;
     }
 
     if (currentState.startTime == null || currentState.endTime == null) {
-      state = AsyncValue.data(currentState.copyWith(
-        errorMessage: 'Silakan pilih waktu',
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(errorMessage: 'Silakan pilih waktu'),
+      );
       return false;
     }
 
     if (currentState.selectedPaymentMethod == null) {
-      state = AsyncValue.data(currentState.copyWith(
-        errorMessage: 'Silakan pilih metode pembayaran',
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(errorMessage: 'Silakan pilih metode pembayaran'),
+      );
       return false;
     }
 
     if (currentState.selectedPaymentType == null) {
-      state = AsyncValue.data(currentState.copyWith(
-        errorMessage: 'Silakan pilih tipe pembayaran',
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(errorMessage: 'Silakan pilih tipe pembayaran'),
+      );
       return false;
     }
 
-    if (currentState.selectedPaymentMethod == TransactionPayMethod.transfer && 
+    if (currentState.selectedPaymentMethod == TransactionPayMethod.transfer &&
         currentState.selectedImage == null) {
-      state = AsyncValue.data(currentState.copyWith(
-        errorMessage: 'Silakan upload bukti transfer',
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(errorMessage: 'Silakan upload bukti transfer'),
+      );
       return false;
     }
 
     if (currentState.selectedUniversity == null) {
-      state = AsyncValue.data(currentState.copyWith(
-        errorMessage: 'Silakan pilih universitas',
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(errorMessage: 'Silakan pilih universitas'),
+      );
       return false;
     }
 
     if (currentState.locationController.text.trim().isEmpty) {
-      state = AsyncValue.data(currentState.copyWith(
-        errorMessage: 'Silakan isi lokasi',
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(errorMessage: 'Silakan isi lokasi'),
+      );
       return false;
     }
 
-    state = AsyncValue.data(currentState.copyWith(
-      isSubmitting: true,
-      errorMessage: null,
-    ));
+    state = AsyncValue.data(
+      currentState.copyWith(isSubmitting: true, errorMessage: null),
+    );
 
     try {
       final usecase = locator<CreateBookingUsecase>();
-      final dateStr = '${currentState.selectedDate!.year}-${currentState.selectedDate!.month.toString().padLeft(2, '0')}-${currentState.selectedDate!.day.toString().padLeft(2, '0')}';
-      
+      final dateStr =
+          '${currentState.selectedDate!.year}-${currentState.selectedDate!.month.toString().padLeft(2, '0')}-${currentState.selectedDate!.day.toString().padLeft(2, '0')}';
+
       final request = CreateBookingRequest(
         customerData: CustomerData(
           userId: currentState.selectedUserId!,
@@ -485,22 +480,28 @@ class BookingForm extends _$BookingForm {
           universityId: currentState.selectedUniversity!.id,
           location: currentState.locationController.text.trim(),
           note: currentState.noteController.text.trim(),
+          platform: kIsWeb ? Platform.web.name : Platform.android.name,
         ),
       );
 
-      await usecase.execute(request, currentState.selectedImage);
-
-      state = AsyncValue.data(currentState.copyWith(
-        isSubmitting: false,
-      ));
+      final response = await usecase.execute(
+        request,
+        currentState.selectedImage,
+      );
+      if (kIsWeb && response.data?.actions != null && response.data?.actions?.redirectUrl!=null) {
+        html.window.open(response.data?.actions?.redirectUrl ?? '', '_blank');
+      }
+      state = AsyncValue.data(currentState.copyWith(isSubmitting: false));
 
       return true;
     } catch (e) {
       Logger().e('Error creating booking: $e');
-      state = AsyncValue.data(currentState.copyWith(
-        isSubmitting: false,
-        errorMessage: 'Gagal membuat booking: $e',
-      ));
+      state = AsyncValue.data(
+        currentState.copyWith(
+          isSubmitting: false,
+          errorMessage: 'Gagal membuat booking: $e',
+        ),
+      );
       return false;
     }
   }

@@ -37,4 +37,5 @@ class UniversityDetailNotifier extends _$UniversityDetailNotifier {
       state = AsyncValue.error(e, stack);
     }
   }
+  
 }

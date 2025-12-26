@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/icon.dart';
+import 'package:wavenadmin/domain/entity/schedule_entity.dart';
+import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/cardItemSingleContainer.dart';
+import 'package:wavenadmin/persentation/widget/header_page.dart';
 import 'package:wavenadmin/persentation/widget/table_calendar.dart';
 
 class SchedulePage extends StatelessWidget {
@@ -11,7 +14,7 @@ class SchedulePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(child: SizedBox(
-      height: MediaQuery.of(context).size.width>700?900:2000,
+      height: MediaQuery.of(context).size.width>700?900:1350,
       child: MainContent()));
   }
 }
@@ -24,36 +27,47 @@ class MainContent extends StatefulWidget {
 }
 
 class _MainContentState extends State<MainContent> {
-  final List<Widget> maincalendar = [
-                    Expanded(
-                      flex: 7,
-                      child: CarditemsinglecontainerWithBorder(
-                        content: CustomCalendar(),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: CarditemsinglecontainerWithBorder(
-                        content: DetailJadwalSection(
-                          tanggal: DateTime(2025, 12, 5, 06, 00),
-                          listJadwal: [
-                            'UGM - Fadila',
-                            'UGM - Fadila',
-                            'UGM - Fadila',
-                          ],
-                        ),
-                      ),
-                    ),
-                  ];
+  DateTime selectedDate = DateTime.now();
+  List<ScheduleEntity> selectedSchedules = [];
+
+  void _handleDateSelected(DateTime date, List<ScheduleEntity> schedules) {
+    setState(() {
+      selectedDate = date;
+      selectedSchedules = schedules;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final maincalendar = [
+      Expanded(
+        flex: MediaQuery.of(context).size.width>700?7:5,
+        child: CarditemsinglecontainerWithBorder(
+          content: CustomCalendar(
+            onDateSelected: _handleDateSelected,
+          ),
+        ),
+      ),
+      Expanded(
+        flex: MediaQuery.of(context).size.width>700?3:5,
+        child: CarditemsinglecontainerWithBorder(
+          content: DetailJadwalSection(
+            tanggal: selectedDate,
+            schedules: selectedSchedules,
+          ),
+        ),
+      ),
+    ];
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         HeaderPage(icon: MyIcon.icondashboard, judul: "Schedule",),
-        ButtonAdd(),
+        LBUttonMobile(ontap: (){
+          context.go('/client');
+        }, teks: "Tambah Booking"),
         SizedBox(
-          height: MediaQuery.of(context).size.width>700?700:1500,
+          height: MediaQuery.of(context).size.width>700?700:1200,
           child: MediaQuery.of(context).size.width>700? Row(
             mainAxisSize: MainAxisSize.min,
             children: maincalendar,
@@ -64,83 +78,17 @@ class _MainContentState extends State<MainContent> {
   }
 }
 
-class ButtonAdd extends StatelessWidget {
-  const ButtonAdd({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        // aksi tombol
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF00A86B), // warna hijau
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        elevation: 0,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            "Tambah Jadwal",
-            style: GoogleFonts.publicSans(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(width: 8),
-          const Icon(Icons.add, color: Colors.white, size: 20),
-        ],
-      ),
-    );
-  }
-}
 
-class HeaderPage extends StatelessWidget {
-  final String judul;
-  final String icon;
-  const HeaderPage({super.key, required this.judul, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Row(
-          spacing: 10,
-          children: [
-            SvgPicture.asset(
-              icon,
-              colorFilter: ColorFilter.mode(
-                MyColor.hijauaccent,
-                BlendMode.srcIn,
-              ),
-              height: 28,
-            ),
-            Text(
-              judul,
-              style: GoogleFonts.publicSans(
-                fontWeight: FontWeight.w600,
-                fontSize: 28,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class DetailJadwalSection extends StatelessWidget {
   final DateTime tanggal;
-  final List<String> listJadwal;
+  final List<ScheduleEntity> schedules;
 
   const DetailJadwalSection({
     super.key,
     required this.tanggal,
-    required this.listJadwal,
+    required this.schedules,
   });
 
   @override
@@ -202,7 +150,7 @@ class DetailJadwalSection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                listJadwal.length.toString(),
+                schedules.length.toString(),
                 style: GoogleFonts.publicSans(
                   fontSize: 16,
                   color: Colors.white,
@@ -216,32 +164,95 @@ class DetailJadwalSection extends StatelessWidget {
         const SizedBox(height: 16),
 
         // === LIST CARD JADWAL ===
-        Column(
-          children: listJadwal
-              .map(
-                (item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: MyColor.hijauaccent,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      item,
-                      style: GoogleFonts.publicSans(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+        Expanded(
+          child: schedules.isEmpty
+              ? Center(
+                  child: Text(
+                    'Tidak ada jadwal',
+                    style: GoogleFonts.publicSans(
+                      color: Colors.white54,
+                      fontSize: 16,
                     ),
                   ),
+                )
+              : ListView.builder(
+                  itemCount: schedules.length,
+                  itemBuilder: (context, index) {
+                    final schedule = schedules[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: MyColor.hijauaccent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Universitas - Client
+                            Text(
+                              '${schedule.universityName} - ${schedule.clientName}',
+                              style: GoogleFonts.publicSans(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            // Waktu
+                            Row(
+                              children: [
+                                const Icon(Icons.access_time, color: Colors.white70, size: 16),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '${schedule.startTime} - ${schedule.endTime}',
+                                  style: GoogleFonts.publicSans(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            // Package
+                            Row(
+                              children: [
+                                const Icon(Icons.card_giftcard, color: Colors.white70, size: 16),
+                                const SizedBox(width: 6),
+                                Text(
+                                  schedule.packageName,
+                                  style: GoogleFonts.publicSans(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            // Location
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on, color: Colors.white70, size: 16),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    schedule.location,
+                                    style: GoogleFonts.publicSans(
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              )
-              .toList(),
         ),
       ],
     );

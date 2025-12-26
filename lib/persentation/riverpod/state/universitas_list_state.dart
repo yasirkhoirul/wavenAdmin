@@ -1,7 +1,6 @@
 import 'package:wavenadmin/domain/entity/universitas_list.dart';
 
 class UniversitasListState {
-  final int page;
   final int limit;
   final int currentPage;
   final bool isReached;
@@ -11,18 +10,16 @@ class UniversitasListState {
   final bool isloadingmore;
 
   const UniversitasListState({
-    required this.page,
     required this.limit,
-    this.currentPage = 0,
+    this.currentPage = 1,
     this.isReached = false,
-    this.highestPage = 0,
+    this.highestPage = 1,
     required this.item,
     this.metadata,
     this.isloadingmore = false
   });
 
   UniversitasListState copyWith({
-    int? page,
     int? limit,
     int? currentPage,
     bool? isReached,
@@ -32,19 +29,20 @@ class UniversitasListState {
     bool? isloading
   }) {
     return UniversitasListState(
-      page: page ?? this.page,
       limit: limit ?? this.limit,
       item: item ?? this.item,
       isReached: isReached??this.isReached,
       highestPage: highestPage??this.highestPage,
       metadata: metadata??this.metadata,
-      isloadingmore: isloading??isloadingmore
+      isloadingmore: isloading??isloadingmore,
+      currentPage: currentPage??this.currentPage
     );
   }
 
   UniversitasListState  appendData({
     List<UniversityItem>? item
   }){
-    return copyWith(item: [...this.item,...item??[]]);
+    return copyWith(item: [...this.item,...item??[]],isloading: 
+    false);
   }
 }

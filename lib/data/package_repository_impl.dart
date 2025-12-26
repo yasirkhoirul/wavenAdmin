@@ -1,6 +1,8 @@
+import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/remote_data.dart';
 import 'package:wavenadmin/data/model/package_detail_model.dart';
 import 'package:wavenadmin/domain/entity/package_dropdown.dart';
+import 'package:wavenadmin/domain/entity/package_list.dart';
 import 'package:wavenadmin/domain/repository/package_repository.dart';
 
 class PackageRepositoryImpl implements PackageRepository {
@@ -22,6 +24,32 @@ class PackageRepositoryImpl implements PackageRepository {
     try {
       final response = await remoteData.getPackageDetail(packageId);
       return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<PackageList> getPackageList(int page, int limit, {String? search, Sort? sort, bool? status}) async {
+    try {
+      final response = await remoteData.getPackageList(page, limit, search: search, sort: sort, status: status);
+      
+      return PackageList(
+        metadata: PackageMetadataEntity(
+          count: response.metadata.count,
+          totalPages: response.metadata.totalPages,
+          page: response.metadata.page,
+          limit: response.metadata.limit,
+        ),
+        data: response.data.map((item) => PackageItem(
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          bannerUrl: item.bannerUrl,
+          description: item.description,
+          benefits: item.benefits,
+        )).toList(),
+      );
     } catch (e) {
       rethrow;
     }

@@ -73,6 +73,7 @@ AdditionalData _$AdditionalDataFromJson(Map<String, dynamic> json) =>
       universityId: json['university_id'] as String,
       location: json['location'] as String,
       note: json['note'] as String,
+      platform: json['platform'] as String,
     );
 
 Map<String, dynamic> _$AdditionalDataToJson(AdditionalData instance) =>
@@ -80,6 +81,7 @@ Map<String, dynamic> _$AdditionalDataToJson(AdditionalData instance) =>
       'university_id': instance.universityId,
       'location': instance.location,
       'note': instance.note,
+      'platform': instance.platform,
     };
 
 CreateBookingResponse _$CreateBookingResponseFromJson(
@@ -87,6 +89,9 @@ CreateBookingResponse _$CreateBookingResponseFromJson(
 ) => CreateBookingResponse(
   message: json['message'] as String,
   bookingId: json['booking_id'] as String?,
+  data: json['data'] == null
+      ? null
+      : BookingResponseData.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$CreateBookingResponseToJson(
@@ -94,7 +99,57 @@ Map<String, dynamic> _$CreateBookingResponseToJson(
 ) => <String, dynamic>{
   'message': instance.message,
   'booking_id': instance.bookingId,
+  'data': instance.data,
 };
+
+BookingResponseData _$BookingResponseDataFromJson(Map<String, dynamic> json) =>
+    BookingResponseData(
+      bookingDetail: BookingDetail.fromJson(
+        json['booking_detail'] as Map<String, dynamic>,
+      ),
+      actions: json['actions'] == null
+          ? null
+          : BookingActions.fromJson(json['actions'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$BookingResponseDataToJson(
+  BookingResponseData instance,
+) => <String, dynamic>{
+  'booking_detail': instance.bookingDetail,
+  'actions': instance.actions,
+};
+
+BookingDetail _$BookingDetailFromJson(Map<String, dynamic> json) =>
+    BookingDetail(
+      bookingId: json['booking_id'] as String,
+      totalAmount: (json['total_amount'] as num).toInt(),
+      paidAmount: (json['paid_amount'] as num).toInt(),
+      paymentMethod: json['payment_method'] as String,
+      transactionTime: json['transaction_time'] as String,
+      status: json['status'] as String,
+    );
+
+Map<String, dynamic> _$BookingDetailToJson(BookingDetail instance) =>
+    <String, dynamic>{
+      'booking_id': instance.bookingId,
+      'total_amount': instance.totalAmount,
+      'paid_amount': instance.paidAmount,
+      'payment_method': instance.paymentMethod,
+      'transaction_time': instance.transactionTime,
+      'status': instance.status,
+    };
+
+BookingActions _$BookingActionsFromJson(Map<String, dynamic> json) =>
+    BookingActions(
+      token: json['token'] as String?,
+      redirectUrl: json['redirect_url'] as String?,
+    );
+
+Map<String, dynamic> _$BookingActionsToJson(BookingActions instance) =>
+    <String, dynamic>{
+      'token': instance.token,
+      'redirect_url': instance.redirectUrl,
+    };
 
 CheckAvailabilityResponse _$CheckAvailabilityResponseFromJson(
   Map<String, dynamic> json,

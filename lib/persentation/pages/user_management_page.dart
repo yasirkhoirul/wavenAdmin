@@ -8,13 +8,13 @@ import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/data/model/update_user_request_model.dart';
 import 'package:wavenadmin/domain/entity/detail_user.dart';
 import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
-import 'package:wavenadmin/persentation/pages/schedule_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/update_user_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/userDetail.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/user_list_notifier.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/carditemcontainer.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
+import 'package:wavenadmin/persentation/widget/header_page.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import 'package:wavenadmin/persentation/widget/tabelcontent.dart';
 
@@ -45,7 +45,8 @@ class _UserManagementpageState extends ConsumerState<UserManagementpage> {
           child: Column(
             children: [
               Row(
-                children: [HeaderPage(icon: MyIcon.iconusers, judul: "User")],
+                children: [HeaderPage
+                (icon: MyIcon.iconusers, judul: "User")],
               ),
               Row(
                 children: [

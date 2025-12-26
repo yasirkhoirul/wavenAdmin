@@ -1,24 +1,27 @@
 import 'package:logger/web.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wavenadmin/common/constant.dart';
-import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
-import 'package:wavenadmin/persentation/riverpod/state/universitas_list_state.dart';
+import 'package:wavenadmin/domain/usecase/get_package_list.dart';
+import 'package:wavenadmin/injection.dart';
+import 'package:wavenadmin/persentation/riverpod/state/package_list_state.dart';
 
-part 'get_university_list_notifier.g.dart';
+part 'get_package_list_notifier.g.dart';
 
 @riverpod
-class GetUniversityListNotifier extends _$GetUniversityListNotifier {
+class GetPackageListNotifier extends _$GetPackageListNotifier {
   @override
-  Future<UniversitasListState> build(
+  Future<PackageListState> build(
     int page,
     int limit, {
     String? search,
     Sort? sort,
+    bool? status,
   }) async {
-    final usecase = ref.read(getListUniversitasUseCse);
-    final data = await usecase.execute(page+1, limit, search: search, sort: sort);
+    Logger().d("dibuat");
+    final usecase = locator<GetPackageList>();
+    final data = await usecase.execute(page + 1, limit, search: search, sort: sort, status: status);
     
-    return UniversitasListState(
+    return PackageListState(
       currentPage: page,
       highestPage: page,
       isReached: data.data.length < limit,
@@ -30,20 +33,17 @@ class GetUniversityListNotifier extends _$GetUniversityListNotifier {
 
   Future<void> appendData() async {
     final currentState = state.value;
-    Logger().d("ini adalah kondisi current page ${currentState?.currentPage} isloading more = ${currentState?.isloadingmore} dan current state = $currentState");
-    if (currentState == null||currentState.isloadingmore) return;
+    Logger().d("Package list - current page ${currentState?.currentPage}");
+    if (currentState == null || currentState.isloadingmore) return;
     
     final nextPage = currentState.currentPage + 1;
     
     // Check if already reached or already have data for next page
-    if(currentState.isReached || nextPage <= currentState.highestPage) {
+    if (currentState.isReached || nextPage <= currentState.highestPage) {
       // Just update currentPage for navigation
       state = AsyncValue.data(
-        currentState.copyWith(
-          currentPage: nextPage
-        )
+        currentState.copyWith(currentPage: nextPage)
       );
-      Logger().d("masuk ke next page");
       return;
     }
     
@@ -55,9 +55,8 @@ class GetUniversityListNotifier extends _$GetUniversityListNotifier {
       )
     );
     
-    Logger().d("fetching page $nextPage");
-    final usecase = ref.read(getListUniversitasUseCse);
-    final data = await usecase.execute(nextPage+1, limit, search: search, sort: sort);
+    final usecase = locator<GetPackageList>();
+    final data = await usecase.execute(nextPage + 1, limit, search: search, sort: sort, status: status);
 
     state = AsyncValue.data(
       currentState.copyWith(
@@ -67,7 +66,6 @@ class GetUniversityListNotifier extends _$GetUniversityListNotifier {
         isloading: false,
       ).appendData(item: data.data),
     );
-    Logger().d("current page setelah append ${state.value?.currentPage}");
   }
 
   void back() {

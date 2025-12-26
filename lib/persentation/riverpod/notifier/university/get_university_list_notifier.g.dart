@@ -56,7 +56,7 @@ final class GetUniversityListNotifierProvider
 }
 
 String _$getUniversityListNotifierHash() =>
-    r'85544bb5a9f3362abe722710f7ae0212e9217a04';
+    r'159dc48eec127767da9691fbfd9791acbc729fa8';
 
 final class GetUniversityListNotifierFamily extends $Family
     with

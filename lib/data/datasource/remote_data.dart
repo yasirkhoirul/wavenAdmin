@@ -12,6 +12,8 @@ import 'package:wavenadmin/data/model/detail_booking_model.dart';
 import 'package:wavenadmin/data/model/list_addons_model.dart';
 import 'package:wavenadmin/data/model/package_detail_model.dart';
 import 'package:wavenadmin/data/model/package_dropdown_model.dart';
+import 'package:wavenadmin/data/model/package_list_model.dart';
+import 'package:wavenadmin/data/model/schedule_model.dart';
 import 'package:wavenadmin/data/model/send_whatsapp_request_model.dart';
 import 'package:wavenadmin/data/model/universitas_list_model.dart';
 import 'package:wavenadmin/data/model/update_user_request_model.dart';
@@ -28,6 +30,7 @@ import 'package:wavenadmin/data/model/user_detial_fotografer_model.dart';
 import 'package:wavenadmin/data/model/user_detial_model.dart';
 import 'package:wavenadmin/data/model/user_photographer_model.dart';
 import 'package:wavenadmin/data/model/usermodel.dart';
+import 'package:wavenadmin/domain/entity/university_detail.dart';
 
 class AppException implements Exception {
   final String message;
@@ -91,11 +94,13 @@ abstract class RemoteData {
   Future<UserListResponse> getListUser(int page, int limit, {String? search,Sort? sort,SortUser? sortBy});
   Future<UserListResponseAdmin> getListUserAdmin(int page, int limit, {String? search,Sort? sort,SortAdmin? sortAdmin});
   Future<UniversitasListModel> getListUniversitas(int page,int limit,{String? search,Sort? sort});
+  Future<ScheduleModel> getListSchedule(int month,int year,{VerificationStatus? status});
   Future<UserFotograferListResponse> getListPhotographer(int page, int limit, {String? search,Sort? sort,SortPhotographer?  sortBy});
   Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort});
   Future<ListAddonsResponse> getListAddons(int page, int limit, {String? search});
   Future<PackageDropdownResponse> getPackageDropdown(int page, int limit, {String? search});
   Future<PackageDetailResponse> getPackageDetail(String packageId);
+  Future<PackageListModel> getPackageList(int page, int limit, {String? search, Sort? sort, bool? status});
   Future<UniversityDropdownResponse> getUniversityDropdown(int page, int limit, {String? search});
   Future<PhotographerDropdownResponse> getPhotographerDropdown(int page, int limit, {String? search});
   Future<UserDetailResponse> getDetailUser(String idUser);
@@ -115,7 +120,9 @@ abstract class RemoteData {
   Future<String> putDetailAdmin(AdminDetailModel payload,String idAdmin);
   Future<String> putDetailFotografer(UserDetailFotograferModel payload,String idFotografer);
   Future<String> createAdmin(AdminDetailModel payload);
+  Future<String> createUniv(UniversityDetail payload);
   Future<void> deleteAdmin(String idAdmin);
+  Future<void> deleteUniv(String idUniv);
   Future<String> deleteFotografer(String idFotografer);
   Future<SendWhatsappResponse> sendWhatsappMessage(String target, String message);
   Future<UpdateUserResponse> updateUser(String userId, UpdateUserRequest request);
@@ -626,11 +633,32 @@ class RemoteDataImpl implements RemoteData {
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }
-  }  
+  }
+
+  @override
+  Future<PackageListModel> getPackageList(int page, int limit, {String? search, Sort? sort, bool? status}) async {
+    try {
+      final response = await dio.dio.get('v1/admin/packages',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (search != null && search.isNotEmpty) 'search': search,
+          if (sort != null) 'sort': sort.name,
+          if (status != null) 'status': status,
+        });
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+      return PackageListModel.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
   @override
   Future<UniversityDropdownResponse> getUniversityDropdown(int page, int limit, {String? search}) async {
     try {
-      final response = await dio.dio.get('v1/admin/master/universities',
+      final response = await dio.dio.get('v1/admin/master/universities/dropdown',
         queryParameters: {
           'page': page,
           'limit': limit,
@@ -785,6 +813,49 @@ class RemoteDataImpl implements RemoteData {
         throw AppException(response.statusCode.toString());
       }
       return UniversitasListModel.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<String> createUniv(UniversityDetail payload) async{
+    try {
+      final response = await dio.dio.post('v1/admin/master/universities',data: {
+        'name':payload.name,
+        'brief_name':payload.briefName,
+        'address':payload.address
+      });
+      if(response.statusCode!=201){
+        throw AppException(response.statusCode.toString());
+      }
+      return response.data['message'];
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<void> deleteUniv(String idUniv) async{
+    try {
+      final response = await dio.dio.delete('v1/admin/master/universities/$idUniv');
+      if(response.statusCode!=200){
+        throw AppException(response.statusCode.toString());
+      }
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<ScheduleModel> getListSchedule(int month,int year,{VerificationStatus? status}) async{
+    try {
+      final response = await dio.dio.get("v1/admin/bookings/calendar",queryParameters: {
+        'month':month,
+        'year':year,
+        if(status!=null)'status':status.name
+      });
+      return ScheduleModel.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }

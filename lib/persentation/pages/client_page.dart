@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
-import 'package:wavenadmin/persentation/pages/schedule_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/booking/booking_notifier.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/carditemcontainer.dart';
@@ -11,6 +10,7 @@ import 'package:wavenadmin/persentation/widget/dialog/dialog_detail_booking.dart
 import 'package:wavenadmin/persentation/widget/dialog/dialog_kirim_wa_client.dart';
 import 'package:wavenadmin/persentation/widget/dialog/dialog_kirim_wa_fotografer.dart';
 import 'package:wavenadmin/persentation/widget/dialog/dialog_tambah_booking.dart';
+import 'package:wavenadmin/persentation/widget/header_page.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import '../../../common/color.dart';
 

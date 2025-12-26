@@ -7,9 +7,11 @@ import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
 import 'package:wavenadmin/data/model/update_booking_request_model.dart';
 import 'package:wavenadmin/data/model/upload_photo_request_model.dart';
 import 'package:wavenadmin/data/model/verify_booking_request_model.dart';
+import 'package:wavenadmin/domain/entity/schedule_entity.dart';
 
 abstract class BookingRepository {
   Future<BookingListData> getListBooking(int page, int limit, {String? search, Sort? sort});
+  Future<List<ScheduleEntity>> getListSchedule(int month,int year,{VerificationStatus? status});
   Future<DetailBooking> getDetailBooking(String idBooking);
   Future<UpdateBookingResponse> updateBooking(String idBooking, UpdateBookingRequest request);
   Future<VerifyBookingResponse> verifyBooking(String idBooking, VerifyStatus status, {String? remarks});

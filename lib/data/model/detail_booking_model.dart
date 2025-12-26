@@ -8,10 +8,7 @@ class DetailBookingResponse {
   final String? message;
   final DetailBookingData? data;
 
-  DetailBookingResponse({
-    this.message,
-    this.data,
-  });
+  DetailBookingResponse({this.message, this.data});
 
   factory DetailBookingResponse.fromJson(Map<String, dynamic> json) =>
       _$DetailBookingResponseFromJson(json);
@@ -51,6 +48,8 @@ class DetailBookingData {
   final String? verificationStatus;
   @JsonKey(name: 'already_photo')
   final bool? alreadyPhoto;
+  @JsonKey(name: 'edited_photo')
+  final String? editedPhoto;
   @JsonKey(name: 'photo_result_url')
   final String? photoResultUrl;
   @JsonKey(name: 'edited_photo_result_url')
@@ -92,6 +91,7 @@ class DetailBookingData {
     this.unpaidAmount,
     this.transactions,
     this.photographerData,
+    this.editedPhoto,
   });
 
   factory DetailBookingData.fromJson(Map<String, dynamic> json) =>
@@ -124,7 +124,9 @@ class DetailBookingData {
       paidAmount: paidAmount ?? 0,
       unpaidAmount: unpaidAmount ?? 0,
       transactions: transactions?.map((t) => t.toEntity()).toList() ?? [],
-      photographerData: photographerData?.map((p) => p.toEntity()).toList() ?? [],
+      photographerData:
+          photographerData?.map((p) => p.toEntity()).toList() ?? [],
+      editedPhoto: editedPhoto ?? '',
     );
   }
 }
@@ -134,10 +136,7 @@ class ExtraItem {
   final String? id;
   final String? name;
 
-  ExtraItem({
-    this.id,
-    this.name,
-  });
+  ExtraItem({this.id, this.name});
 
   factory ExtraItem.fromJson(Map<String, dynamic> json) =>
       _$ExtraItemFromJson(json);
@@ -145,10 +144,7 @@ class ExtraItem {
   Map<String, dynamic> toJson() => _$ExtraItemToJson(this);
 
   Extra toEntity() {
-    return Extra(
-      id: id ?? '',
-      name: name ?? '',
-    );
+    return Extra(id: id ?? '', name: name ?? '');
   }
 }
 
@@ -204,12 +200,7 @@ class PhotographerItem {
   final String? phoneNumber;
   final int? fee;
 
-  PhotographerItem({
-    this.id,
-    this.name,
-    this.phoneNumber,
-    this.fee,
-  });
+  PhotographerItem({this.id, this.name, this.phoneNumber, this.fee});
 
   factory PhotographerItem.fromJson(Map<String, dynamic> json) =>
       _$PhotographerItemFromJson(json);

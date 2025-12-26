@@ -101,10 +101,12 @@ class AdditionalData {
   
   final String note;
 
+  final String platform;
+
   AdditionalData({
     required this.universityId,
     required this.location,
-    required this.note,
+    required this.note, required this.platform,
   });
 
   factory AdditionalData.fromJson(Map<String, dynamic> json) =>
@@ -119,16 +121,89 @@ class CreateBookingResponse {
   
   @JsonKey(name: 'booking_id')
   final String? bookingId;
+  
+  final BookingResponseData? data;
 
   CreateBookingResponse({
     required this.message,
     this.bookingId,
+    this.data,
   });
 
   factory CreateBookingResponse.fromJson(Map<String, dynamic> json) =>
       _$CreateBookingResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$CreateBookingResponseToJson(this);
+}
+
+@JsonSerializable()
+class BookingResponseData {
+  @JsonKey(name: 'booking_detail')
+  final BookingDetail bookingDetail;
+  
+  final BookingActions? actions;
+
+  BookingResponseData({
+    required this.bookingDetail,
+    this.actions,
+  });
+
+  factory BookingResponseData.fromJson(Map<String, dynamic> json) =>
+      _$BookingResponseDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BookingResponseDataToJson(this);
+}
+
+@JsonSerializable()
+class BookingDetail {
+  @JsonKey(name: 'booking_id')
+  final String bookingId;
+  
+  @JsonKey(name: 'total_amount')
+  final int totalAmount;
+  
+  @JsonKey(name: 'paid_amount')
+  final int paidAmount;
+  
+  @JsonKey(name: 'payment_method')
+  final String paymentMethod;
+  
+  @JsonKey(name: 'transaction_time')
+  final String transactionTime;
+  
+  final String status;
+
+  BookingDetail({
+    required this.bookingId,
+    required this.totalAmount,
+    required this.paidAmount,
+    required this.paymentMethod,
+    required this.transactionTime,
+    required this.status,
+  });
+
+  factory BookingDetail.fromJson(Map<String, dynamic> json) =>
+      _$BookingDetailFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BookingDetailToJson(this);
+}
+
+@JsonSerializable()
+class BookingActions {
+  final String? token;
+  
+  @JsonKey(name: 'redirect_url')
+  final String? redirectUrl;
+
+  BookingActions({
+    required this.token,
+    required this.redirectUrl,
+  });
+
+  factory BookingActions.fromJson(Map<String, dynamic> json) =>
+      _$BookingActionsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BookingActionsToJson(this);
 }
 
 @JsonSerializable()

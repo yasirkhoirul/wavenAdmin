@@ -38,6 +38,7 @@ class UniversityDetailData {
     required this.isActive,
     required this.createdAt,
   });
+  
 
   factory UniversityDetailData.fromJson(Map<String, dynamic> json) =>
       _$UniversityDetailDataFromJson(json);

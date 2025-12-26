@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wavenadmin/domain/usecase/create_admin.dart';
 import 'package:wavenadmin/domain/usecase/create_transaction_usecase.dart';
+import 'package:wavenadmin/domain/usecase/create_univ.dart';
 import 'package:wavenadmin/domain/usecase/delete_admin.dart';
 import 'package:wavenadmin/domain/usecase/delete_fotografer.dart';
+import 'package:wavenadmin/domain/usecase/delete_univ.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_booking.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_fotografer.dart';
@@ -10,6 +12,7 @@ import 'package:wavenadmin/domain/usecase/get_detail_user.dart';
 import 'package:wavenadmin/domain/usecase/get_list_addons.dart';
 import 'package:wavenadmin/domain/usecase/get_list_booking.dart';
 import 'package:wavenadmin/domain/usecase/get_list_photographer.dart';
+import 'package:wavenadmin/domain/usecase/get_list_schedule.dart';
 import 'package:wavenadmin/domain/usecase/get_package_dropdown.dart';
 import 'package:wavenadmin/domain/usecase/get_photographer_dropdown.dart';
 import 'package:wavenadmin/domain/usecase/get_universitas_list.dart';
@@ -109,4 +112,14 @@ final uploadEditedPhoto = Provider<UploadEditedPhotoUsecase>((ref) {
 
 final getListUniversitasUseCse = Provider<GetUniversitasList>((ref) {
   return locator<GetUniversitasList>();
+},);
+
+final createUnive = Provider<CreateUniv>((ref) {
+  return locator<CreateUniv>();
+},);
+final deleteUnive = Provider<DeleteUniv>((ref) {
+  return locator<DeleteUniv>();
+},);
+final getListScheduleUseCase = Provider<GetListSchedule>((ref) {
+  return locator<GetListSchedule>();
 },);

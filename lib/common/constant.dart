@@ -92,7 +92,14 @@ enum TransactionPayType{
   dp
 }
 enum TransactionPayMethod{
+  va,
   qris,
   transfer,
   cash
+}
+
+enum Platform{
+  web,
+  android,
+  ios
 }

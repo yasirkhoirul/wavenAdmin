@@ -1,4 +1,4 @@
-class   DetailBooking {
+class DetailBooking {
   final String id;
   final String clientName;
   final String clientPhoneNumber;
@@ -14,6 +14,7 @@ class   DetailBooking {
   final String note;
   final String verificationStatus;
   final bool alreadyPhoto;
+  final String editedPhoto;
   final String photoResultUrl;
   final String editedPhotoResultUrl;
   final String status;
@@ -49,6 +50,7 @@ class   DetailBooking {
     this.unpaidAmount = 0,
     this.transactions = const [],
     this.photographerData = const [],
+    this.editedPhoto = '',
   });
 
   DetailBooking copyWith({
@@ -102,6 +104,7 @@ class   DetailBooking {
       unpaidAmount: unpaidAmount ?? this.unpaidAmount,
       transactions: transactions ?? this.transactions,
       photographerData: photographerData ?? this.photographerData,
+      editedPhoto: editedPhoto,
     );
   }
 }
@@ -110,19 +113,10 @@ class Extra {
   final String id;
   final String name;
 
-  Extra({
-    this.id = '',
-    this.name = '',
-  });
+  Extra({this.id = '', this.name = ''});
 
-  Extra copyWith({
-    String? id,
-    String? name,
-  }) {
-    return Extra(
-      id: id ?? this.id,
-      name: name ?? this.name,
-    );
+  Extra copyWith({String? id, String? name}) {
+    return Extra(id: id ?? this.id, name: name ?? this.name);
   }
 }
 
@@ -165,7 +159,8 @@ class Transaction {
       method: method ?? this.method,
       transactionTime: transactionTime ?? this.transactionTime,
       verificationStatus: verificationStatus ?? this.verificationStatus,
-      transactionEvidenceUrl: transactionEvidenceUrl ?? this.transactionEvidenceUrl,
+      transactionEvidenceUrl:
+          transactionEvidenceUrl ?? this.transactionEvidenceUrl,
     );
   }
 }
