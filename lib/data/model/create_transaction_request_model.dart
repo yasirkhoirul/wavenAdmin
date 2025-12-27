@@ -1,5 +1,5 @@
-import 'package:json_annotation/json_annotation.dart';
 
+import 'package:json_annotation/json_annotation.dart';
 part 'create_transaction_request_model.g.dart';
 
 @JsonSerializable()
@@ -13,10 +13,12 @@ class CreateTransactionRequest {
   @JsonKey(name: 'amount')
   final double amount;
 
+  final String platform;
   const CreateTransactionRequest({
     required this.paymentType,
     required this.paymentMethod,
-    required this.amount,
+    required this.amount, 
+    required this.platform,
   });
 
   factory CreateTransactionRequest.fromJson(Map<String, dynamic> json) =>
@@ -45,7 +47,7 @@ class CreateTransactionResponse {
 class CreateTransactionData {
   @JsonKey(name: 'transaction_detail')
   final TransactionDetail transactionDetail;
-  final List<QrisAction>? actions;
+  final ActionsData? actions;
 
   const CreateTransactionData({
     required this.transactionDetail,
@@ -143,4 +145,16 @@ class QrisPaymentStatusData {
       _$QrisPaymentStatusDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$QrisPaymentStatusDataToJson(this);
+}
+
+@JsonSerializable()
+class ActionsData {
+  final String? token;
+  @JsonKey(name: "redirect_url")
+  final String? redirectUrl;
+  const ActionsData(this.token,this.redirectUrl);
+
+  factory ActionsData.fromJson(Map<String,dynamic> json)=> _$ActionsDataFromJson(json);
+
+  Map<String,dynamic> toJson() => _$ActionsDataToJson(this);
 }

@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
@@ -7,6 +8,7 @@ import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/booking/detail_booking_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
+import 'dart:html' as html;
 
 part 'transaction_form_state.g.dart';
 
@@ -223,6 +225,7 @@ class TransactionForm extends _$TransactionForm {
         paymentType: currentState.selectedPaymentType!.name,
         paymentMethod: currentState.selectedPaymentMethod!.name,
         amount: currentState.amount,
+        platform:kIsWeb? Platform.web.name:Platform.android.name,
       );
 
 
@@ -231,7 +234,11 @@ class TransactionForm extends _$TransactionForm {
         request,
         currentState.selectedImage,
       );
-
+      if(kIsWeb && response.data?.actions!=null && response.data?.actions?.redirectUrl!=null&&response.data?.actions?.token!=null){
+         
+        html.window.open(response.data?.actions?.redirectUrl ?? '', '_blank');
+      
+      }
       // Refresh booking detail
       await ref.read(detailBookingProvider(currentState.bookingId).notifier).onRefresh();
 

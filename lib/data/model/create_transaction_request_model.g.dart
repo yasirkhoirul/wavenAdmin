@@ -12,6 +12,7 @@ CreateTransactionRequest _$CreateTransactionRequestFromJson(
   paymentType: json['payment_type'] as String,
   paymentMethod: json['payment_method'] as String,
   amount: (json['amount'] as num).toDouble(),
+  platform: json['platform'] as String,
 );
 
 Map<String, dynamic> _$CreateTransactionRequestToJson(
@@ -20,6 +21,7 @@ Map<String, dynamic> _$CreateTransactionRequestToJson(
   'payment_type': instance.paymentType,
   'payment_method': instance.paymentMethod,
   'amount': instance.amount,
+  'platform': instance.platform,
 };
 
 CreateTransactionResponse _$CreateTransactionResponseFromJson(
@@ -41,9 +43,9 @@ CreateTransactionData _$CreateTransactionDataFromJson(
   transactionDetail: TransactionDetail.fromJson(
     json['transaction_detail'] as Map<String, dynamic>,
   ),
-  actions: (json['actions'] as List<dynamic>?)
-      ?.map((e) => QrisAction.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  actions: json['actions'] == null
+      ? null
+      : ActionsData.fromJson(json['actions'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$CreateTransactionDataToJson(
@@ -116,3 +118,12 @@ Map<String, dynamic> _$QrisPaymentStatusDataToJson(
   'is_paid': instance.isPaid,
   'description': instance.description,
 };
+
+ActionsData _$ActionsDataFromJson(Map<String, dynamic> json) =>
+    ActionsData(json['token'] as String?, json['redirect_url'] as String?);
+
+Map<String, dynamic> _$ActionsDataToJson(ActionsData instance) =>
+    <String, dynamic>{
+      'token': instance.token,
+      'redirect_url': instance.redirectUrl,
+    };
