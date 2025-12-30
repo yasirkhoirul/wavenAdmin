@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/model/update_booking_request_model.dart';
@@ -449,7 +451,7 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                                         controller: namaClient,
                                       ),
                                       ItemDetail(
-                                        judul: 'Email',
+                                        judul: 'Instagram',
                                         sub: ItemDetailText(
                                           textSub: data.clientInstagram,
                                         ),
@@ -1133,11 +1135,21 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                                           spacing: 10,
                                           children: [
                                             LBUttonMobile(
-                                              ontap: () {},
+                                              ontap:data.editedPhoto.isEmpty?null: () {
+                                                Logger().d("ini di klik");
+                                                showDialog(context: context, builder: (context) => ListEditPhotoDialog(listEditedPhoto: data.editedPhoto,),);
+                                              },
                                               teks: "Lihat List Edit",
                                             ),
                                             LBUttonMobile(
-                                              ontap: () {},
+                                              ontap:data.editedPhoto.isEmpty?null: () async {
+                                                await Clipboard.setData(ClipboardData(text: data.editedPhoto));
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text('List edit foto berhasil disalin')),
+                                                  );
+                                                }
+                                              },
                                               teks: "Copy",
                                               color: MyColor.birutua,
                                             ),
@@ -1202,11 +1214,20 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                                           spacing: 10,
                                           children: [
                                             LButtonWeb(
-                                              ontap: () {},
+                                              ontap: data.editedPhoto.isEmpty?null:() {
+                                                showDialog(context: context, builder: (context) => ListEditPhotoDialog(listEditedPhoto: data.editedPhoto,),);
+                                              },
                                               teks: "Lihat List Edit",
                                             ),
                                             LButtonWeb(
-                                              ontap: () {},
+                                              ontap: data.editedPhoto.isEmpty?null: () async {
+                                                await Clipboard.setData(ClipboardData(text: data.editedPhoto));
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text('List edit foto berhasil disalin')),
+                                                  );
+                                                }
+                                              },
                                               teks: "Copy",
                                               color: MyColor.birutua,
                                             ),
@@ -1321,6 +1342,54 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                 ),
               );
             },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ListEditPhotoDialog extends StatefulWidget {
+  final String listEditedPhoto;
+  const ListEditPhotoDialog({
+    super.key, required this.listEditedPhoto,
+  });
+
+  @override
+  State<ListEditPhotoDialog> createState() => _ListEditPhotoDialogState();
+}
+
+class _ListEditPhotoDialogState extends State<ListEditPhotoDialog> {
+  late TextEditingController textcontroller = TextEditingController();
+  @override
+  void initState() {
+    textcontroller.text = widget.listEditedPhoto;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    textcontroller.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 600,
+      height: 800,
+      child: Center(
+        child: Card(
+          color: MyColor.abuDialog,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: SingleChildScrollView(child: SizedBox(
+              width: 600,
+              child: Column(
+                children: [
+                  ItemDetailInputOutlineGreenText(judul: "List Item Yang Perlu Diedit", controller: textcontroller,maxLength: 6,)
+                ],
+              ),
+            )),
           ),
         ),
       ),

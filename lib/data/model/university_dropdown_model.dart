@@ -6,7 +6,7 @@ part 'university_dropdown_model.g.dart';
 @JsonSerializable()
 class UniversityDropdownResponse {
   final String message;
-  final Metadata metadata;
+  final Metadata? metadata;
   final List<UniversityItem> data;
 
   UniversityDropdownResponse({
@@ -23,10 +23,10 @@ class UniversityDropdownResponse {
   UniversityDropdown toEntity() {
     return UniversityDropdown(
       message: message,
-      count: metadata.count,
-      totalPages: metadata.totalPages,
-      page: metadata.page,
-      limit: metadata.limit,
+      count: metadata?.count??0,
+      totalPages: metadata?.totalPages??0,
+      page: metadata?.page??0,
+      limit: metadata?.limit??0,
       universities: data.map((item) => item.toEntity()).toList(),
     );
   }
@@ -38,7 +38,7 @@ class Metadata {
   @JsonKey(name: 'total_pages')
   final int totalPages;
   final int page;
-  final int limit;
+  final int? limit;
 
   Metadata({
     required this.count,

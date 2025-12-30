@@ -8,12 +8,110 @@ import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/persentation/cubit/auth_cubit.dart';
 
 class MainScaffoldDrawer extends StatelessWidget {
-  final StatefulNavigationShell navigationShell;
-  const MainScaffoldDrawer({super.key, required this.navigationShell});
+  final StatefulNavigationShell statefulNavigationShell;
+  const MainScaffoldDrawer({super.key, required this.statefulNavigationShell});
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(child: ListView());
+    return Drawer(child: ListView(
+      children: [
+        ItemSideNavigation(
+              judul: "Dashboard",
+              aset: MyIcon.icondashboard,
+              isActive: statefulNavigationShell.currentIndex == 0,
+              onTap: () => statefulNavigationShell.goBranch(0),
+            ),
+            ItemSideNavigation(
+              judul: "Find Edited Photo",
+              aset: MyIcon.iconpengaturan,
+              isActive: statefulNavigationShell.currentIndex == 1,
+              onTap: () => statefulNavigationShell.goBranch(1),
+            ),
+            ItemSideNavigationDropdown(
+              judul: "Manajemen Client",
+              aset: MyIcon.iconmanajemenclien,
+              isActive: false,
+              subitem: [
+                ItemSideNavigation(
+                  judul: "Schedule",
+                  isActive: statefulNavigationShell.currentIndex == 3,
+                  onTap: () => statefulNavigationShell.goBranch(3),
+                  aset: MyIcon.iconmanajemenclien,
+                ),
+                ItemSideNavigation(
+                  judul: "client",
+                  isActive: statefulNavigationShell.currentIndex == 2,
+                  onTap: () => statefulNavigationShell.goBranch(2),
+                  aset: MyIcon.iconmanajemenclien,
+                ),
+              ],
+            ),
+            ItemSideNavigationDropdown(
+              judul: "User Management",
+              isActive: false,
+              aset: MyIcon.iconusers,
+              subitem: [
+                ItemSideNavigation(
+                  judul: "User",
+                  isActive: statefulNavigationShell.currentIndex == 4,
+                  onTap: () => statefulNavigationShell.goBranch(4),
+                  aset: MyIcon.iconusers,
+                ),
+                ItemSideNavigation(
+                  judul: "Admin",
+                  isActive: statefulNavigationShell.currentIndex == 5,
+                  onTap: () => statefulNavigationShell.goBranch(5),
+                  aset: MyIcon.iconusers,
+                ),
+                ItemSideNavigation(
+                  judul: "Photographer",
+                  isActive: statefulNavigationShell.currentIndex == 6,
+                  onTap: () => statefulNavigationShell.goBranch(6),
+                  aset: MyIcon.iconusers,
+                ),
+              ],
+            ),
+            ItemSideNavigationDropdown(
+              judul: "Reference Settings",
+              isActive: false,
+              aset: MyIcon.iconreferensi,
+              subitem: [
+                ItemSideNavigation(
+                  judul: "Universitas",
+                  isActive: statefulNavigationShell.currentIndex == 7,
+                  onTap: () => statefulNavigationShell.goBranch(7),
+                  aset: MyIcon.iconreferensi,
+                ),
+                ItemSideNavigation(
+                  judul: "Package",
+                  isActive: statefulNavigationShell.currentIndex == 8,
+                  onTap: () => statefulNavigationShell.goBranch(8),
+                  aset: MyIcon.iconreferensi,
+                ),
+                ItemSideNavigation(
+                  judul: "Photographer",
+                  isActive: statefulNavigationShell.currentIndex == 9,
+                  onTap: () => statefulNavigationShell.goBranch(9),
+                  aset: MyIcon.iconreferensi,
+                ),
+              ],
+            ),
+            ItemSideNavigation(
+              judul: "Setting",
+              isActive: statefulNavigationShell.currentIndex == 10,
+              onTap: () => statefulNavigationShell.goBranch(10),
+              aset: MyIcon.iconpengaturan,
+            ),
+            ItemSideNavigation(
+              judul: "Logout",
+              isActive: false,
+              onTap: () {
+                context.read<AuthCubit>().logOut();
+              },
+              aset: MyIcon.iconcancel,
+            ),
+      ],
+    ));
   }
 }
 
@@ -100,7 +198,19 @@ class SideNavigation extends StatelessWidget {
                   onTap: () => statefulNavigationShell.goBranch(8),
                   aset: MyIcon.iconreferensi,
                 ),
+                ItemSideNavigation(
+                  judul: "Photographer",
+                  isActive: statefulNavigationShell.currentIndex == 9,
+                  onTap: () => statefulNavigationShell.goBranch(9),
+                  aset: MyIcon.iconreferensi,
+                ),
               ],
+            ),
+            ItemSideNavigation(
+              judul: "Setting",
+              isActive: statefulNavigationShell.currentIndex == 10,
+              onTap: () => statefulNavigationShell.goBranch(10),
+              aset: MyIcon.iconpengaturan,
             ),
             ItemSideNavigation(
               judul: "Logout",

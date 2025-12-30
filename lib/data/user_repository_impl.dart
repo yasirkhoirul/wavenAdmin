@@ -1,6 +1,7 @@
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/remote_data.dart';
 import 'package:wavenadmin/data/model/admin_detail_model.dart';
+import 'package:wavenadmin/data/model/create_fotografer_request.dart';
 import 'package:wavenadmin/data/model/user_detial_fotografer_model.dart';
 import 'package:wavenadmin/domain/entity/detail_admin.dart';
 import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
@@ -106,6 +107,16 @@ class UserRepositoryImpl implements UserRepositoty {
     try {
       final response = await remoteData.getPhotographerDropdown(page, limit, search: search);
       return response.toEntity();
+    } catch (e) {
+      rethrow;
+    }
+  }
+  
+  @override
+  Future<String> createFotografer(UserFotografer data,String username,String password,String email) async{
+    try {
+      final payload = CreateFotograferRequest.fromEntity(data, username: username, password: password, email: email);
+      return await remoteData.createFotografer(payload);
     } catch (e) {
       rethrow;
     }

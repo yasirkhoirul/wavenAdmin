@@ -50,7 +50,7 @@ BookingData _$BookingDataFromJson(Map<String, dynamic> json) => BookingData(
   endTime: json['end_time'] as String,
   paymentMethod: json['payment_method'] as String,
   paymentType: json['payment_type'] as String,
-  amount: (json['amount'] as num).toDouble(),
+  amount: (json['amount'] as num).toInt(),
   addonIds: (json['addon_ids'] as List<dynamic>)
       .map((e) => e as String)
       .toList(),

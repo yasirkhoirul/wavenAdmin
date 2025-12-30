@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wavenadmin/common/constant.dart';
+import 'package:wavenadmin/data/model/usermodel.dart';
 import 'package:wavenadmin/persentation/riverpod/state/photographer_paged_state.dart';
 import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
 
@@ -26,7 +27,7 @@ class PhotographerList extends _$PhotographerList {
 
       state = state.copyWith(
         items: result.listData,
-        metadata: result.metada,
+        metadata: result.metada??Metadata(count: 0, totalPages: 0, page: 0, limit: limit),
         currentPage: 0,
         highestPage: 0,
         hasMore: result.listData.length == limit,

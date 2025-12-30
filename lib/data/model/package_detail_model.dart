@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'package_detail_model.g.dart';
@@ -23,7 +25,7 @@ class PackageDetailData {
   final String id;
   final String title;
   final int price;
-  
+  final List<int>? gambarDetail;
   @JsonKey(name: 'banner_url')
   final String bannerUrl;
   
@@ -46,6 +48,7 @@ class PackageDetailData {
     required this.isActive,
     required this.createdAt,
     required this.benefits,
+    this.gambarDetail
   });
 
   factory PackageDetailData.fromJson(Map<String, dynamic> json) =>

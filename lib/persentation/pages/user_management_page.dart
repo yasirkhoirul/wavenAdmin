@@ -7,7 +7,7 @@ import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/data/model/update_user_request_model.dart';
 import 'package:wavenadmin/domain/entity/detail_user.dart';
-import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
+import 'package:wavenadmin/persentation/pages/fotografer_mangement_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/update_user_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/userDetail.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/user_list_notifier.dart';
@@ -45,17 +45,13 @@ class _UserManagementpageState extends ConsumerState<UserManagementpage> {
           child: Column(
             children: [
               Row(
-                children: [HeaderPage
-                (icon: MyIcon.iconusers, judul: "User")],
+                children: [HeaderPage(icon: MyIcon.iconusers, judul: "User")],
               ),
               Row(
                 children: [
                   Flexible(
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: 400,
-                        minWidth: 200
-                      ) ,
+                      constraints: BoxConstraints(maxWidth: 400, minWidth: 200),
                       child: CardItemContainer(
                         aset: MyIcon.iconusers,
                         judul: "Total Users",
@@ -91,7 +87,7 @@ class _TabelUserState extends ConsumerState<TabelUser> {
   List<String> _idCheck = [];
   SortUser sortBy = SortUser.name;
   bool isAsc = true;
-  
+
   @override
   void initState() {
     super.initState();
@@ -204,27 +200,63 @@ class _TabelUserState extends ConsumerState<TabelUser> {
         ),
       ),
       DataColumn(label: Text("Aksi")),
-      DataColumn(label: ColumnSort(label: "Nama User", onTap: (){
-        setState(() {
-          isAsc = !isAsc;
-          sortBy = SortUser.name;
-        });
-        ref.read(userGetListProvider.notifier).getListUsers(widget.limit,search: searchController.text,sort: isAsc?Sort.asc:Sort.desc,sortBy: sortBy);
-      })),
-      DataColumn(label: ColumnSort(label: "Email", onTap: () {
-        setState(() {
-          isAsc = !isAsc;
-          sortBy = SortUser.email;
-        });
-        ref.read(userGetListProvider.notifier).getListUsers(widget.limit,search: searchController.text,sort: isAsc?Sort.asc:Sort.desc,sortBy: sortBy);
-      },)),
-      DataColumn(label: ColumnSort(label: "Universitas", onTap: (){
-        setState(() {
-          isAsc = !isAsc;
-          sortBy = SortUser.university_name;
-        });
-        ref.read(userGetListProvider.notifier).getListUsers(widget.limit,search: searchController.text,sort: isAsc?Sort.asc:Sort.desc,sortBy: sortBy);
-      })),
+      DataColumn(
+        label: ColumnSort(
+          label: "Nama User",
+          onTap: () {
+            setState(() {
+              isAsc = !isAsc;
+              sortBy = SortUser.name;
+            });
+            ref
+                .read(userGetListProvider.notifier)
+                .getListUsers(
+                  widget.limit,
+                  search: searchController.text,
+                  sort: isAsc ? Sort.asc : Sort.desc,
+                  sortBy: sortBy,
+                );
+          },
+        ),
+      ),
+      DataColumn(
+        label: ColumnSort(
+          label: "Email",
+          onTap: () {
+            setState(() {
+              isAsc = !isAsc;
+              sortBy = SortUser.email;
+            });
+            ref
+                .read(userGetListProvider.notifier)
+                .getListUsers(
+                  widget.limit,
+                  search: searchController.text,
+                  sort: isAsc ? Sort.asc : Sort.desc,
+                  sortBy: sortBy,
+                );
+          },
+        ),
+      ),
+      DataColumn(
+        label: ColumnSort(
+          label: "Universitas",
+          onTap: () {
+            setState(() {
+              isAsc = !isAsc;
+              sortBy = SortUser.university_name;
+            });
+            ref
+                .read(userGetListProvider.notifier)
+                .getListUsers(
+                  widget.limit,
+                  search: searchController.text,
+                  sort: isAsc ? Sort.asc : Sort.desc,
+                  sortBy: sortBy,
+                );
+          },
+        ),
+      ),
       DataColumn(label: Text("No Hp")),
     ];
     return LayoutBuilder(
@@ -241,7 +273,9 @@ class _TabelUserState extends ConsumerState<TabelUser> {
                     padding: const EdgeInsets.all(8.0),
                     child: OutlinedSearcchBar(
                       onSubmitted: (String p1) {
-                        ref.read(userGetListProvider.notifier).getListUsers(widget.limit,search: p1);
+                        ref
+                            .read(userGetListProvider.notifier)
+                            .getListUsers(widget.limit, search: p1);
                       },
                       controller: searchController,
                     ),
@@ -263,7 +297,10 @@ class _TabelUserState extends ConsumerState<TabelUser> {
                             dataColumnUser: dataColumnUser,
                             datarow: datarow,
                           )
-                        : Center(child: CircularProgressIndicator()),
+                        : SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
                   ),
                 );
               },
@@ -274,14 +311,22 @@ class _TabelUserState extends ConsumerState<TabelUser> {
                       ref.read(userGetListProvider.notifier).back();
                     }
                   : null,
-              next: (state.metadata?.totalPages??0) > state.currentpage + 1 && !(state.isloading??true)
+              next:
+                  (state.metadata?.totalPages ?? 0) > state.currentpage + 1 &&
+                      !(state.isloading ?? true)
                   ? () {
-                    
-                    ref.read(userGetListProvider.notifier).appendData(widget.limit,search: searchController.text,sort: isAsc?Sort.asc:Sort.desc,sortBy: sortBy);
-                  }
+                      ref
+                          .read(userGetListProvider.notifier)
+                          .appendData(
+                            widget.limit,
+                            search: searchController.text,
+                            sort: isAsc ? Sort.asc : Sort.desc,
+                            sortBy: sortBy,
+                          );
+                    }
                   : null,
-              jumlahPage: state.metadata?.totalPages??0,
-              currentPage: state.currentpage+1,
+              jumlahPage: state.metadata?.totalPages ?? 0,
+              currentPage: state.currentpage + 1,
             ),
           ],
         );
@@ -502,9 +547,7 @@ class _DetailUserDialogState extends ConsumerState<DetailUserDialog> {
   Widget _buildUniversityField(DetailUser user) {
     return ItemDetailOutline(
       judul: "Universitas",
-      sub: ItemDetailText(
-        textSub: user.universityName ?? '-',
-      ),
+      sub: ItemDetailText(textSub: user.universityName ?? '-'),
     );
   }
 

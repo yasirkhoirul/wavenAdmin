@@ -43,6 +43,9 @@ class UserPhotographerModel {
   @JsonKey(name: 'fee_per_hour')
   final int? feePerHour;
 
+  @JsonKey(name: 'is_active')
+  final bool isActive;
+
   final String? gears;
   final String? instagram;
   final String? location;
@@ -56,7 +59,7 @@ class UserPhotographerModel {
     this.feePerHour,
     this.gears,
     this.instagram,
-    this.location,
+    this.location, required this.isActive,
   });
 
   UserFotografer toEntity() {
@@ -69,7 +72,7 @@ class UserPhotographerModel {
       feePerHour: feePerHour,
       gears: gears,
       instagram: instagram,
-      location: location,
+      location: location, isActive: isActive,
     );
   }
 

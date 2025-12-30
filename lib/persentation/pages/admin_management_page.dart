@@ -5,7 +5,7 @@ import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/domain/entity/detail_admin.dart';
-import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
+import 'package:wavenadmin/persentation/pages/fotografer_mangement_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_detail_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_list_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_mutation_notifier.dart';

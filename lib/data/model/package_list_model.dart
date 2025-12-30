@@ -5,7 +5,7 @@ part 'package_list_model.g.dart';
 @JsonSerializable()
 class PackageListModel {
   final String message;
-  final PackageMetadata metadata;
+  final PackageMetadata? metadata;
   final List<PackageData> data;
 
   PackageListModel({

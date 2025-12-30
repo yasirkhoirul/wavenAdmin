@@ -9,9 +9,9 @@ part of 'package_list_model.dart';
 PackageListModel _$PackageListModelFromJson(Map<String, dynamic> json) =>
     PackageListModel(
       message: json['message'] as String,
-      metadata: PackageMetadata.fromJson(
-        json['metadata'] as Map<String, dynamic>,
-      ),
+      metadata: json['metadata'] == null
+          ? null
+          : PackageMetadata.fromJson(json['metadata'] as Map<String, dynamic>),
       data: (json['data'] as List<dynamic>)
           .map((e) => PackageData.fromJson(e as Map<String, dynamic>))
           .toList(),

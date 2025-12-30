@@ -11,10 +11,10 @@ class UniversitasList {
 }
 
 class UniversityMetadata {
-  final int count;
-  final int totalPages;
-  final int page;
-  final int limit;
+  final int? count;
+  final int? totalPages;
+  final int? page;
+  final int? limit;
 
   UniversityMetadata({
     required this.count,

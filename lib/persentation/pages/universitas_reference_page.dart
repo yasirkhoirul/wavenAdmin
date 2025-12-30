@@ -5,7 +5,7 @@ import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/domain/entity/university_detail.dart';
-import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
+import 'package:wavenadmin/persentation/pages/fotografer_mangement_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/university/create_university_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/university/delete_university_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/university/get_university_list_notifier.dart';
@@ -59,14 +59,9 @@ class _UniversitasReferencePageState
                       Flexible(
                         child: OutlinedSearcchBar(
                           onSubmitted: (value) {
-                            ref.invalidate(
-                              getUniversityListProvider(
-                                0,
-                                limit,
-                                search: value,
-                                sort: sortBy,
-                              ),
-                            );
+                            setState(() {
+                              searchController.text = value;
+                            });
                           },
                           controller: searchController,
                         ),
@@ -293,20 +288,20 @@ class _UniversitasReferencePageState
         FooterTabel(
           back: state.currentPage > 0
               ? () {
-                  ref.read(getUniversityListProvider(0, limit).notifier).back();
+                  ref.read(getUniversityListProvider(0, limit,search: searchController.text,sort: sortBy).notifier).back();
                 }
               : null,
           next: state.metadata?.totalPages != (state.currentPage + 1)
               ? () {
                   ref
-                      .read(getUniversityListProvider(0, limit).notifier)
+                      .read(getUniversityListProvider(0, limit,search: searchController.text,sort: sortBy).notifier)
                       .appendData(
                         
                       );
                 }
               : null,
           jumlahPage: state.metadata?.totalPages ?? 0,
-          currentPage: state.currentPage,
+          currentPage: state.currentPage+1,
         ),
       ],
     );

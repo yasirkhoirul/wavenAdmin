@@ -5,7 +5,7 @@ part 'universitas_list_model.g.dart';
 @JsonSerializable()
 class UniversitasListModel {
   final String message;
-  final UniversityMetadata metadata;
+  final UniversityMetadata? metadata;
   final List<UniversityData> data;
 
   UniversitasListModel({

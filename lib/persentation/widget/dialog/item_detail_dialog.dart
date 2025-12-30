@@ -61,7 +61,9 @@ class ItemDetail extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Container(padding: const EdgeInsets.all(2), child: sub),
+        Container(
+          
+          padding: const EdgeInsets.all(2), child: sub),
       ],
     );
   }
@@ -164,6 +166,7 @@ class ItemDetailInputOutlineGreenText extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? textInputFormatter;
   final bool enabled;
+  final int? maxLength;
   const ItemDetailInputOutlineGreenText({
     super.key,
     required this.judul,
@@ -171,6 +174,7 @@ class ItemDetailInputOutlineGreenText extends StatelessWidget {
     this.validator,
     this.keyboardType,
     this.enabled = true, this.textInputFormatter,
+    this.maxLength
   });
 
   @override
@@ -192,6 +196,7 @@ class ItemDetailInputOutlineGreenText extends StatelessWidget {
             color: MyColor.hijauaccent,
             fontWeight: FontWeight.w200,
           ),
+          maxLines: maxLength,
           keyboardType: keyboardType,
           enabled: enabled,
           validator: validator,

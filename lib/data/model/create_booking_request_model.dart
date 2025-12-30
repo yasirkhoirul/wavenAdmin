@@ -70,7 +70,7 @@ class BookingData {
   @JsonKey(name: 'payment_type')
   final String paymentType;
   
-  final double amount;
+  final int amount;
   
   @JsonKey(name: 'addon_ids')
   final List<String> addonIds;

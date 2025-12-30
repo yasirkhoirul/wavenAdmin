@@ -1,8 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:wavenadmin/persentation/cubit/auth_cubit.dart';
+import 'package:wavenadmin/persentation/pages/fotografer_reference_page.dart';
 import 'package:wavenadmin/persentation/pages/package_reference_page.dart';
 import 'package:wavenadmin/persentation/pages/payment_result_page.dart';
-import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
+import 'package:wavenadmin/persentation/pages/pengaturan_page.dart';
+import 'package:wavenadmin/persentation/pages/fotografer_mangement_page.dart';
 import 'package:wavenadmin/persentation/pages/universitas_reference_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/auth_listen.dart';
 import 'package:wavenadmin/persentation/pages/admin_management_page.dart';
@@ -10,7 +12,7 @@ import 'package:wavenadmin/persentation/pages/client_page.dart';
 import 'package:wavenadmin/persentation/pages/dashboard_page.dart';
 import 'package:wavenadmin/persentation/pages/login_page.dart';
 import 'package:wavenadmin/persentation/pages/mains_caffold.dart';
-import 'package:wavenadmin/persentation/pages/pengaturan_page.dart';
+import 'package:wavenadmin/persentation/pages/filemover_page.dart';
 import 'package:wavenadmin/persentation/pages/schedule_page.dart';
 import 'package:wavenadmin/persentation/pages/user_management_page.dart';
 
@@ -114,8 +116,16 @@ class Approuter {
             StatefulShellBranch(
               routes: [
                 GoRoute(
-                  path: '/addon',
-                  builder: (context, state) => const UniversitasReferencePage(),
+                  path: '/fotograferReferensi',
+                  builder: (context, state) => const FotograferReferencePage(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/pengaturanPage',
+                  builder: (context, state) => const PengaturanPage(),
                 ),
               ],
             ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/model/create_booking_request_model.dart';
 import 'package:wavenadmin/domain/entity/detail_user.dart';
@@ -13,7 +14,7 @@ import 'package:wavenadmin/domain/usecase/get_package_dropdown.dart';
 import 'package:wavenadmin/injection.dart';
 import 'package:wavenadmin/domain/usecase/create_booking_usecase.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/userDetail.dart';
-import 'dart:html' as html;
+import 'package:wavenadmin/common/web_helper.dart';
 
 part 'booking_form_state.g.dart';
 
@@ -34,7 +35,7 @@ class BookingFormState {
   final TransactionPayMethod? selectedPaymentMethod;
   final TransactionPayType? selectedPaymentType;
   final List<Addon> selectedAddons;
-  final double calculatedAmount;
+  final int calculatedAmount;
 
   // Additional Data
   final University? selectedUniversity;
@@ -93,7 +94,7 @@ class BookingFormState {
     TransactionPayMethod? selectedPaymentMethod,
     TransactionPayType? selectedPaymentType,
     List<Addon>? selectedAddons,
-    double? calculatedAmount,
+    int? calculatedAmount,
     University? selectedUniversity,
     XFile? selectedImage,
     bool? isFetchingPackageDetail,
@@ -336,22 +337,22 @@ class BookingForm extends _$BookingForm {
     final currentState = state.value;
     if (currentState == null) return;
 
-    double amount = 0;
+    int amount = 0;
 
     // Add package price
     if (currentState.selectedPackage != null &&
         currentState.selectedPackage!.price != null) {
-      amount += currentState.selectedPackage!.price!.toDouble();
+      amount += currentState.selectedPackage!.price!;
     }
 
     // Add addons prices
     for (final addon in currentState.selectedAddons) {
-      amount += addon.price.toDouble();
+      amount += addon.price;
     }
 
-    // Apply payment type (dp = 50%)
+    // Apply payment type (dp = 50%) - use integer division
     if (currentState.selectedPaymentType == TransactionPayType.dp) {
-      amount = amount / 2;
+      amount = amount ~/ 2;
     }
 
     state = AsyncValue.data(currentState.copyWith(calculatedAmount: amount));
@@ -488,9 +489,23 @@ class BookingForm extends _$BookingForm {
         request,
         currentState.selectedImage,
       );
-      if (kIsWeb && response.data?.actions != null && response.data?.actions?.redirectUrl!=null) {
-        html.window.open(response.data?.actions?.redirectUrl ?? '', '_blank');
+      
+      // Handle payment redirect based on platform
+      if (response.data?.actions != null && 
+          response.data?.actions?.redirectUrl != null) {
+        final redirectUrl = response.data!.actions!.redirectUrl!;
+        
+        if (kIsWeb) {
+          // Web: Open in new tab, user stays on admin page
+          openUrlInNewTab(redirectUrl);
+        } else {
+          // Mobile/Desktop: Open in appropriate way
+          // For Android/iOS: Will use in-app browser (WebView/Custom Tabs)
+          // For Windows/Linux/macOS: Will use default system browser
+          await _handlePaymentRedirect(redirectUrl);
+        }
       }
+      
       state = AsyncValue.data(currentState.copyWith(isSubmitting: false));
 
       return true;
@@ -503,6 +518,37 @@ class BookingForm extends _$BookingForm {
         ),
       );
       return false;
+    }
+  }
+
+  /// Handle payment redirect for non-web platforms
+  /// - Android/iOS: Opens in in-app browser (WebView/Custom Tabs)
+  /// - Windows/Desktop: Opens in system default browser
+  Future<void> _handlePaymentRedirect(String url) async {
+    try {
+      final uri = Uri.parse(url);
+      
+      // For mobile platforms (Android/iOS), use in-app WebView
+      // For desktop platforms (Windows/Linux/macOS), use external browser
+      final mode = defaultTargetPlatform == TargetPlatform.android ||
+              defaultTargetPlatform == TargetPlatform.iOS
+          ? LaunchMode.inAppWebView
+          : LaunchMode.externalApplication;
+
+      final launched = await launchUrl(
+        uri,
+        mode: mode,
+        webViewConfiguration: const WebViewConfiguration(
+          enableJavaScript: true,
+          enableDomStorage: true,
+        ),
+      );
+
+      if (!launched) {
+        Logger().e('Could not launch payment URL: $url');
+      }
+    } catch (e) {
+      Logger().e('Error launching payment URL: $e');
     }
   }
 }

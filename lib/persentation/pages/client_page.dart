@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
-import 'package:wavenadmin/persentation/pages/photo_grapher_management_page.dart';
+import 'package:wavenadmin/persentation/pages/fotografer_mangement_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/booking/booking_notifier.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/carditemcontainer.dart';

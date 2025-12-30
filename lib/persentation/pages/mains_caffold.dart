@@ -15,7 +15,7 @@ class Mainscaffold extends StatelessWidget {
       ),
       drawer: iswidth
           ? null
-          : MainScaffoldDrawer(navigationShell: navigationShellState),
+          : MainScaffoldDrawer(statefulNavigationShell: navigationShellState),
       body: SafeArea(
         child: Row(
           children: [
@@ -41,6 +41,6 @@ class Mainscaffold extends StatelessWidget {
         ),
       ),
     );
-  }
+  }  
 }
 

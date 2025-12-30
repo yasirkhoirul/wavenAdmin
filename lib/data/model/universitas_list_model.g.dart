@@ -10,9 +10,9 @@ UniversitasListModel _$UniversitasListModelFromJson(
   Map<String, dynamic> json,
 ) => UniversitasListModel(
   message: json['message'] as String,
-  metadata: UniversityMetadata.fromJson(
-    json['metadata'] as Map<String, dynamic>,
-  ),
+  metadata: json['metadata'] == null
+      ? null
+      : UniversityMetadata.fromJson(json['metadata'] as Map<String, dynamic>),
   data: (json['data'] as List<dynamic>)
       .map((e) => UniversityData.fromJson(e as Map<String, dynamic>))
       .toList(),

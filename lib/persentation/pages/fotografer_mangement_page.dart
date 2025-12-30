@@ -6,12 +6,15 @@ import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
+import 'package:wavenadmin/persentation/riverpod/notifier/photographer/create_fotografer.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/fotografer_detail.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/fotografer_mutation.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/photographer_list.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
+import 'package:wavenadmin/persentation/widget/dialog/dialog_tambah_fotografer.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
 import 'package:wavenadmin/persentation/widget/header_page.dart';
+import 'package:wavenadmin/persentation/widget/mychip.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import 'package:wavenadmin/persentation/widget/tabelcontent.dart';
 
@@ -74,6 +77,7 @@ class _TabelPhotographerState extends ConsumerState<TabelPhotographer> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(photographerListProvider);
+    final stateCreate = ref.watch(createFotograferProvider);
     Logger().d(
       "ini adalah current page,${state.currentPage} dan ini high ${state.highestPage}",
     );
@@ -88,11 +92,13 @@ class _TabelPhotographerState extends ConsumerState<TabelPhotographer> {
               isAsc = !isAsc;
               sortBy = SortPhotographer.name;
             });
-            ref.read(photographerListProvider.notifier).loadFirstPage(
-              search: searchcontroller.text,
-              sort: isAsc ? Sort.asc : Sort.desc,
-              sortBy: sortBy,
-            );
+            ref
+                .read(photographerListProvider.notifier)
+                .loadFirstPage(
+                  search: searchcontroller.text,
+                  sort: isAsc ? Sort.asc : Sort.desc,
+                  sortBy: sortBy,
+                );
           },
         ),
       ),
@@ -106,11 +112,13 @@ class _TabelPhotographerState extends ConsumerState<TabelPhotographer> {
               isAsc = !isAsc;
               sortBy = SortPhotographer.location;
             });
-            ref.read(photographerListProvider.notifier).loadFirstPage(
-              search: searchcontroller.text,
-              sort: isAsc ? Sort.asc : Sort.desc,
-              sortBy: sortBy,
-            );
+            ref
+                .read(photographerListProvider.notifier)
+                .loadFirstPage(
+                  search: searchcontroller.text,
+                  sort: isAsc ? Sort.asc : Sort.desc,
+                  sortBy: sortBy,
+                );
           },
         ),
       ),
@@ -123,11 +131,13 @@ class _TabelPhotographerState extends ConsumerState<TabelPhotographer> {
               isAsc = !isAsc;
               sortBy = SortPhotographer.fee_per_hour;
             });
-            ref.read(photographerListProvider.notifier).loadFirstPage(
-              search: searchcontroller.text,
-              sort: isAsc ? Sort.asc : Sort.desc,
-              sortBy: sortBy,
-            );
+            ref
+                .read(photographerListProvider.notifier)
+                .loadFirstPage(
+                  search: searchcontroller.text,
+                  sort: isAsc ? Sort.asc : Sort.desc,
+                  sortBy: sortBy,
+                );
           },
         ),
       ),
@@ -139,14 +149,17 @@ class _TabelPhotographerState extends ConsumerState<TabelPhotographer> {
               isAsc = !isAsc;
               sortBy = SortPhotographer.bank_account;
             });
-            ref.read(photographerListProvider.notifier).loadFirstPage(
-              search: searchcontroller.text,
-              sort: isAsc ? Sort.asc : Sort.desc,
-              sortBy: sortBy,
-            );
+            ref
+                .read(photographerListProvider.notifier)
+                .loadFirstPage(
+                  search: searchcontroller.text,
+                  sort: isAsc ? Sort.asc : Sort.desc,
+                  sortBy: sortBy,
+                );
           },
         ),
       ),
+      const DataColumn(label: Text("Status")),
       const DataColumn(label: Text("No Rekening")),
     ];
     final datRow = state.items
@@ -184,6 +197,12 @@ class _TabelPhotographerState extends ConsumerState<TabelPhotographer> {
               DataCell(Text(e.value.gears ?? '')),
               DataCell(Text(e.value.feePerHour.toString())),
               DataCell(Text(e.value.bankAccount ?? '')),
+              DataCell(
+                Mychip(
+                  label: e.value.isActive ? "Aktif" : "Tidak Aktif",
+                  color: e.value.isActive ? MyColor.hijauaccent : MyColor.oren,
+                ),
+              ),
               DataCell(Text(e.value.accountNumber ?? '')),
             ],
           ),
@@ -192,9 +211,8 @@ class _TabelPhotographerState extends ConsumerState<TabelPhotographer> {
     return Column(
       spacing: 10,
       children: [
-        
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             OutlinedSearcchBar(
               onSubmitted: (String p1) {
@@ -204,6 +222,9 @@ class _TabelPhotographerState extends ConsumerState<TabelPhotographer> {
               },
               controller: searchcontroller,
             ),
+            MButtonWeb(ontap: () async {
+              showDialog(context: context, builder: (context) => DialogTambahFotografer(),);
+            }, teks: "Tambah", icon: Icons.add),
           ],
         ),
         SingleChildScrollView(
@@ -259,8 +280,12 @@ class DialogDeleteFotografer extends ConsumerWidget {
           actions: isNull
               ? <Widget>[
                   MButtonWeb(
-                    ontap: () async{
-                      await ref.read(fotograferMutationProvider(idFotografer).notifier).deleteFotografer();
+                    ontap: () async {
+                      await ref
+                          .read(
+                            fotograferMutationProvider(idFotografer).notifier,
+                          )
+                          .deleteFotografer();
                     },
                     teks: "Ok",
                   ),
@@ -272,10 +297,13 @@ class DialogDeleteFotografer extends ConsumerWidget {
         return AlertDialog(content: Text(error.toString()));
       },
       loading: () {
-        return AlertDialog(content: SizedBox(
-          height: 50,
-          width: 50,
-          child: Center(child: CircularProgressIndicator())));
+        return AlertDialog(
+          content: SizedBox(
+            height: 50,
+            width: 50,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        );
       },
     );
   }
@@ -325,7 +353,7 @@ class _DialogDetailFotograferState
             rekening.text = data.accountNumber ?? '';
             namabank.text = data.bankAccount ?? '';
             location.text = '';
-            
+
             gear.text = data.gear ?? '';
             fee.text = data.feePerHour?.toString() ?? '';
             _isActive = data.isActive;
@@ -480,7 +508,7 @@ class _DialogDetailFotograferState
                                 ),
                               ],
                             ),
-                          )
+                          ),
                         ],
                       );
                     },
@@ -627,18 +655,26 @@ class FooterTabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> dataList = [
-      Expanded(child: Text("Jumlah Page ${jumlahPage ?? 0}",style: GoogleFonts.robotoFlex(
-            fontWeight: FontWeight.bold
-          ),)),
+      Expanded(
+        child: Text(
+          "Jumlah Page ${jumlahPage ?? 0}",
+          style: GoogleFonts.robotoFlex(fontWeight: FontWeight.bold),
+        ),
+      ),
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 10,
         children: [
-          MediaQuery.of(context).size.width > 900?MButtonWeb(ontap: back, teks: "Kembali"):MButtonMobile(ontap: back, teks: "Kembali"),
-          Text("$currentPage",style: GoogleFonts.robotoFlex(
-            fontWeight: FontWeight.bold
-          ),),
-           MediaQuery.of(context).size.width > 900?MButtonWeb(ontap: next, teks: "Berikutnya"):MButtonMobile(ontap: next, teks: "Berikutnya"),
+          MediaQuery.of(context).size.width > 900
+              ? MButtonWeb(ontap: back, teks: "Kembali")
+              : MButtonMobile(ontap: back, teks: "Kembali"),
+          Text(
+            "$currentPage",
+            style: GoogleFonts.robotoFlex(fontWeight: FontWeight.bold),
+          ),
+          MediaQuery.of(context).size.width > 900
+              ? MButtonWeb(ontap: next, teks: "Berikutnya")
+              : MButtonMobile(ontap: next, teks: "Berikutnya"),
         ],
       ),
     ];
@@ -662,11 +698,7 @@ class ColumnSort extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const ColumnSort({
-    super.key,
-    required this.label,
-    required this.onTap,
-  });
+  const ColumnSort({super.key, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -675,10 +707,7 @@ class ColumnSort extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label),
-        InkWell(
-          onTap: onTap,
-          child: Icon(Icons.sort),
-        ),
+        InkWell(onTap: onTap, child: Icon(Icons.sort)),
       ],
     );
   }

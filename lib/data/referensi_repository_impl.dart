@@ -17,10 +17,10 @@ class ReferensiRepositoryImpl implements ReferensiRepository {
     return UniversitasList(
       message: model.message,
       metadata: UniversityMetadata(
-        count: model.metadata.count,
-        totalPages: model.metadata.totalPages,
-        page: model.metadata.page,
-        limit: model.metadata.limit,
+        count: model.metadata?.count,
+        totalPages: model.metadata?.totalPages,
+        page: model.metadata?.page,
+        limit: model.metadata?.limit,
       ),
       data: model.data.map((item) => UniversityItem(
         id: item.id,

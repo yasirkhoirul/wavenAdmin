@@ -1,6 +1,7 @@
 import 'package:logger/web.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wavenadmin/common/constant.dart';
+import 'package:wavenadmin/domain/entity/universitas_list.dart';
 import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
 import 'package:wavenadmin/persentation/riverpod/state/universitas_list_state.dart';
 
@@ -24,7 +25,7 @@ class GetUniversityListNotifier extends _$GetUniversityListNotifier {
       isReached: data.data.length < limit,
       item: data.data,
       limit: limit,
-      metadata: data.metadata,
+      metadata:data.metadata.totalPages == null? UniversityMetadata(count: 0, totalPages: 0, page: 0, limit: limit): data.metadata,
     );
   }
 

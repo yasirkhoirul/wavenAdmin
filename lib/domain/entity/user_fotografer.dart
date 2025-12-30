@@ -16,6 +16,7 @@ class UserFotografer {
   final String? gears;
   final String? instagram;
   final String? location;
+  final bool isActive;
 
   const UserFotografer({
     required this.id,
@@ -26,6 +27,6 @@ class UserFotografer {
     this.feePerHour,
     this.gears,
     this.instagram,
-    this.location,
+    this.location, required this.isActive,
   });
 }

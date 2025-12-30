@@ -9,24 +9,39 @@ import 'package:wavenadmin/data/datasource/dio.dart';
 import 'package:wavenadmin/data/datasource/local_data.dart';
 import 'package:wavenadmin/data/datasource/remote_data.dart';
 import 'package:wavenadmin/data/package_repository_impl.dart';
+import 'package:wavenadmin/data/pengaturan_repository_impl.dart';
 import 'package:wavenadmin/data/referensi_repository_impl.dart';
 import 'package:wavenadmin/data/university_repository_impl.dart';
 import 'package:wavenadmin/data/user_repository_impl.dart';
+import 'package:wavenadmin/data/file_mover_repository_impl.dart';
+import 'package:wavenadmin/data/datasource/file_mover_local_data_source.dart';
 import 'package:wavenadmin/domain/repository/addons_repository.dart';
 import 'package:wavenadmin/domain/repository/auth_repository.dart';
 import 'package:wavenadmin/domain/repository/booking_repository.dart';
 import 'package:wavenadmin/domain/repository/package_repository.dart';
+import 'package:wavenadmin/domain/repository/pengaturan_repository.dart';
 import 'package:wavenadmin/domain/repository/referensi_repository.dart';
 import 'package:wavenadmin/domain/repository/university_repository.dart';
 import 'package:wavenadmin/domain/repository/user_repositoty.dart';
+import 'package:wavenadmin/domain/repository/file_mover_repository.dart';
 import 'package:wavenadmin/domain/usecase/create_admin.dart';
 import 'package:wavenadmin/domain/usecase/create_booking_usecase.dart';
+import 'package:wavenadmin/domain/usecase/create_fotografer.dart';
+import 'package:wavenadmin/domain/usecase/create_package.dart';
 import 'package:wavenadmin/domain/usecase/create_univ.dart';
 import 'package:wavenadmin/domain/usecase/delete_admin.dart';
 import 'package:wavenadmin/domain/usecase/delete_fotografer.dart';
+import 'package:wavenadmin/domain/usecase/delete_package.dart';
 import 'package:wavenadmin/domain/usecase/delete_univ.dart';
+import 'package:wavenadmin/domain/usecase/get_addons_dropdown.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_booking.dart';
+import 'package:wavenadmin/domain/usecase/get_pengaturan.dart';
+import 'package:wavenadmin/domain/usecase/get_photographer_bookings.dart';
+import 'package:wavenadmin/domain/usecase/get_photographer_detail.dart';
+import 'package:wavenadmin/domain/usecase/get_photographer_payment_list.dart';
+import 'package:wavenadmin/domain/repository/photographer_payment_repository.dart';
+import 'package:wavenadmin/data/photographer_payment_repository_impl.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_user.dart';
 import 'package:wavenadmin/domain/usecase/get_list_addons.dart';
@@ -48,10 +63,14 @@ import 'package:wavenadmin/domain/usecase/put_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/update_booking.dart';
 import 'package:wavenadmin/domain/usecase/create_transaction_usecase.dart';
+import 'package:wavenadmin/domain/usecase/update_package.dart';
 import 'package:wavenadmin/domain/usecase/upload_edited_photo_usecase.dart';
 import 'package:wavenadmin/domain/usecase/upload_photo_result_usecase.dart';
 import 'package:wavenadmin/domain/usecase/verify_booking_usecase.dart';
 import 'package:wavenadmin/domain/usecase/verify_transaction_usecase.dart';
+import 'package:wavenadmin/domain/usecase/save_file_mover_history.dart';
+import 'package:wavenadmin/domain/usecase/get_file_mover_histories.dart';
+import 'package:wavenadmin/domain/usecase/clear_file_mover_history.dart';
 import 'package:wavenadmin/persentation/cubit/auth_cubit.dart';
 import 'package:http/http.dart'as http;
 import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_list_notifier.dart';
@@ -100,6 +119,20 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton(() => DeleteUniv(locator()),);
    locator.registerLazySingleton(() => GetPackageList(locator()),);
   locator.registerLazySingleton(() => GetListSchedule(locator()),);
+  locator.registerLazySingleton(() => UpdatePackage(locator()),);
+  locator.registerLazySingleton(() => CreatePackage(locator()),);
+  locator.registerLazySingleton(() => DeletePackage(locator()),);
+  locator.registerLazySingleton(() => GetAddonsDropdown(locator()),);
+  locator.registerLazySingleton(() => GetPhotographerPaymentList(locator()),);
+  locator.registerLazySingleton(() => GetPhotographerDetail(locator()),);
+  locator.registerLazySingleton(() => GetPhotographerBookings(locator()),);
+  locator.registerLazySingleton(() => GetPengaturan(locator()),);
+  locator.registerLazySingleton(() => CreateFotografer(locator()),);
+  // File Mover Use Cases
+  locator.registerLazySingleton(() => SaveFileMoverHistory(locator()),);
+  locator.registerLazySingleton(() => GetFileMoverHistories(locator()),);
+  locator.registerLazySingleton(() => ClearFileMoverHistory(locator()),);
+  
   //repository
   locator.registerLazySingleton<AuthRepository>(() => AuthRepositoryimpl(locator(), localData: locator()),);
   locator.registerLazySingleton<UserRepositoty>(() => UserRepositoryImpl(locator()),);
@@ -108,9 +141,14 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton<PackageRepository>(() => PackageRepositoryImpl(locator()),);
   locator.registerLazySingleton<ReferensiRepository>(() => ReferensiRepositoryImpl(locator()),);
   locator.registerCachedFactory<UniversityRepository>(() => UniversityRepositoryImpl(locator()),);
+  locator.registerLazySingleton<FileMoverRepository>(() => FileMoverRepositoryImpl(locator()),);
+  locator.registerLazySingleton<PhotographerPaymentRepository>(() => PhotographerPaymentRepositoryImpl(remoteData: locator()),);
+  locator.registerLazySingleton<PengaturanRepository>(() => PengaturanRepositoryImpl(locator()),);
+  
   //datasource
   locator.registerLazySingleton<RemoteData>(() =>RemoteDataImpl(locator(), locator()) ,);
   locator.registerLazySingleton<LocalData>(() =>LocalDataImpl(locator()) ,);
+  locator.registerLazySingleton(() => FileMoverLocalDataSource(locator()),);
 
   //http
   locator.registerLazySingleton(() => http.Client());

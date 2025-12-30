@@ -1,15 +1,24 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/dio.dart';
 import 'package:wavenadmin/data/model/admin_detail_model.dart';
+import 'package:wavenadmin/data/model/addons_dropdown_model.dart';
 import 'package:wavenadmin/data/model/booking_model.dart';
+import 'package:wavenadmin/data/model/create_fotografer_request.dart';
+import 'package:wavenadmin/data/model/create_package_model.dart';
 import 'package:wavenadmin/data/model/create_booking_request_model.dart';
 import 'package:wavenadmin/data/model/detail_booking_model.dart';
 import 'package:wavenadmin/data/model/list_addons_model.dart';
+import 'package:wavenadmin/data/model/pengaturan_model.dart';
+import 'package:wavenadmin/data/model/photographer_booking_model.dart';
+import 'package:wavenadmin/data/model/photographer_detail_model.dart';
+import 'package:wavenadmin/data/model/photographer_payment_model.dart';
 import 'package:wavenadmin/data/model/package_detail_model.dart';
 import 'package:wavenadmin/data/model/package_dropdown_model.dart';
 import 'package:wavenadmin/data/model/package_list_model.dart';
@@ -98,6 +107,7 @@ abstract class RemoteData {
   Future<UserFotograferListResponse> getListPhotographer(int page, int limit, {String? search,Sort? sort,SortPhotographer?  sortBy});
   Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort});
   Future<ListAddonsResponse> getListAddons(int page, int limit, {String? search});
+  Future<AddonsDropdownResponse> getAddonsDropdown(int page, int limit, {String? search});
   Future<PackageDropdownResponse> getPackageDropdown(int page, int limit, {String? search});
   Future<PackageDetailResponse> getPackageDetail(String packageId);
   Future<PackageListModel> getPackageList(int page, int limit, {String? search, Sort? sort, bool? status});
@@ -121,6 +131,7 @@ abstract class RemoteData {
   Future<String> putDetailFotografer(UserDetailFotograferModel payload,String idFotografer);
   Future<String> createAdmin(AdminDetailModel payload);
   Future<String> createUniv(UniversityDetail payload);
+  Future<String> createFotografer(CreateFotograferRequest payload);
   Future<void> deleteAdmin(String idAdmin);
   Future<void> deleteUniv(String idUniv);
   Future<String> deleteFotografer(String idFotografer);
@@ -128,6 +139,28 @@ abstract class RemoteData {
   Future<UpdateUserResponse> updateUser(String userId, UpdateUserRequest request);
   Future<UniversityDetailResponse> getDetailUniversity(String universityId);
   Future<UpdateUniversityResponse> updateUniversity(String universityId, UpdateUniversityRequest request);
+  Future<String>updatePackage(Uint8List gambar,PackageDetailData packageDetail,String idPackage);
+  Future<CreatePackageResponse> createPackage(CreatePackageRequest request, Uint8List imageFile);
+  Future<DeletePackageResponse> deletePackage(String packageId);
+  Future<PhotographerPaymentResponse> getPhotographerPaymentList(
+    int page,
+    int limit, {
+    String? search,
+    DateTime? startTime,
+    DateTime? endTime,
+    String? sortBy,
+    Sort? sort,
+  });
+  Future<PhotographerDetailResponse> getPhotographerDetail(String id);
+  Future<PhotographerBookingResponse> getPhotographerBookings(
+    String photographerId,
+    int page,
+    int limit, {
+    String? search,
+    DateTime? startTime,
+    DateTime? endTime,
+  });
+  Future<PengaturanModel> getPengaturan();
 }
 
 class RemoteDataImpl implements RemoteData {
@@ -477,36 +510,23 @@ class RemoteDataImpl implements RemoteData {
 
   @override
   Future<CreateTransactionResponse> createTransaction(String idBooking, CreateTransactionRequest request, XFile? imageFile) async {
-    Logger().d("Creating transaction for booking: $idBooking");
     try {
+      // Use same pattern as updatePackage/createPackage that works
       final formData = FormData();
       
-      // Add JSON data as string
-      formData.fields.add(MapEntry('data', json.encode(request.toJson())));
+      formData.fields.add(MapEntry("data", jsonEncode(request.toJson())));
       
-      // Add image file if exists
       if (imageFile != null) {
         final bytes = await imageFile.readAsBytes();
         formData.files.add(
-          MapEntry(
-            'image',
-            MultipartFile.fromBytes(
-              bytes,
-              filename: imageFile.name,
-            ),
-          ),
+          MapEntry('image', MultipartFile.fromBytes(bytes, filename: "image.png")),
         );
       }
       
-      final response = await dio.dio.post(
-        'v1/admin/bookings/$idBooking/transactions',
-        data: formData,
-      );
-      
+      final response = await dio.dio.post('v1/admin/bookings/$idBooking/transactions', data: formData);
       if (response.statusCode != 201 && response.statusCode != 200) {
-        throw AppException('Failed to create transaction');
+        throw AppException(response.data['message'] ?? 'Failed to create transaction');
       }
-      
       return CreateTransactionResponse.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
@@ -606,6 +626,24 @@ class RemoteDataImpl implements RemoteData {
   }
   
   @override
+  Future<AddonsDropdownResponse> getAddonsDropdown(int page, int limit, {String? search}) async {
+    try {
+      final response = await dio.dio.get('v1/admin/addons/dropdown',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (search != null) 'search': search,
+        });
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+      return AddonsDropdownResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
   Future<PackageDropdownResponse> getPackageDropdown(int page, int limit, {String? search}) async {
     try {
       final response = await dio.dio.get('v1/admin/packages/dropdown',
@@ -694,31 +732,38 @@ class RemoteDataImpl implements RemoteData {
   @override
   Future<CreateBookingResponse> createBooking(CreateBookingRequest request, XFile? imageFile) async {
     try {
+      // Use same pattern as updatePackage/createPackage that works
       final formData = FormData();
       
-      // Add JSON data as string
-      formData.fields.add(MapEntry('data', json.encode(request.toJson())));
+      final jsonData = jsonEncode(request.toJson());
+      Logger().d("=== CREATE BOOKING ===");
+      Logger().d("JSON data: $jsonData");
+      Logger().d("JSON length: ${jsonData.length}");
+      Logger().d("Has image: ${imageFile != null}");
       
-      // Add image file if provided
+      formData.fields.add(MapEntry("data", jsonData));
+      
       if (imageFile != null) {
         final bytes = await imageFile.readAsBytes();
-        formData.files.add(MapEntry(
-          'image',
-          MultipartFile.fromBytes(bytes, filename: imageFile.name),
-        ));
+        Logger().d("Image bytes length: ${bytes.length}");
+        formData.files.add(
+          MapEntry('image', MultipartFile.fromBytes(bytes, filename: "image.png")),
+        );
       }
       
-      final response = await dio.dio.post(
-        'v1/admin/bookings',
-        data: formData,
-      );
+      Logger().d("FormData fields: ${formData.fields.length}");
+      Logger().d("FormData files: ${formData.files.length}");
+      Logger().d("====================");
+      
+      final response = await dio.dio.post('v1/admin/bookings', data: formData);
+      Logger().d("Response status: ${response.statusCode}");
       
       if (response.statusCode != 201) {
-        throw AppException(response.statusCode.toString());
+        throw AppException(response.data['message'] ?? response.statusCode.toString());
       }
-      
       return CreateBookingResponse.fromJson(response.data);
     } catch (e) {
+      Logger().e("Create booking error: $e");
       throw AppException(_friendlyErrorMessage(e));
     }
   }
@@ -856,6 +901,199 @@ class RemoteDataImpl implements RemoteData {
         if(status!=null)'status':status.name
       });
       return ScheduleModel.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<String> updatePackage(Uint8List gambar,PackageDetailData payload,String idPackage) async{
+    try {
+      final formMap = FormData();
+
+    formMap.fields.add(MapEntry("data", jsonEncode({
+      'title':payload.title,
+      'description':payload.description,
+      'price':payload.price,
+      'is_active':payload.isActive,
+      'benefits':payload.benefits
+    })));
+    formMap.files.add(
+      MapEntry('image', MultipartFile.fromBytes(gambar, filename: "image.png")),
+    );
+
+    final response = await dio.dio.put('v1/admin/packages/$idPackage',data: formMap);
+    if(response.statusCode!=200){
+      throw AppException(response.data['message']);
+    }
+    return response.data['message'];
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<CreatePackageResponse> createPackage(CreatePackageRequest request, Uint8List imageFile) async {
+    try {
+      final formMap = FormData();
+      
+      formMap.fields.add(MapEntry("data", jsonEncode(request.toJson())));
+      formMap.files.add(
+        MapEntry('image', MultipartFile.fromBytes(imageFile, filename: "image.png")),
+      );
+      
+      final response = await dio.dio.post('v1/admin/packages', data: formMap);
+      if (response.statusCode != 201) {
+        throw AppException(response.data['message']);
+      }
+      return CreatePackageResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<DeletePackageResponse> deletePackage(String packageId) async {
+    try {
+      final response = await dio.dio.delete('v1/admin/packages/$packageId');
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+      return DeletePackageResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<PhotographerPaymentResponse> getPhotographerPaymentList(
+    int page,
+    int limit, {
+    String? search,
+    DateTime? startTime,
+    DateTime? endTime,
+    String? sortBy,
+    Sort? sort,
+  }) async {
+    try {
+      final Map<String, dynamic> queryParams = {
+        'page': page,
+        'limit': limit,
+      };
+
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
+      }
+
+      if (startTime != null) {
+        queryParams['start_time'] = startTime.toIso8601String().split('T')[0];
+      }
+
+      if (endTime != null) {
+        queryParams['end_time'] = endTime.toIso8601String().split('T')[0];
+      }
+
+      if (sortBy != null) {
+        queryParams['sort_by'] = sortBy;
+      }
+
+      if (sort != null) {
+        queryParams['sort'] = sort == Sort.asc ? 'asc' : 'desc';
+      }
+
+      final response = await dio.dio.get(
+        'v1/admin/photographers/payment-info',
+        queryParameters: queryParams,
+      );
+
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+
+      return PhotographerPaymentResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<PhotographerDetailResponse> getPhotographerDetail(String id) async {
+    try {
+      final response = await dio.dio.get(
+        'v1/admin/photographers/$id/payment-info',
+      );
+
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+
+      return PhotographerDetailResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<PhotographerBookingResponse> getPhotographerBookings(
+    String photographerId,
+    int page,
+    int limit, {
+    String? search,
+    DateTime? startTime,
+    DateTime? endTime,
+  }) async {
+    try {
+      final Map<String, dynamic> queryParams = {
+        'page': page,
+        'limit': limit,
+      };
+
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
+      }
+
+      if (startTime != null) {
+        queryParams['start_time'] = startTime.toIso8601String().split('T')[0];
+      }
+
+      if (endTime != null) {
+        queryParams['end_time'] = endTime.toIso8601String().split('T')[0];
+      }
+
+      final response = await dio.dio.get(
+        'v1/admin/photographers/$photographerId/bookings',
+        queryParameters: queryParams,
+      );
+
+      if (response.statusCode != 200) {
+        throw AppException(response.statusCode.toString());
+      }
+
+      return PhotographerBookingResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<PengaturanModel> getPengaturan() async{
+    
+    try {
+      final response = await dio.dio.get('v1/admin/master/payment-gateway/status');
+      if(response.statusCode != 200){
+        throw AppException(response.data['message']);
+      }
+      return PengaturanModel.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<String> createFotografer(CreateFotograferRequest payload) async{
+    try {
+      final response = await dio.dio.post("v1/admin/photographers",data: payload.toJson());
+      return response.data['message'];
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }

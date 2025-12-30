@@ -18,6 +18,7 @@ abstract class UserRepositoty {
   Future<String> putDetailAdmin(DetailAdmin payload, String idAdmin);
   Future<String> putDetailFotografer(DetailFotografer payload, String idFotografer);
   Future<String> createAdmin(DetailAdmin payload);
+  Future<String> createFotografer(UserFotografer data,String username,String password,String email);
   Future<void> deleteAdmin(String idAdmin);
   Future<String> deleteFotografer(String idFotografer);
 }

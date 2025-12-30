@@ -10,7 +10,9 @@ UniversityDropdownResponse _$UniversityDropdownResponseFromJson(
   Map<String, dynamic> json,
 ) => UniversityDropdownResponse(
   message: json['message'] as String,
-  metadata: Metadata.fromJson(json['metadata'] as Map<String, dynamic>),
+  metadata: json['metadata'] == null
+      ? null
+      : Metadata.fromJson(json['metadata'] as Map<String, dynamic>),
   data: (json['data'] as List<dynamic>)
       .map((e) => UniversityItem.fromJson(e as Map<String, dynamic>))
       .toList(),
@@ -28,7 +30,7 @@ Metadata _$MetadataFromJson(Map<String, dynamic> json) => Metadata(
   count: (json['count'] as num).toInt(),
   totalPages: (json['total_pages'] as num).toInt(),
   page: (json['page'] as num).toInt(),
-  limit: (json['limit'] as num).toInt(),
+  limit: (json['limit'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$MetadataToJson(Metadata instance) => <String, dynamic>{

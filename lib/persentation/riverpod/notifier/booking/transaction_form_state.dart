@@ -8,7 +8,7 @@ import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/booking/detail_booking_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
-import 'dart:html' as html;
+import 'package:wavenadmin/common/web_helper.dart';
 
 part 'transaction_form_state.g.dart';
 
@@ -236,7 +236,7 @@ class TransactionForm extends _$TransactionForm {
       );
       if(kIsWeb && response.data?.actions!=null && response.data?.actions?.redirectUrl!=null&&response.data?.actions?.token!=null){
          
-        html.window.open(response.data?.actions?.redirectUrl ?? '', '_blank');
+        openUrlInNewTab(response.data?.actions?.redirectUrl ?? '');
       
       }
       // Refresh booking detail

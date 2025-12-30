@@ -27,6 +27,15 @@ dependencies:
   flutter_riverpod: ^3.0.3
   dropdown_search: ^6.0.2
   image_picker: ^1.2.1
+  web: ^1.1.1
+  intl: ^0.20.1
+  cached_network_image: ^3.4.1
+  equatable: ^2.0.7
+  url_launcher: ^6.3.2
+  
+  
+  
+
 
   riverpod_annotation: ^3.0.3
   

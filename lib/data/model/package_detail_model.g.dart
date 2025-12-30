@@ -29,6 +29,9 @@ PackageDetailData _$PackageDetailDataFromJson(Map<String, dynamic> json) =>
       benefits: (json['benefits'] as List<dynamic>)
           .map((e) => PackageBenefit.fromJson(e as Map<String, dynamic>))
           .toList(),
+      gambarDetail: (json['gambarDetail'] as List<dynamic>?)
+          ?.map((e) => (e as num).toInt())
+          .toList(),
     );
 
 Map<String, dynamic> _$PackageDetailDataToJson(PackageDetailData instance) =>
@@ -36,6 +39,7 @@ Map<String, dynamic> _$PackageDetailDataToJson(PackageDetailData instance) =>
       'id': instance.id,
       'title': instance.title,
       'price': instance.price,
+      'gambarDetail': instance.gambarDetail,
       'banner_url': instance.bannerUrl,
       'description': instance.description,
       'is_active': instance.isActive,
