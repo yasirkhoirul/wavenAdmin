@@ -1116,7 +1116,7 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
                       Padding(
                         padding: EdgeInsets.all(8),
                         child: SizedBox(
-                          height: isSmallScreen ? 400 : 100,
+                          height: isSmallScreen ? 600 : 100,
                           child: isSmallScreen
                               ? Column(
                                   spacing: 10,

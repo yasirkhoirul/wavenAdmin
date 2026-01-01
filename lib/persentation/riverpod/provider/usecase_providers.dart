@@ -3,8 +3,11 @@ import 'package:wavenadmin/domain/usecase/create_admin.dart';
 import 'package:wavenadmin/domain/usecase/create_transaction_usecase.dart';
 import 'package:wavenadmin/domain/usecase/create_univ.dart';
 import 'package:wavenadmin/domain/usecase/delete_admin.dart';
+import 'package:wavenadmin/domain/usecase/delete_batch_user.dart';
 import 'package:wavenadmin/domain/usecase/delete_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/delete_univ.dart';
+import 'package:wavenadmin/domain/usecase/delete_user.dart';
+import 'package:wavenadmin/domain/usecase/get_dashboard.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_booking.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_fotografer.dart';
@@ -22,6 +25,7 @@ import 'package:wavenadmin/domain/usecase/put_detail_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/update_booking.dart';
 import 'package:wavenadmin/domain/usecase/upload_edited_photo_usecase.dart';
 import 'package:wavenadmin/domain/usecase/upload_photo_result_usecase.dart';
+import 'package:wavenadmin/domain/usecase/verify_batch_booking.dart';
 import 'package:wavenadmin/domain/usecase/verify_booking_usecase.dart';
 import 'package:wavenadmin/domain/usecase/verify_transaction_usecase.dart';
 import 'package:wavenadmin/injection.dart';
@@ -66,6 +70,10 @@ final deleteFotograferUseCase = Provider<DeleteFotografer>((ref) {
 
 final getListBooking = Provider<GetListBooking>((ref) {
   return locator<GetListBooking>();
+},);
+
+final verifyBatchBookingUsecase = Provider<VerifyBatchBooking>((ref) {
+  return locator<VerifyBatchBooking>();
 },);
 
 final getDetailBooking = Provider<GetDetailBooking>((ref) {
@@ -120,6 +128,16 @@ final createUnive = Provider<CreateUniv>((ref) {
 final deleteUnive = Provider<DeleteUniv>((ref) {
   return locator<DeleteUniv>();
 },);
+final deleteUserUsecase = Provider<DeleteUser>((ref) {
+  return locator<DeleteUser>();
+},);
+final deleteBatchUserUsecase = Provider<DeleteBatchUser>((ref) {
+  return locator<DeleteBatchUser>();
+},);
 final getListScheduleUseCase = Provider<GetListSchedule>((ref) {
   return locator<GetListSchedule>();
+},);
+
+final getDashboardProviderUseCase = Provider<GetDashboard>((ref) {
+  return locator<GetDashboard>();
 },);

@@ -18,8 +18,7 @@ class Carditemsinglecontainer extends StatelessWidget{
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: header??[]
             ),
-            Expanded(child:content 
-            )
+            content
           ],
         ),
       ),

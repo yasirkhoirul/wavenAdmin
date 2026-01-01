@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/constant.dart';
@@ -13,6 +12,8 @@ import 'package:wavenadmin/data/model/booking_model.dart';
 import 'package:wavenadmin/data/model/create_fotografer_request.dart';
 import 'package:wavenadmin/data/model/create_package_model.dart';
 import 'package:wavenadmin/data/model/create_booking_request_model.dart';
+import 'package:wavenadmin/data/model/dashboard_model.dart';
+import 'package:wavenadmin/data/model/delete_batch_user_model.dart';
 import 'package:wavenadmin/data/model/detail_booking_model.dart';
 import 'package:wavenadmin/data/model/list_addons_model.dart';
 import 'package:wavenadmin/data/model/pengaturan_model.dart';
@@ -31,6 +32,7 @@ import 'package:wavenadmin/data/model/university_dropdown_model.dart';
 import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
 import 'package:wavenadmin/data/model/update_booking_request_model.dart';
 import 'package:wavenadmin/data/model/upload_photo_request_model.dart';
+import 'package:wavenadmin/data/model/verify_batch_booking_model.dart';
 import 'package:wavenadmin/data/model/verify_booking_request_model.dart';
 import 'package:wavenadmin/data/model/user_photographer_dropdown.dart';
 import 'package:wavenadmin/data/model/tokenmode.dart';
@@ -105,7 +107,7 @@ abstract class RemoteData {
   Future<UniversitasListModel> getListUniversitas(int page,int limit,{String? search,Sort? sort});
   Future<ScheduleModel> getListSchedule(int month,int year,{VerificationStatus? status});
   Future<UserFotograferListResponse> getListPhotographer(int page, int limit, {String? search,Sort? sort,SortPhotographer?  sortBy});
-  Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort});
+  Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort, SortBooking? sortBy});
   Future<ListAddonsResponse> getListAddons(int page, int limit, {String? search});
   Future<AddonsDropdownResponse> getAddonsDropdown(int page, int limit, {String? search});
   Future<PackageDropdownResponse> getPackageDropdown(int page, int limit, {String? search});
@@ -118,6 +120,7 @@ abstract class RemoteData {
   Future<UpdateBookingResponse> updateBooking(String idBooking, UpdateBookingRequest request);
   Future<VerifyBookingResponse> verifyBooking(String idBooking, VerifyStatus status, {String? remarks});
   Future<VerifyBookingResponse> verifyTransaction(String idTransaction, VerifyStatus status, {String? remarks});
+  Future<VerifyBatchBookingResponse> verifyBatchBooking(List<String> bookingIds);
   Future<CreateTransactionResponse> createTransaction(String idBooking, CreateTransactionRequest request, XFile? imageFile);
   Future<List<int>> getQrisImage(String gatewayTransactionId);
   Future<QrisPaymentStatusResponse> checkQrisPaymentStatus(String bookingId, String gatewayTransactionId);
@@ -161,6 +164,10 @@ abstract class RemoteData {
     DateTime? endTime,
   });
   Future<PengaturanModel> getPengaturan();
+  Future<PengaturanModel> updatePengaturan(bool isActive);
+  Future<DashboardResponse> getDashboard();
+  Future<String> deleteUser(String userId);
+  Future<DeleteBatchUserResponse> deleteBatchUser(List<String> userIds);
 }
 
 class RemoteDataImpl implements RemoteData {
@@ -417,7 +424,7 @@ class RemoteDataImpl implements RemoteData {
   }
   
   @override
-  Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort}) async {
+  Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort, SortBooking? sortBy}) async {
     try {
       final response = await dio.dio.get(
         'v1/admin/bookings',
@@ -426,6 +433,7 @@ class RemoteDataImpl implements RemoteData {
           'limit': limit,
           if (search != null) 'search': search,
           if (sort != null) 'sort': sort.name,
+          if (sortBy != null) 'sort_by': sortBy.name,
         },
       );
       if (response.statusCode != 200) {
@@ -503,6 +511,24 @@ class RemoteDataImpl implements RemoteData {
         throw AppException('Failed to verify transaction');
       }
       return VerifyBookingResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<VerifyBatchBookingResponse> verifyBatchBooking(List<String> bookingIds) async {
+    Logger().d("Verifying batch bookings: $bookingIds");
+    try {
+      final request = VerifyBatchBookingRequest(ids: bookingIds);
+      final response = await dio.dio.patch(
+        'v1/admin/bookings/verify-batch',
+        data: request.toJson(),
+      );
+      if (response.statusCode != 200) {
+        throw AppException('Failed to verify batch bookings');
+      }
+      return VerifyBatchBookingResponse.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }
@@ -1088,12 +1114,78 @@ class RemoteDataImpl implements RemoteData {
       throw AppException(_friendlyErrorMessage(e));
     }
   }
+
+  @override
+  Future<PengaturanModel> updatePengaturan(bool isActive) async {
+    try {
+      final response = await dio.dio.patch(
+        'v1/admin/master/payment-gateway/status',
+        data: {'is_active': isActive},
+      );
+      Logger().d(response.data);
+      if (response.statusCode != 200) {
+        throw AppException(response.data['message']);
+      }
+      return PengaturanModel.fromJson(response.data);
+    } catch (e) {
+      Logger().e(e);
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
   
   @override
   Future<String> createFotografer(CreateFotograferRequest payload) async{
     try {
       final response = await dio.dio.post("v1/admin/photographers",data: payload.toJson());
       return response.data['message'];
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<DashboardResponse> getDashboard() async{
+    try {
+      final response = await dio.dio.get('v1/admin/dashboard');
+      if(response.statusCode!=200){
+        throw AppException(response.data['message']);
+      }
+      return DashboardResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+    
+  }
+
+  @override
+  Future<String> deleteUser(String userId) async {
+    try {
+      final response = await dio.dio.delete('v1/admin/users/$userId');
+      if (response.statusCode != 200) {
+        throw AppException('Failed to delete user');
+      }
+      final data = response.data;
+      if (data is Map && data['message'] is String) {
+        return data['message'] as String;
+      }
+      return 'User deleted successfully';
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<DeleteBatchUserResponse> deleteBatchUser(List<String> userIds) async {
+    try {
+      final request = DeleteBatchUserRequest(ids: userIds);
+      final response = await dio.dio.delete(
+        'v1/admin/users/delete-batch',
+        data: request.toJson(),
+      );
+      if (response.statusCode != 200) {
+        throw AppException('Failed to delete batch users');
+      }
+      return DeleteBatchUserResponse.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }

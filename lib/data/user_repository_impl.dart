@@ -2,6 +2,7 @@ import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/remote_data.dart';
 import 'package:wavenadmin/data/model/admin_detail_model.dart';
 import 'package:wavenadmin/data/model/create_fotografer_request.dart';
+import 'package:wavenadmin/data/model/delete_batch_user_model.dart';
 import 'package:wavenadmin/data/model/user_detial_fotografer_model.dart';
 import 'package:wavenadmin/domain/entity/detail_admin.dart';
 import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
@@ -122,5 +123,21 @@ class UserRepositoryImpl implements UserRepositoty {
     }
   }
 
+  @override
+  Future<String> deleteUser(String userId) async {
+    try {
+      return await remoteData.deleteUser(userId);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
+  @override
+  Future<DeleteBatchUserResponse> deleteBatchUser(List<String> userIds) async {
+    try {
+      return await remoteData.deleteBatchUser(userIds);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

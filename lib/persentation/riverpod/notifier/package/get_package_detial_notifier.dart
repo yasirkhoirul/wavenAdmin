@@ -18,11 +18,12 @@ class GetPackageDetialNotifier extends _$GetPackageDetialNotifier{
   }
 
   Future<void> onUpdate(Uint8List gambar,PackageDetailData package)async{
-    state = AsyncLoading();
+    state = const AsyncLoading();
     try {
       final usecase = locator<UpdatePackage>();
       await usecase.execute(idPackage, gambar, package);
-      ref.invalidate(getPackageDetialProvider(idPackage));
+      // Rebuild state by calling build again instead of invalidating self
+      ref.invalidateSelf();
     } catch (e,s) {
       state = AsyncError(e, s);
     }

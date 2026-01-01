@@ -1,0 +1,19 @@
+Windows Registry Editor Version 5.00
+
+; Register custom URL scheme for WavenAdmin payment callback
+; Usage: Double-click this file to add registry entry
+; Backend should redirect to: wavenadmin://payment-result?booking_id=xxx&status=success
+
+[HKEY_CLASSES_ROOT\wavenadmin]
+@="URL:WavenAdmin Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\wavenadmin\shell]
+
+[HKEY_CLASSES_ROOT\wavenadmin\shell\open]
+
+[HKEY_CLASSES_ROOT\wavenadmin\shell\open\command]
+@="\"C:\\Path\\To\\wavenadmin.exe\" \"%1\""
+
+; Note: Update the path above with actual installation path of wavenadmin.exe
+; Example: "C:\\Program Files\\WavenAdmin\\wavenadmin.exe" "%1"

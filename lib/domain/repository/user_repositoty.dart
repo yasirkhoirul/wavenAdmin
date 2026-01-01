@@ -1,4 +1,5 @@
 import 'package:wavenadmin/common/constant.dart';
+import 'package:wavenadmin/data/model/delete_batch_user_model.dart';
 import 'package:wavenadmin/domain/entity/detail_admin.dart';
 import 'package:wavenadmin/domain/entity/detail_fotografer.dart';
 import 'package:wavenadmin/domain/entity/detail_user.dart';
@@ -21,4 +22,6 @@ abstract class UserRepositoty {
   Future<String> createFotografer(UserFotografer data,String username,String password,String email);
   Future<void> deleteAdmin(String idAdmin);
   Future<String> deleteFotografer(String idFotografer);
+  Future<String> deleteUser(String userId);
+  Future<DeleteBatchUserResponse> deleteBatchUser(List<String> userIds);
 }

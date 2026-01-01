@@ -34,7 +34,11 @@ class _PengaturanPageState extends ConsumerState<PengaturanPage> {
                         children: [
                           Switch(
                             value: data.isActive,
-                            onChanged: (value) {},
+                            onChanged: (value) async {
+                              await ref
+                                  .read(pengaturanProvider.notifier)
+                                  .onChanged(value);
+                            },
                           ),
                         ],
                       ),
@@ -45,7 +49,7 @@ class _PengaturanPageState extends ConsumerState<PengaturanPage> {
               error: (error, stackTrace) {
                 return Column(
                   children: [
-                    Text("Terjadi Kesalahan"),
+                    Text("Terjadi Kesalahan $error"),
                     MButtonWeb(
                       ontap: () {
                         ref.invalidate(pengaturanProvider);

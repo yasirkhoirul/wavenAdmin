@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/model/create_transaction_request_model.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/booking/detail_booking_notifier.dart';
@@ -224,7 +225,7 @@ class TransactionForm extends _$TransactionForm {
       final request = CreateTransactionRequest(
         paymentType: currentState.selectedPaymentType!.name,
         paymentMethod: currentState.selectedPaymentMethod!.name,
-        amount: currentState.amount,
+        amount: currentState.amount.toInt(),
         platform:kIsWeb? Platform.web.name:Platform.android.name,
       );
 
@@ -234,11 +235,22 @@ class TransactionForm extends _$TransactionForm {
         request,
         currentState.selectedImage,
       );
-      if(kIsWeb && response.data?.actions!=null && response.data?.actions?.redirectUrl!=null&&response.data?.actions?.token!=null){
-         
-        openUrlInNewTab(response.data?.actions?.redirectUrl ?? '');
-      
+       // Handle payment redirect based on platform
+      if (response.data?.actions != null && 
+          response.data?.actions?.redirectUrl != null) {
+        final redirectUrl = response.data!.actions!.redirectUrl!;
+        
+        if (kIsWeb) {
+          // Web: Open in new tab, user stays on admin page
+          openUrlInNewTab(redirectUrl);
+        } else {
+          // Mobile/Desktop: Open in appropriate way
+          // For Android/iOS: Will use in-app browser (WebView/Custom Tabs)
+          // For Windows/Linux/macOS: Will use default system browser
+          await _handlePaymentRedirect(redirectUrl);
+        }
       }
+      
       // Refresh booking detail
       await ref.read(detailBookingProvider(currentState.bookingId).notifier).onRefresh();
 
@@ -268,6 +280,32 @@ class TransactionForm extends _$TransactionForm {
       return false;
     }
   }
+
+  Future<void> _handlePaymentRedirect(String url) async {
+    try {
+      final uri = Uri.parse(url);
+      
+      // Use inAppBrowserView for all platforms
+      // This provides a browser UI with clear close/done button
+      // Better UX than inAppWebView (no UI) or externalApplication (opens outside app)
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.inAppBrowserView,
+        webViewConfiguration: const WebViewConfiguration(
+          enableJavaScript: true,
+          enableDomStorage: true,
+        ),
+      );
+
+      if (!launched) {
+        Logger().e('Could not launch payment URL: $url');
+        // Fallback: try external browser
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      Logger().e('Error launching payment URL: $e');
+    }
+}
 
   Future<void> checkQrisPaymentStatus() async {
     final currentState = state.value;

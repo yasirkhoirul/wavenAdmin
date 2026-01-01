@@ -23,11 +23,22 @@ enum Sort{
 }
 
 enum AksiBooking{
-  waclient,
-  wafotografer,
-  detail,
-  verifikasi,
-  hapus
+  waclient("Wa Client"),
+  wafotografer("Wa Fotografer"),
+  detail("Detail"),
+  verifikasi("Verifikasi");
+  
+
+  final String teks;
+  const AksiBooking(this.teks);
+}
+
+enum AksiNormal{
+  detail("Detail"),
+  hapus("Hapus");
+
+  final String teks;
+  const AksiNormal(this.teks);
 }
 
 enum RequestState{
@@ -58,6 +69,13 @@ enum SortAdmin{
   email,
   is_active,
   type
+}
+
+enum SortBooking{
+  event_date,
+event_start_time,
+status,
+already_photo
 }
 
 enum SortUser{

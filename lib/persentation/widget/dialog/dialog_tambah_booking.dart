@@ -14,6 +14,7 @@ import 'package:wavenadmin/persentation/riverpod/notifier/booking/booking_notifi
 import 'package:wavenadmin/persentation/riverpod/notifier/package/get_package_dropdown_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/university/get_university_dropdown_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/user_list_notifier.dart';
+import 'package:wavenadmin/persentation/widget/button.dart';
 
 class DialogTambahBooking extends ConsumerStatefulWidget {
   const DialogTambahBooking({super.key});
@@ -323,9 +324,8 @@ class _DialogTambahBookingState extends ConsumerState<DialogTambahBooking> {
           SizedBox(height: 16),
           state.isSubmitting
               ? Center(child: CircularProgressIndicator())
-              : ElevatedButton(
-                  onPressed: () async {
-                    final success = await notifier.submit();
+              : MButtonWeb(ontap: ()async{
+                final success = await notifier.submit();
                     if (success && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Booking berhasil ditambahkan')),
@@ -334,14 +334,7 @@ class _DialogTambahBookingState extends ConsumerState<DialogTambahBooking> {
                       ref.invalidate(bookingProvider());
                       Navigator.pop(context);
                     }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: MyColor.hijauaccent,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: Text('Simpan Booking'),
-                ),
+              }, teks: "Simpan Booking")
         ],
       ),
     );
@@ -514,14 +507,19 @@ class _DialogTambahBookingState extends ConsumerState<DialogTambahBooking> {
             
             // Dropdown to add addon
             DropdownButtonFormField<Addon>(
+              isExpanded: true,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Tambah addon',
+                hintText: 'Addon',
               ),
               items: data.addons
                   .map((addon) => DropdownMenuItem(
                         value: addon,
-                        child: Text('${addon.title} - Rp ${addon.price}'),
+                        child: Row(
+                          children: [
+                            Text('${addon.title} - Rp ${addon.price}'),
+                          ],
+                        ),
                       ))
                   .toList(),
               onChanged: (value) {

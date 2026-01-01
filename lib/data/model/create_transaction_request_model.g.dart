@@ -11,7 +11,7 @@ CreateTransactionRequest _$CreateTransactionRequestFromJson(
 ) => CreateTransactionRequest(
   paymentType: json['payment_type'] as String,
   paymentMethod: json['payment_method'] as String,
-  amount: (json['amount'] as num).toDouble(),
+  amount: (json['amount'] as num).toInt(),
   platform: json['platform'] as String,
 );
 
@@ -59,8 +59,8 @@ TransactionDetail _$TransactionDetailFromJson(Map<String, dynamic> json) =>
     TransactionDetail(
       bookingId: json['booking_id'] as String,
       gatewayTransactionId: json['gateway_transaction_id'] as String?,
-      totalAmount: (json['total_amount'] as num).toDouble(),
-      paidAmount: (json['paid_amount'] as num).toDouble(),
+      totalAmount: (json['total_amount'] as num).toInt(),
+      paidAmount: (json['paid_amount'] as num).toInt(),
       currency: json['currency'] as String?,
       paymentMethod: json['payment_method'] as String,
       transactionTime: json['transaction_time'] as String,

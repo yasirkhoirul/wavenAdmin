@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,7 +22,7 @@ class MainScaffoldDrawer extends StatelessWidget {
               isActive: statefulNavigationShell.currentIndex == 0,
               onTap: () => statefulNavigationShell.goBranch(0),
             ),
-            ItemSideNavigation(
+            kIsWeb? Container(): ItemSideNavigation(
               judul: "Find Edited Photo",
               aset: MyIcon.iconpengaturan,
               isActive: statefulNavigationShell.currentIndex == 1,
@@ -131,7 +132,7 @@ class SideNavigation extends StatelessWidget {
               isActive: statefulNavigationShell.currentIndex == 0,
               onTap: () => statefulNavigationShell.goBranch(0),
             ),
-            ItemSideNavigation(
+            kIsWeb? Container(): ItemSideNavigation(
               judul: "Find Edited Photo",
               aset: MyIcon.iconpengaturan,
               isActive: statefulNavigationShell.currentIndex == 1,

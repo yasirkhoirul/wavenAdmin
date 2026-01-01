@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wavenadmin/common/constant.dart';
+import 'package:wavenadmin/common/deep_link_handler.dart';
 import 'package:wavenadmin/data/model/create_booking_request_model.dart';
 import 'package:wavenadmin/domain/entity/detail_user.dart';
 import 'package:wavenadmin/domain/entity/list_addons.dart';
@@ -145,7 +146,14 @@ class BookingForm extends _$BookingForm {
 
   @override
   FutureOr<BookingFormState> build() async {
+    // Setup payment result callback listener
+    _setupPaymentResultListener();
     return BookingFormState();
+  }
+
+  /// Setup listener for payment callback from deep link
+  void _setupPaymentResultListener() {
+    
   }
 
   void setSelectedUser(String? userId) {
@@ -522,22 +530,20 @@ class BookingForm extends _$BookingForm {
   }
 
   /// Handle payment redirect for non-web platforms
-  /// - Android/iOS: Opens in in-app browser (WebView/Custom Tabs)
-  /// - Windows/Desktop: Opens in system default browser
+  /// Uses in-app browser view with close button for better UX
+  /// User can close the payment window by:
+  /// - Android/iOS: Tap the "Done"/"Close" button or device back button
+  /// - Windows/Desktop: Click the "X" close button in the browser window
   Future<void> _handlePaymentRedirect(String url) async {
     try {
       final uri = Uri.parse(url);
       
-      // For mobile platforms (Android/iOS), use in-app WebView
-      // For desktop platforms (Windows/Linux/macOS), use external browser
-      final mode = defaultTargetPlatform == TargetPlatform.android ||
-              defaultTargetPlatform == TargetPlatform.iOS
-          ? LaunchMode.inAppWebView
-          : LaunchMode.externalApplication;
-
+      // Use inAppBrowserView for all platforms
+      // This provides a browser UI with clear close/done button
+      // Better UX than inAppWebView (no UI) or externalApplication (opens outside app)
       final launched = await launchUrl(
         uri,
-        mode: mode,
+        mode: LaunchMode.inAppBrowserView,
         webViewConfiguration: const WebViewConfiguration(
           enableJavaScript: true,
           enableDomStorage: true,
@@ -546,6 +552,8 @@ class BookingForm extends _$BookingForm {
 
       if (!launched) {
         Logger().e('Could not launch payment URL: $url');
+        // Fallback: try external browser
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
       Logger().e('Error launching payment URL: $e');

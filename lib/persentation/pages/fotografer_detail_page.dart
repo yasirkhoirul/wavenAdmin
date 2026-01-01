@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/constant.dart';
-import 'package:wavenadmin/persentation/pages/fotografer_mangement_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/photographer_booking_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/photographer_detail_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/state/photographer_booking_state.dart';
 import 'package:wavenadmin/persentation/riverpod/state/photographer_detail_state.dart';
+import 'package:wavenadmin/persentation/widget/footer_tabel.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import 'package:wavenadmin/persentation/widget/tabelcontent.dart';
 
@@ -57,10 +57,15 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
       ),
     );
 
+    final isSmallScreen = MediaQuery.of(context).size.width < 600;
+    final isVerySmallScreen = MediaQuery.of(context).size.width < 400;
+
     return Container(
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.9,
-        maxWidth: MediaQuery.of(context).size.width * 0.8,
+        maxWidth: isSmallScreen 
+            ? MediaQuery.of(context).size.width * 0.95
+            : MediaQuery.of(context).size.width * 0.8,
       ),
       decoration: BoxDecoration(
         color: const Color(0xFF2D2D2D),
@@ -71,7 +76,7 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
         children: [
           // Header with close button
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(isVerySmallScreen ? 12 : 20),
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(color: Colors.grey, width: 0.5),
@@ -80,10 +85,10 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   "Details",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: isVerySmallScreen ? 16 : 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -98,52 +103,69 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
           // Scrollable content
           Flexible(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(isVerySmallScreen ? 12 : 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Photographer Details Section
-                  _buildPhotographerDetails(detailState),
-                  const SizedBox(height: 30),
+                  _buildPhotographerDetails(detailState, isSmallScreen, isVerySmallScreen),
+                  SizedBox(height: isVerySmallScreen ? 20 : 30),
 
                   // Client Section Header
-                  const Text(
+                  Text(
                     "Client",
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: isVerySmallScreen ? 16 : 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: isVerySmallScreen ? 12 : 16),
 
                   // Search Bar and Filter
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 2,
-                        child: OutlinedSearcchBar(
-                          onSubmitted: (value) {
-                            Logger().d("Search: $value");
-                            setState(() {
-                              searchQuery = value;
-                            });
-                          },
-                          controller: searchController,
+                  isSmallScreen
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            OutlinedSearcchBar(
+                              onSubmitted: (value) {
+                                Logger().d("Search: $value");
+                                setState(() {
+                                  searchQuery = value;
+                                });
+                              },
+                              controller: searchController,
+                            ),
+                            const SizedBox(height: 12),
+                            _buildDateRangeButton(context, isVerySmallScreen),
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            Flexible(
+                              flex: 2,
+                              child: OutlinedSearcchBar(
+                                onSubmitted: (value) {
+                                  Logger().d("Search: $value");
+                                  setState(() {
+                                    searchQuery = value;
+                                  });
+                                },
+                                controller: searchController,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            _buildDateRangeButton(context, isVerySmallScreen),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      _buildDateRangeButton(context),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: isVerySmallScreen ? 12 : 16),
 
                   // Payment Summary Cards
                   if (detailState.requestState == RequestState.succes &&
                       detailState.detail != null)
-                    _buildPaymentSummary(detailState),
+                    _buildPaymentSummary(detailState, isSmallScreen, isVerySmallScreen),
 
-                  const SizedBox(height: 20),
+                  SizedBox(height: isVerySmallScreen ? 16 : 20),
 
                   // Booking List Table
                   bookingState.requestState == RequestState.loading
@@ -173,7 +195,7 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
                                 ],
                               ),
                             )
-                          : _buildBookingTable(context, bookingState),
+                          : _buildBookingTable(context, bookingState, isVerySmallScreen),
                 ],
               ),
             ),
@@ -183,7 +205,7 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
     );
   }
 
-  Widget _buildPhotographerDetails(PhotographerDetailState state) {
+  Widget _buildPhotographerDetails(PhotographerDetailState state, bool isSmallScreen, bool isVerySmallScreen) {
     if (state.requestState == RequestState.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -214,7 +236,7 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
     final photographer = state.detail!.photographerData;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(isVerySmallScreen ? 12 : 20),
       decoration: BoxDecoration(
         color: const Color(0xFF3A3A3A),
         borderRadius: BorderRadius.circular(8),
@@ -222,101 +244,40 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Photographer",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: isVerySmallScreen ? 14 : 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
+          SizedBox(height: isVerySmallScreen ? 12 : 16),
+          isSmallScreen
+              ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Nama Fotografer",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      photographer.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "No Hp",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      photographer.phoneNumber,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Fee",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      currencyFormatter.format(photographer.feePerHour),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Rekening",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
+                    _buildInfoField("Nama Fotografer", photographer.name, isVerySmallScreen),
+                    SizedBox(height: isVerySmallScreen ? 12 : 16),
+                    _buildInfoField("No Hp", photographer.phoneNumber, isVerySmallScreen, isGreen: true),
+                    SizedBox(height: isVerySmallScreen ? 12 : 16),
+                    _buildInfoField("Fee", currencyFormatter.format(photographer.feePerHour), isVerySmallScreen),
+                    SizedBox(height: isVerySmallScreen ? 12 : 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          photographer.bankAccount,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
+                          "Rekening",
+                          style: TextStyle(
+                            fontSize: isVerySmallScreen ? 10 : 12,
+                            color: Colors.grey,
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(height: 4),
                         Text(
-                          "44219313213", // TODO: Get actual account number from API
-                          style: const TextStyle(
-                            fontSize: 14,
+                          "${photographer.bankAccount} - 44219313213",
+                          style: TextStyle(
+                            fontSize: isVerySmallScreen ? 12 : 14,
                             fontWeight: FontWeight.w500,
                             color: Colors.white,
                           ),
@@ -324,16 +285,95 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
                       ],
                     ),
                   ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildInfoField("Nama Fotografer", photographer.name, isVerySmallScreen),
+                          SizedBox(height: isVerySmallScreen ? 12 : 16),
+                          _buildInfoField("No Hp", photographer.phoneNumber, isVerySmallScreen, isGreen: true),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildInfoField("Fee", currencyFormatter.format(photographer.feePerHour), isVerySmallScreen),
+                          SizedBox(height: isVerySmallScreen ? 12 : 16),
+                          const Text(
+                            "Rekening",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  photographer.bankAccount,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Flexible(
+                                child: Text(
+                                  "44219313213",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildDateRangeButton(BuildContext context) {
+  Widget _buildInfoField(String label, String value, bool isVerySmallScreen, {bool isGreen = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: isVerySmallScreen ? 10 : 12,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: isVerySmallScreen ? 12 : 14,
+            fontWeight: FontWeight.w500,
+            color: isGreen ? Colors.green : Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateRangeButton(BuildContext context, bool isVerySmallScreen) {
     return InkWell(
       onTap: () async {
         final picked = await showDateRangePicker(
@@ -353,7 +393,10 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: isVerySmallScreen ? 8 : 16,
+          vertical: isVerySmallScreen ? 8 : 12,
+        ),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(8),
@@ -361,24 +404,64 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.filter_alt, size: 16, color: Colors.white),
-            const SizedBox(width: 8),
-            const Text("Filter", style: TextStyle(color: Colors.white)),
-            const SizedBox(width: 8),
-            Text(
-              startTime != null && endTime != null
-                  ? "${DateFormat('dd MMM yy').format(startTime!)} - ${DateFormat('dd MMM yy').format(endTime!)}"
-                  : "18 Nov 25 - 25 Des 25",
-              style: const TextStyle(fontSize: 12, color: Colors.white),
+            Icon(
+              Icons.filter_alt,
+              size: isVerySmallScreen ? 14 : 16,
+              color: Colors.white,
             ),
+            SizedBox(width: isVerySmallScreen ? 4 : 8),
+            Text(
+              "Filter",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: isVerySmallScreen ? 12 : 14,
+              ),
+            ),
+            if (!isVerySmallScreen) ...[
+              const SizedBox(width: 8),
+              Text(
+                startTime != null && endTime != null
+                    ? "${DateFormat('dd MMM yy').format(startTime!)} - ${DateFormat('dd MMM yy').format(endTime!)}"
+                    : "18 Nov 25 - 25 Des 25",
+                style: const TextStyle(fontSize: 12, color: Colors.white),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPaymentSummary(PhotographerDetailState state) {
+  Widget _buildPaymentSummary(PhotographerDetailState state, bool isSmallScreen, bool isVerySmallScreen) {
     final payment = state.detail!.paymentData;
+
+    if (isSmallScreen) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildSummaryCard(
+            "Total Belum Dibayar",
+            currencyFormatter.format(payment.unpaidAmount),
+            Colors.grey[200]!,
+            isVerySmallScreen,
+          ),
+          SizedBox(height: isVerySmallScreen ? 8 : 12),
+          _buildSummaryCard(
+            "Total Sudah Dibayar",
+            currencyFormatter.format(payment.paidAmount),
+            Colors.grey[200]!,
+            isVerySmallScreen,
+          ),
+          SizedBox(height: isVerySmallScreen ? 8 : 12),
+          _buildSummaryCard(
+            "Total Client",
+            "${payment.sessionCount} Client",
+            Colors.grey[200]!,
+            isVerySmallScreen,
+          ),
+        ],
+      );
+    }
 
     return Row(
       children: [
@@ -387,6 +470,7 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
             "Total Belum Dibayar",
             currencyFormatter.format(payment.unpaidAmount),
             Colors.grey[200]!,
+            isVerySmallScreen,
           ),
         ),
         const SizedBox(width: 16),
@@ -395,6 +479,7 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
             "Total Sudah Dibayar",
             currencyFormatter.format(payment.paidAmount),
             Colors.grey[200]!,
+            isVerySmallScreen,
           ),
         ),
         const SizedBox(width: 16),
@@ -403,15 +488,16 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
             "Total Client",
             "${payment.sessionCount} Client",
             Colors.grey[200]!,
+            isVerySmallScreen,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSummaryCard(String title, String value, Color bgColor) {
+  Widget _buildSummaryCard(String title, String value, Color bgColor, bool isVerySmallScreen) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(isVerySmallScreen ? 12 : 16),
       decoration: BoxDecoration(
         color: const Color(0xFF3A3A3A),
         borderRadius: BorderRadius.circular(8),
@@ -421,16 +507,16 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 12,
+            style: TextStyle(
+              fontSize: isVerySmallScreen ? 10 : 12,
               color: Colors.grey,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: isVerySmallScreen ? 4 : 8),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: isVerySmallScreen ? 14 : 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -441,7 +527,7 @@ class _FotograferDetailPageState extends ConsumerState<FotograferDetailPage> {
   }
 
   Widget _buildBookingTable(
-      BuildContext context, PhotographerBookingState state) {
+      BuildContext context, PhotographerBookingState state, bool isVerySmallScreen) {
     final List<DataColumn> dataColumns = [
       const DataColumn(label: Text("No")),
       const DataColumn(label: Text("Aksi")),

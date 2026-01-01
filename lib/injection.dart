@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:wavenadmin/data/addons_repository_impl.dart';
 import 'package:wavenadmin/data/auth_repositoryimpl.dart';
 import 'package:wavenadmin/data/booking_repository_impl.dart';
+import 'package:wavenadmin/data/dashboard_repository_impl.dart';
 import 'package:wavenadmin/data/datasource/dio.dart';
 import 'package:wavenadmin/data/datasource/local_data.dart';
 import 'package:wavenadmin/data/datasource/remote_data.dart';
@@ -30,13 +31,17 @@ import 'package:wavenadmin/domain/usecase/create_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/create_package.dart';
 import 'package:wavenadmin/domain/usecase/create_univ.dart';
 import 'package:wavenadmin/domain/usecase/delete_admin.dart';
+import 'package:wavenadmin/domain/usecase/delete_batch_user.dart';
 import 'package:wavenadmin/domain/usecase/delete_fotografer.dart';
 import 'package:wavenadmin/domain/usecase/delete_package.dart';
 import 'package:wavenadmin/domain/usecase/delete_univ.dart';
+import 'package:wavenadmin/domain/usecase/delete_user.dart';
 import 'package:wavenadmin/domain/usecase/get_addons_dropdown.dart';
+import 'package:wavenadmin/domain/usecase/get_dashboard.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_admin.dart';
 import 'package:wavenadmin/domain/usecase/get_detail_booking.dart';
 import 'package:wavenadmin/domain/usecase/get_pengaturan.dart';
+import 'package:wavenadmin/domain/usecase/update_pengaturan.dart';
 import 'package:wavenadmin/domain/usecase/get_photographer_bookings.dart';
 import 'package:wavenadmin/domain/usecase/get_photographer_detail.dart';
 import 'package:wavenadmin/domain/usecase/get_photographer_payment_list.dart';
@@ -66,6 +71,7 @@ import 'package:wavenadmin/domain/usecase/create_transaction_usecase.dart';
 import 'package:wavenadmin/domain/usecase/update_package.dart';
 import 'package:wavenadmin/domain/usecase/upload_edited_photo_usecase.dart';
 import 'package:wavenadmin/domain/usecase/upload_photo_result_usecase.dart';
+import 'package:wavenadmin/domain/usecase/verify_batch_booking.dart';
 import 'package:wavenadmin/domain/usecase/verify_booking_usecase.dart';
 import 'package:wavenadmin/domain/usecase/verify_transaction_usecase.dart';
 import 'package:wavenadmin/domain/usecase/save_file_mover_history.dart';
@@ -76,6 +82,7 @@ import 'package:http/http.dart'as http;
 import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_list_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/user_list_notifier.dart';
 import 'package:wavenadmin/persentation/route/approuter.dart';
+import 'package:wavenadmin/domain/repository/dasboard_repository.dart';
 
 
 final GetIt locator = GetIt.instance;
@@ -105,7 +112,10 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton(() => GetDetailBooking(locator()),);
   locator.registerLazySingleton(() => UpdateBooking(locator()),);
   locator.registerLazySingleton(() => CreateBookingUsecase(locator()),);
-  locator.registerLazySingleton(() => VerifyBookingUsecase(locator()),);  locator.registerLazySingleton(() => VerifyTransactionUsecase(locator()));  locator.registerLazySingleton(() => CreateTransactionUsecase(locator()),);
+  locator.registerLazySingleton(() => VerifyBookingUsecase(locator()),);
+  locator.registerLazySingleton(() => VerifyTransactionUsecase(locator()));
+  locator.registerLazySingleton(() => VerifyBatchBooking(locator()),);
+  locator.registerLazySingleton(() => CreateTransactionUsecase(locator()),);
   locator.registerLazySingleton(() => UploadPhotoResultUsecase(locator()),);
   locator.registerLazySingleton(() => UploadEditedPhotoUsecase(locator()),);
   locator.registerLazySingleton(() => GetListAddons(locator()),);
@@ -127,7 +137,11 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton(() => GetPhotographerDetail(locator()),);
   locator.registerLazySingleton(() => GetPhotographerBookings(locator()),);
   locator.registerLazySingleton(() => GetPengaturan(locator()),);
+  locator.registerLazySingleton(() => UpdatePengaturan(locator()),);
   locator.registerLazySingleton(() => CreateFotografer(locator()),);
+  locator.registerLazySingleton(() => DeleteUser(locator()),);
+  locator.registerLazySingleton(() => DeleteBatchUser(locator()),);
+  locator.registerLazySingleton(() => GetDashboard(locator()),);
   // File Mover Use Cases
   locator.registerLazySingleton(() => SaveFileMoverHistory(locator()),);
   locator.registerLazySingleton(() => GetFileMoverHistories(locator()),);
@@ -144,7 +158,8 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton<FileMoverRepository>(() => FileMoverRepositoryImpl(locator()),);
   locator.registerLazySingleton<PhotographerPaymentRepository>(() => PhotographerPaymentRepositoryImpl(remoteData: locator()),);
   locator.registerLazySingleton<PengaturanRepository>(() => PengaturanRepositoryImpl(locator()),);
-  
+  locator.registerLazySingleton<DasboardRepository>(() => DashboardRepositoryImpl(locator()),);
+
   //datasource
   locator.registerLazySingleton<RemoteData>(() =>RemoteDataImpl(locator(), locator()) ,);
   locator.registerLazySingleton<LocalData>(() =>LocalDataImpl(locator()) ,);

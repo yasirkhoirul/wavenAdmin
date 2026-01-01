@@ -1,6 +1,7 @@
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wavenadmin/common/constant.dart';
+import 'package:wavenadmin/common/deep_link_handler.dart';
 import 'package:wavenadmin/persentation/riverpod/provider/usecase_providers.dart';
 import 'package:wavenadmin/persentation/riverpod/state/booking_list_state.dart';
 
@@ -11,10 +12,10 @@ class BookingNotifier extends _$BookingNotifier {
   static const int limit = 10;
 
   @override
-  Future<BookingListState> build({String? search, Sort? sort}) async {
+  Future<BookingListState> build({String? search, Sort? sort, SortBooking? sortBy}) async {
     final response = await AsyncValue.guard(() {
       final usecase = ref.read(getListBooking);
-      return usecase.execute(1, limit, sort: sort, search: search);
+      return usecase.execute(1, limit, sort: sort, search: search, sortBy: sortBy);
     });
 
     if (response.hasError) {
@@ -23,10 +24,59 @@ class BookingNotifier extends _$BookingNotifier {
 
     final responseData = response.requireValue;
     Logger().d("ini adalah respond pertama kali ${responseData.bookings}");
+    _listen();
     return BookingListState().replaceData(responseData);
   }
 
-  Future<void> loadMore({String? search, Sort? sort}) async {
+  void _listen(){
+    DeepLinkHandler().onPaymentResult = (bookingId,status,params){
+      Logger().i('Payment callback received in BookingForm - Booking: $bookingId, Status: $status');
+      
+      // Check if provider is still mounted before accessing state
+      if (!ref.mounted) {
+        Logger().w('BookingForm provider is disposed, skipping state update');
+        return;
+      }
+      
+      // You can handle the payment result here
+      // For example: show dialog, refresh booking list, navigate to booking detail, etc.
+      final currentState = state.value;
+      if (currentState == null) return;
+      
+      if (status.toLowerCase() == 'success' || status.toLowerCase() == 'settlement') {
+        state = AsyncValue.data(
+          currentState.copyWith(
+            bookingId: bookingId,
+            bookingStatus: status
+          ),
+        );
+        Logger().i('Payment successful for booking: $bookingId');
+        // TODO: Show success dialog or navigate to booking detail
+      } else {
+        state = AsyncValue.data(
+          currentState.copyWith(
+            bookingId: bookingId,
+            bookingStatus: status
+          ),
+        );
+        Logger().w('Payment failed/cancelled for booking: $bookingId');
+      }
+    };
+  }
+
+  void onResetBookingResult(){
+    Logger().d("ini dipanggil");
+    final current = state.asData?.value;
+    if (current == null) return;
+    state == AsyncValue.data(
+      current.copyWith(
+        bookingId: null,
+        bookingStatus: null
+      )
+    );
+  }
+
+  Future<void> loadMore({String? search, Sort? sort, SortBooking? sortBy}) async {
     final current = state.asData?.value;
     if (current == null) return;
     
@@ -49,7 +99,7 @@ class BookingNotifier extends _$BookingNotifier {
 
     final response = await AsyncValue.guard(() {
       final usecase = ref.read(getListBooking);
-      return usecase.execute(nextPage + 1, limit, search: search, sort: sort);
+      return usecase.execute(nextPage + 1, limit, search: search, sort: sort, sortBy: sortBy);
     });
 
     if (response.hasError) {

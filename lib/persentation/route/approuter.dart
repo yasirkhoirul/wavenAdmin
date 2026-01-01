@@ -1,4 +1,6 @@
 import 'package:go_router/go_router.dart';
+import 'package:logger/logger.dart';
+import 'package:wavenadmin/common/deep_link_handler.dart';
 import 'package:wavenadmin/persentation/cubit/auth_cubit.dart';
 import 'package:wavenadmin/persentation/pages/fotografer_reference_page.dart';
 import 'package:wavenadmin/persentation/pages/package_reference_page.dart';
@@ -22,6 +24,31 @@ class Approuter {
       initialLocation: '/dashboard',
       refreshListenable: CubitListenable(authCubit),
       routes: [
+        // Payment callback route - handles deep link from payment gateway
+        GoRoute(
+          path: '/',
+          name: 'payment-result',
+          redirect: (context, state) {
+            // Extract payment parameters from deep link
+            final params = state.uri.queryParameters;
+            final orderId = params['order_id'];
+            final status = params['transaction_status'];
+            
+            Logger().d('Payment callback received - Order: $orderId, Status: $status');
+            
+            // Trigger deep link handler callback
+            if (orderId != null && status != null) {
+              DeepLinkHandler().onPaymentResult?.call(
+                orderId,
+                status,
+                params,
+              );
+            }
+            
+            // Redirect to dashboard after handling callback
+            return '/client';
+          },
+        ),
         GoRoute(
           path: '/payment/result',
           name: 'paymentresult',

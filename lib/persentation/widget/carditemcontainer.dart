@@ -30,25 +30,29 @@ class CardItemContainer extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              spacing: 10,
-              children: [
-                SvgPicture.asset(
-                  aset,
-                  colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-                ),
-                Expanded(
-                  child: Text(
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                spacing: 10,
+                children: [
+                  SvgPicture.asset(
+                    aset,
+                    colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+                  ),
+                  Text(
                     judul,
                     style: GoogleFonts.publicSans(color: color),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            Text(
-              content,
-              style: GoogleFonts.publicSans(color: Colors.white, fontSize: 28),
-              textAlign: TextAlign.end,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Text(
+                content,
+                style: GoogleFonts.publicSans(color: Colors.white, fontSize: 28),
+                textAlign: TextAlign.end,
+              ),
             ),
             if (subcontent != null)
               Text(

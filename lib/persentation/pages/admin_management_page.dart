@@ -11,6 +11,7 @@ import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_list_notif
 import 'package:wavenadmin/persentation/riverpod/notifier/admin/admin_mutation_notifier.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
+import 'package:wavenadmin/persentation/widget/footer_tabel.dart';
 import 'package:wavenadmin/persentation/widget/header_page.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import 'package:wavenadmin/persentation/widget/tabelcontent.dart';
@@ -23,12 +24,15 @@ class AdminManagementPage extends StatelessWidget {
     return SingleChildScrollView(
       child: SizedBox(
         height: 1200,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            HeaderPage(judul: "Admin", icon: MyIcon.iconusers),
-            AdminManagementMainContent(),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeaderPage(judul: "Admin", icon: MyIcon.iconusers),
+              AdminManagementMainContent(),
+            ],
+          ),
         ),
       ),
     );
@@ -46,7 +50,7 @@ class AdminManagementMainContent extends ConsumerStatefulWidget {
 class _AdminManagementMainContentState
     extends ConsumerState<AdminManagementMainContent> {
   final TextEditingController searchController = TextEditingController();
-  int limit = 2;
+  int limit = 10;
   bool isAsc = true;
   SortAdmin sortBy = SortAdmin.name;
   @override
@@ -205,35 +209,52 @@ class _AdminManagementMainContentState
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 10,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: OutlinedSearcchBar(
-                    onSubmitted: (value) {
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                spacing: 16,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: OutlinedSearcchBar(
+                      onSubmitted: (value) {
+                        ref
+                            .read(userAdminGetListProvider.notifier)
+                            .getListAdminData(
+                              limit,
+                              search: value,
+                              sort: isAsc ? Sort.asc : Sort.desc,
+                            );
+                      },
+                      controller: searchController,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
                       ref
                           .read(userAdminGetListProvider.notifier)
                           .getListAdminData(
                             limit,
-                            search: value,
                             sort: isAsc ? Sort.asc : Sort.desc,
+                            sortAdmin: sortBy,
                           );
                     },
-                    controller: searchController,
+                    icon: Icon(Icons.refresh, color: MyColor.hijauaccent),
+                    tooltip: 'Refresh',
                   ),
-                ),
-                MButtonWeb(
-                  ontap: () async {
-                    await showDialog<DetailAdmin>(
-                      context: context,
-                      builder: (context) =>
-                          Center(child: AdminFormDialog(limit: limit)),
-                    );
-                  },
-                  teks: "Tambah",
-                  icon: Icons.add,
-                ),
-              ],
+                  MButtonWeb(
+                    ontap: () async {
+                      await showDialog<DetailAdmin>(
+                        context: context,
+                        builder: (context) =>
+                            Center(child: AdminFormDialog(limit: limit)),
+                      );
+                    },
+                    teks: "Tambah",
+                    icon: Icons.add,
+                  ),
+                ],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,

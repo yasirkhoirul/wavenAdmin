@@ -16,7 +16,7 @@ final class BookingNotifierProvider
     extends $AsyncNotifierProvider<BookingNotifier, BookingListState> {
   const BookingNotifierProvider._({
     required BookingNotifierFamily super.from,
-    required ({String? search, Sort? sort}) super.argument,
+    required ({String? search, Sort? sort, SortBooking? sortBy}) super.argument,
   }) : super(
          retry: null,
          name: r'bookingProvider',
@@ -50,7 +50,7 @@ final class BookingNotifierProvider
   }
 }
 
-String _$bookingNotifierHash() => r'7466fe3f35f65a229e113fa81df693098c87b358';
+String _$bookingNotifierHash() => r'1b667b942014d15b5069fb6381ef10b839973701';
 
 final class BookingNotifierFamily extends $Family
     with
@@ -59,7 +59,7 @@ final class BookingNotifierFamily extends $Family
           AsyncValue<BookingListState>,
           BookingListState,
           FutureOr<BookingListState>,
-          ({String? search, Sort? sort})
+          ({String? search, Sort? sort, SortBooking? sortBy})
         > {
   const BookingNotifierFamily._()
     : super(
@@ -70,26 +70,39 @@ final class BookingNotifierFamily extends $Family
         isAutoDispose: true,
       );
 
-  BookingNotifierProvider call({String? search, Sort? sort}) =>
-      BookingNotifierProvider._(
-        argument: (search: search, sort: sort),
-        from: this,
-      );
+  BookingNotifierProvider call({
+    String? search,
+    Sort? sort,
+    SortBooking? sortBy,
+  }) => BookingNotifierProvider._(
+    argument: (search: search, sort: sort, sortBy: sortBy),
+    from: this,
+  );
 
   @override
   String toString() => r'bookingProvider';
 }
 
 abstract class _$BookingNotifier extends $AsyncNotifier<BookingListState> {
-  late final _$args = ref.$arg as ({String? search, Sort? sort});
+  late final _$args =
+      ref.$arg as ({String? search, Sort? sort, SortBooking? sortBy});
   String? get search => _$args.search;
   Sort? get sort => _$args.sort;
+  SortBooking? get sortBy => _$args.sortBy;
 
-  FutureOr<BookingListState> build({String? search, Sort? sort});
+  FutureOr<BookingListState> build({
+    String? search,
+    Sort? sort,
+    SortBooking? sortBy,
+  });
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build(search: _$args.search, sort: _$args.sort);
+    final created = build(
+      search: _$args.search,
+      sort: _$args.sort,
+      sortBy: _$args.sortBy,
+    );
     final ref =
         this.ref as $Ref<AsyncValue<BookingListState>, BookingListState>;
     final element =

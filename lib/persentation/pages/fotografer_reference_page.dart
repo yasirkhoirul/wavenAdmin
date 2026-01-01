@@ -9,7 +9,7 @@ import 'package:wavenadmin/persentation/pages/fotografer_detail_page.dart';
 import 'package:wavenadmin/persentation/pages/fotografer_mangement_page.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/photographer/photographer_payment_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/state/photographer_payment_state.dart';
-import 'package:wavenadmin/persentation/widget/button.dart';
+import 'package:wavenadmin/persentation/widget/footer_tabel.dart';
 import 'package:wavenadmin/persentation/widget/header_page.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import 'package:wavenadmin/persentation/widget/tabelcontent.dart';
@@ -73,59 +73,164 @@ class _FotograferReferencePageState
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Flexible(
-                        child: OutlinedSearcchBar(
-                          onSubmitted: (value) {
-                            Logger().d("Search: $value");
-                            setState(() {
-                              searchQuery = value;
-                            });
-                          },
-                          controller: searchController,
+                  MediaQuery.of(context).size.width < 700
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 12,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  child: OutlinedSearcchBar(
+                                    onSubmitted: (value) {
+                                      Logger().d("Search: $value");
+                                      setState(() {
+                                        searchQuery = value;
+                                      });
+                                    },
+                                    controller: searchController,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                IconButton(
+                                  onPressed: () {
+                                    ref.invalidate(
+                                      photographerPaymentProvider(
+                                        0,
+                                        limit,
+                                        search: searchQuery,
+                                        startTime: startTime,
+                                        endTime: endTime,
+                                        sortBy: sortBy,
+                                        sort: isAsc ? Sort.asc : Sort.desc,
+                                      ),
+                                    );
+                                  },
+                                  icon: Icon(Icons.refresh,
+                                      color: MyColor.hijauaccent),
+                                  tooltip: 'Refresh',
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  child: _buildDateInput(
+                                    label: "Start Date",
+                                    date: startTime,
+                                    onTap: () async {
+                                      final picked = await showDatePicker(
+                                        context: context,
+                                        initialDate:
+                                            startTime ?? DateTime.now(),
+                                        firstDate: DateTime(2000),
+                                        lastDate: DateTime(2100),
+                                      );
+                                      if (picked != null) {
+                                        setState(() {
+                                          startTime = picked;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Flexible(
+                                  child: _buildDateInput(
+                                    label: "End Date",
+                                    date: endTime,
+                                    onTap: () async {
+                                      final picked = await showDatePicker(
+                                        context: context,
+                                        initialDate: endTime ?? DateTime.now(),
+                                        firstDate: DateTime(2000),
+                                        lastDate: DateTime(2100),
+                                      );
+                                      if (picked != null) {
+                                        setState(() {
+                                          endTime = picked;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Flexible(
+                              child: OutlinedSearcchBar(
+                                onSubmitted: (value) {
+                                  Logger().d("Search: $value");
+                                  setState(() {
+                                    searchQuery = value;
+                                  });
+                                },
+                                controller: searchController,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            IconButton(
+                              onPressed: () {
+                                ref.invalidate(
+                                  photographerPaymentProvider(
+                                    0,
+                                    limit,
+                                    search: searchQuery,
+                                    startTime: startTime,
+                                    endTime: endTime,
+                                    sortBy: sortBy,
+                                    sort: isAsc ? Sort.asc : Sort.desc,
+                                  ),
+                                );
+                              },
+                              icon: Icon(Icons.refresh,
+                                  color: MyColor.hijauaccent),
+                              tooltip: 'Refresh',
+                            ),
+                            const SizedBox(width: 16),
+                            _buildDateInput(
+                              label: "Start Date",
+                              date: startTime,
+                              onTap: () async {
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: startTime ?? DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                );
+                                if (picked != null) {
+                                  setState(() {
+                                    startTime = picked;
+                                  });
+                                }
+                              },
+                            ),
+                            const SizedBox(width: 16),
+                            _buildDateInput(
+                              label: "End Date",
+                              date: endTime,
+                              onTap: () async {
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: endTime ?? DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                );
+                                if (picked != null) {
+                                  setState(() {
+                                    endTime = picked;
+                                  });
+                                }
+                              },
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      _buildDateInput(
-                        label: "Start Date",
-                        date: startTime,
-                        onTap: () async {
-                          final picked = await showDatePicker(
-                            context: context,
-                            initialDate: startTime ?? DateTime.now(),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          );
-                          if (picked != null) {
-                            setState(() {
-                              startTime = picked;
-                            });
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 16),
-                      _buildDateInput(
-                        label: "End Date",
-                        date: endTime,
-                        onTap: () async {
-                          final picked = await showDatePicker(
-                            context: context,
-                            initialDate: endTime ?? DateTime.now(),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          );
-                          if (picked != null) {
-                            setState(() {
-                              endTime = picked;
-                            });
-                          }
-                        },
-                      ),
-                      
-                    ],
-                  ),
                   const SizedBox(height: 20),
                   state.requestState == RequestState.loading
                       ? SizedBox(

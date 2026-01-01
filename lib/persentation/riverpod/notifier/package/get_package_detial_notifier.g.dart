@@ -56,7 +56,7 @@ final class GetPackageDetialNotifierProvider
 }
 
 String _$getPackageDetialNotifierHash() =>
-    r'55d616068f4ad5606956049e80e33c5e85be7579';
+    r'fe9b27539197f8b219a2c2e904f6fcc3bae4cd1f';
 
 final class GetPackageDetialNotifierFamily extends $Family
     with

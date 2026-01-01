@@ -16,4 +16,14 @@ class PengaturanRepositoryImpl implements PengaturanRepository {
     }
   }
 
+  @override
+  Future<Pengaturan> updatePengaturan(bool isActive) async {
+    try {
+      final response = await remoteData.updatePengaturan(isActive);
+      return response.data.toEntity();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
 }

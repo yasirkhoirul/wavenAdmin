@@ -7,7 +7,7 @@ class GetListBooking {
 
   const GetListBooking(this.repository);
 
-  Future<BookingListData> execute(int page, int limit, {String? search, Sort? sort}) async {
-    return await repository.getListBooking(page, limit, search: search, sort: sort);
+  Future<BookingListData> execute(int page, int limit, {String? search, Sort? sort, SortBooking? sortBy}) async {
+    return await repository.getListBooking(page, limit, search: search, sort: sort, sortBy: sortBy);
   }
 }

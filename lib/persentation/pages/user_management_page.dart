@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/color.dart';
@@ -8,12 +9,14 @@ import 'package:wavenadmin/common/icon.dart';
 import 'package:wavenadmin/data/model/update_user_request_model.dart';
 import 'package:wavenadmin/domain/entity/detail_user.dart';
 import 'package:wavenadmin/persentation/pages/fotografer_mangement_page.dart';
+import 'package:wavenadmin/persentation/riverpod/notifier/user/delete_user_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/update_user_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/userDetail.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/user/user_list_notifier.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/carditemcontainer.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
+import 'package:wavenadmin/persentation/widget/footer_tabel.dart';
 import 'package:wavenadmin/persentation/widget/header_page.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import 'package:wavenadmin/persentation/widget/tabelcontent.dart';
@@ -26,12 +29,10 @@ class UserManagementpage extends ConsumerStatefulWidget {
 }
 
 class _UserManagementpageState extends ConsumerState<UserManagementpage> {
-  int limit = 3;
+  int limit = 10;
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(userGetListProvider.notifier).getListUsers(limit);
-    });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {});
     super.initState();
   }
 
@@ -42,30 +43,36 @@ class _UserManagementpageState extends ConsumerState<UserManagementpage> {
       child: SingleChildScrollView(
         child: SizedBox(
           height: 1000,
-          child: Column(
-            children: [
-              Row(
-                children: [HeaderPage(icon: MyIcon.iconusers, judul: "User")],
-              ),
-              Row(
-                children: [
-                  Flexible(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: 400, minWidth: 200),
-                      child: CardItemContainer(
-                        aset: MyIcon.iconusers,
-                        judul: "Total Users",
-                        content: state.totaldata == null
-                            ? "Loading"
-                            : state.totaldata.toString(),
-                        color: MyColor.oren,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [HeaderPage(icon: MyIcon.iconusers, judul: "User")],
+                ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: 400,
+                          minWidth: 200,
+                        ),
+                        child: CardItemContainer(
+                          aset: MyIcon.iconusers,
+                          judul: "Total Users",
+                          content: state.totaldata == null
+                              ? "Loading"
+                              : state.totaldata.toString(),
+                          color: MyColor.oren,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Expanded(child: TabelUser(limit: limit)),
-            ],
+                  ],
+                ),
+                Expanded(child: TabelUser(limit: limit)),
+              ],
+            ),
           ),
         ),
       ),
@@ -91,11 +98,98 @@ class _TabelUserState extends ConsumerState<TabelUser> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref
+          .read(userGetListProvider.notifier)
+          .getListUsers(
+            widget.limit,
+            search: searchController.text,
+            sort: isAsc ? Sort.asc : Sort.desc,
+            sortBy: sortBy,
+          );
+    });
     ref.listenManual(userGetListProvider, (previous, next) {
       if (previous?.userData != next.userData) {
         setState(() {
           columnIsChecked = false;
           _idCheck = [];
+        });
+      }
+    });
+
+    ref.listenManual(deleteUserProvider, (previous, next) {
+      Logger().w("ini adlaah next $next");
+      Logger().w("ini adlaah prev $previous");
+
+      if (previous?.isLoading == true && !next.isLoading) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // Save context and messenger reference before any operations
+          final currentContext = context;
+          if (!currentContext.mounted) return;
+
+          // Get messenger instance BEFORE any dialog operations
+          final messenger = ScaffoldMessenger.of(currentContext);
+          FocusScope.of(currentContext).unfocus();
+
+          next.when(
+            data: (message) {
+              Logger().w("ini adalh indata $message");
+
+              // Close loading dialog if exists
+              try {
+                if (currentContext.mounted) {
+                  Navigator.of(currentContext, rootNavigator: true).pop();
+                }
+              } catch (e) {
+                // No dialog to close or already closed
+              }
+
+              // Wait TWO frames before showing snackbar for stable widget tree
+              WidgetsBinding.instance.addPostFrameCallback((__) {
+                WidgetsBinding.instance.addPostFrameCallback((___) {
+                  if (currentContext.mounted) {
+                    try {
+                      // Use the messenger instance we got earlier
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          content: Text(message ?? "berhasil dihapus"),
+                        ),
+                      );
+                    } catch (e) {
+                      Logger().w("ini adalh indata catch $e");
+                      // Widget disposed, ignore
+                    }
+                  }
+                });
+              });
+            },
+            loading: () {},
+            error: (error, stack) {
+              // Close loading dialog if exists
+              Logger().w("ini adalh indata error $error");
+              try {
+                if (currentContext.mounted) {
+                  Navigator.of(currentContext, rootNavigator: true).pop();
+                }
+              } catch (e) {
+                // No dialog to close or already closed
+              }
+
+              // Wait TWO frames before showing snackbar for stable widget tree
+              WidgetsBinding.instance.addPostFrameCallback((__) {
+                WidgetsBinding.instance.addPostFrameCallback((___) {
+                  if (currentContext.mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (context) =>
+                          AlertDialog(content: Text(error.toString())),
+                    );
+                  }
+                });
+              });
+            },
+          );
         });
       }
     });
@@ -107,10 +201,101 @@ class _TabelUserState extends ConsumerState<TabelUser> {
     super.dispose();
   }
 
+  void _deleteUser(String userId, String userName) {
+    // Unfocus to avoid focus traversal errors
+    FocusScope.of(context).unfocus();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: MyColor.abuDialog,
+        title: Text(
+          'Konfirmasi Hapus User',
+          style: GoogleFonts.robotoFlex(color: Colors.white),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin menghapus user $userName?',
+          style: GoogleFonts.robotoFlex(color: Colors.white),
+        ),
+        actions: [
+          TextButton(onPressed: () => context.pop(), child: Text('Batal')),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _showLoadingDialog('Menghapus user...');
+              ref.read(deleteUserProvider.notifier).deleteUser(userId);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text('Hapus',style: GoogleFonts.robotoFlex(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteBatchUsers() {
+    if (_idCheck.isEmpty) return;
+
+    // Unfocus to avoid focus traversal errors
+    FocusScope.of(context).unfocus();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: MyColor.abuDialog,
+        title: Text(
+          'Konfirmasi Hapus Batch User',
+          style: GoogleFonts.robotoFlex(color: Colors.white),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin menghapus ${_idCheck.length} user?',
+          style: GoogleFonts.robotoFlex(color: Colors.white),
+        ),
+        actions: [
+          TextButton(onPressed: () => context.pop(), child: Text('Batal')),
+          ElevatedButton(
+            onPressed: () {
+              final idsToDelete = List<String>.from(_idCheck);
+              Navigator.of(context).pop();
+              _showLoadingDialog('Menghapus ${idsToDelete.length} user...');
+              ref
+                  .read(deleteUserProvider.notifier)
+                  .deleteBatchUser(idsToDelete);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text('Hapus',style: GoogleFonts.robotoFlex(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLoadingDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: MyColor.abuDialog,
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.robotoFlex(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    Logger().d(_idCheck);
     final state = ref.watch(userGetListProvider);
+
     final List<DataRow> datarow = state.userData != null
         ? state.userData!
               .skip(state.currentpage * widget.limit)
@@ -150,19 +335,21 @@ class _TabelUserState extends ConsumerState<TabelUser> {
                     DataCell(
                       PopupMenuButton(
                         onSelected: (value) {
-                          if (value == AksiBooking.detail) {
+                          if (value == AksiNormal.detail) {
                             showDialog(
                               context: context,
                               builder: (context) =>
                                   DetailUserDialog(idUser: values.value.id),
                             );
                           }
+                          if (value == AksiNormal.hapus) {
+                            _deleteUser(values.value.id, values.value.name);
+                          }
                         },
-                        itemBuilder: (BuildContext context) => AksiBooking
-                            .values
+                        itemBuilder: (BuildContext context) => AksiNormal.values
                             .map(
                               (e) =>
-                                  PopupMenuItem(value: e, child: Text(e.name)),
+                                  PopupMenuItem(value: e, child: Text(e.teks)),
                             )
                             .toList(),
                       ),
@@ -266,7 +453,7 @@ class _TabelUserState extends ConsumerState<TabelUser> {
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
                   child: Padding(
@@ -275,12 +462,46 @@ class _TabelUserState extends ConsumerState<TabelUser> {
                       onSubmitted: (String p1) {
                         ref
                             .read(userGetListProvider.notifier)
-                            .getListUsers(widget.limit, search: p1);
+                            .getListUsers(
+                              widget.limit,
+                              search: searchController.text,
+                              sort: isAsc ? Sort.asc : Sort.desc,
+                              sortBy: sortBy,
+                            );
                       },
                       controller: searchController,
                     ),
                   ),
                 ),
+                IconButton(
+                  onPressed: () {
+                    ref
+                        .read(userGetListProvider.notifier)
+                        .getListUsers(
+                          widget.limit,
+                          search: searchController.text,
+                          sort: isAsc ? Sort.asc : Sort.desc,
+                          sortBy: sortBy,
+                        );
+                  },
+                  icon: Icon(Icons.refresh, color: MyColor.hijauaccent),
+                  tooltip: 'Refresh',
+                ),
+                if (_idCheck.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton.icon(
+                      onPressed: _deleteBatchUsers,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      icon: Icon(Icons.delete),
+                      label: Text(
+                        'Hapus (${_idCheck.length})',
+                        style: GoogleFonts.robotoFlex(color: Colors.white),
+                      ),
+                    ),
+                  ),
               ],
             ),
             Builder(
@@ -290,18 +511,15 @@ class _TabelUserState extends ConsumerState<TabelUser> {
                 }
                 return SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: state.isloading != true
-                        ? TabelContent(
-                            dataColumnUser: dataColumnUser,
-                            datarow: datarow,
-                          )
-                        : SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            child: Center(child: CircularProgressIndicator()),
-                          ),
-                  ),
+                  child: state.isloading != true
+                      ? TabelContent(
+                          dataColumnUser: dataColumnUser,
+                          datarow: datarow,
+                        )
+                      : SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
                 );
               },
             ),
@@ -348,7 +566,7 @@ class _DetailUserDialogState extends ConsumerState<DetailUserDialog> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
-  bool isActive = true;
+  late String _statusValue = Status.aktif.name;
 
   @override
   void dispose() {
@@ -473,9 +691,32 @@ class _DetailUserDialogState extends ConsumerState<DetailUserDialog> {
                     keyboardType: TextInputType.phone,
                   ),
                   SizedBox(height: 12),
-                  _buildUniversityField(user),
-                  SizedBox(height: 12),
-                  _buildActiveCheckbox(),
+                  ItemDetail(
+                    judul: "Status",
+                    sub: DropDownOutlined(
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'aktif',
+                          child: Text('Aktif'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'tidakaktif',
+                          child: Text('Tidak Aktif'),
+                        ),
+                      ],
+                      initialValue: _statusValue,
+                      validator: (value) {
+                        if (value == null || value.isEmpty)
+                          return 'Tidak boleh kosong';
+                        return null;
+                      },
+                      onChanged: (value) {
+                        setState(() {
+                          _statusValue = value ?? Status.aktif.name;
+                        });
+                      },
+                    ),
+                  ),
                 ],
               ),
             )
@@ -534,7 +775,32 @@ class _DetailUserDialogState extends ConsumerState<DetailUserDialog> {
                         SizedBox(height: 12),
                         _buildUniversityField(user),
                         SizedBox(height: 12),
-                        _buildActiveCheckbox(),
+                        ItemDetail(
+                          judul: "Status",
+                          sub: DropDownOutlined(
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'aktif',
+                                child: Text('Aktif'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'tidakaktif',
+                                child: Text('Tidak Aktif'),
+                              ),
+                            ],
+                            initialValue: _statusValue,
+                            validator: (value) {
+                              if (value == null || value.isEmpty)
+                                return 'Tidak boleh kosong';
+                              return null;
+                            },
+                            onChanged: (value) {
+                              setState(() {
+                                _statusValue = value ?? Status.aktif.name;
+                              });
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -551,28 +817,7 @@ class _DetailUserDialogState extends ConsumerState<DetailUserDialog> {
     );
   }
 
-  Widget _buildActiveCheckbox() {
-    return Row(
-      children: [
-        Checkbox(
-          value: isActive,
-          onChanged: (value) {
-            setState(() {
-              isActive = value ?? true;
-            });
-          },
-        ),
-        Text(
-          "Active",
-          style: GoogleFonts.robotoFlex(
-            color: Color(0xFFE0E0E0),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-
+ 
   Widget _buildFooter(BuildContext context, AsyncValue<String?> updateState) {
     return updateState.when(
       data: (message) {
@@ -610,7 +855,7 @@ class _DetailUserDialogState extends ConsumerState<DetailUserDialog> {
                     onPressed: () {
                       ref.read(updateUserProvider.notifier).reset();
                       ref.invalidate(userDetailProvider(widget.idUser));
-                      ref.invalidate(userGetListProvider);
+
                       Navigator.pop(context);
                     },
                     child: Text('Tutup'),
@@ -639,7 +884,7 @@ class _DetailUserDialogState extends ConsumerState<DetailUserDialog> {
                   name: nameController.text,
                   phoneNumber: phoneController.text,
                   universityId: "019adf75-15c9-78ee-93d6-370db8303226",
-                  isActive: isActive,
+                  isActive: _statusValue == Status.aktif.name,
                 );
 
                 await ref
@@ -708,7 +953,7 @@ class _DetailUserDialogState extends ConsumerState<DetailUserDialog> {
                       name: nameController.text,
                       phoneNumber: phoneController.text,
                       universityId: "019adf75-15c9-78ee-93d6-370db8303226",
-                      isActive: isActive,
+                      isActive: _statusValue == Status.aktif.name,
                     );
 
                     await ref

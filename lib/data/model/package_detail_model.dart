@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:json_annotation/json_annotation.dart';
 
 part 'package_detail_model.g.dart';

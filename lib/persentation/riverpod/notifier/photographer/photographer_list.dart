@@ -8,7 +8,7 @@ part 'photographer_list.g.dart';
 
 @riverpod
 class PhotographerList extends _$PhotographerList {
-  static const int limit = 3;
+  static const int limit = 10;
 
   @override
   PhotographerPagedState build() {

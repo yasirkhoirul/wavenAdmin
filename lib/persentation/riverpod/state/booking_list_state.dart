@@ -15,6 +15,8 @@ class BookingListState {
   final int totalLunas;
   final int totalNeedVerified;
   final int totalVerified;
+  final String? bookingid;
+  final String? statusPending;
 
   const BookingListState({
     this.items = const [],
@@ -30,6 +32,8 @@ class BookingListState {
     this.totalLunas = 0,
     this.totalNeedVerified = 0,
     this.totalVerified = 0,
+    this.bookingid,
+    this.statusPending
   });
 
   BookingListState copyWith({
@@ -46,6 +50,8 @@ class BookingListState {
     int? totalLunas,
     int? totalNeedVerified,
     int? totalVerified,
+    String? bookingId,
+    String? bookingStatus
   }) {
     return BookingListState(
       items: items ?? this.items,
@@ -61,6 +67,8 @@ class BookingListState {
       totalLunas: totalLunas ?? this.totalLunas,
       totalNeedVerified: totalNeedVerified ?? this.totalNeedVerified,
       totalVerified: totalVerified ?? this.totalVerified,
+      bookingid: bookingId,
+      statusPending: bookingStatus
     );
   }
 

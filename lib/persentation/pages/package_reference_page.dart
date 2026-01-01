@@ -20,6 +20,7 @@ import 'package:wavenadmin/persentation/riverpod/notifier/package/get_package_li
 import 'package:wavenadmin/persentation/riverpod/state/package_list_state.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
+import 'package:wavenadmin/persentation/widget/footer_tabel.dart';
 import 'package:wavenadmin/persentation/widget/header_page.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import 'package:wavenadmin/persentation/widget/tabelcontent.dart';
@@ -34,7 +35,7 @@ class PackageReferencePage extends ConsumerStatefulWidget {
 
 class _PackageReferencePageState extends ConsumerState<PackageReferencePage> {
   final TextEditingController searchController = TextEditingController();
-  int limit = 2;
+  int limit = 10;
   bool isAsc = true;
   Sort? sortBy;
   String searchQuery = '';
@@ -59,41 +60,59 @@ class _PackageReferencePageState extends ConsumerState<PackageReferencePage> {
     return SingleChildScrollView(
       child: SizedBox(
         height: 1200,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            HeaderPage(judul: "Referensi Paket", icon: MyIcon.iconusers),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeaderPage(judul: "Referensi Paket", icon: MyIcon.iconusers),
+              SizedBox(height: 20),
+              Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: OutlinedSearcchBar(
-                          onSubmitted: (value) {
-                            Logger().d("ini dietakn");
-                            setState(() {
-                              searchQuery = value;
-                            });
-                            Logger().d("ini dietakn selesai");
-                          },
-                          controller: searchController,
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      spacing: 16,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: OutlinedSearcchBar(
+                            onSubmitted: (value) {
+                              Logger().d("ini dietakn");
+                              setState(() {
+                                searchQuery = value;
+                              });
+                              Logger().d("ini dietakn selesai");
+                            },
+                            controller: searchController,
+                          ),
                         ),
-                      ),
-                      MButtonWeb(
-                        ontap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => const DialogCreatePackage(),
-                          );
-                        },
-                        teks: "Tambah",
-                        icon: Icons.add,
-                      ),
-                    ],
+                        IconButton(
+                          onPressed: () {
+                            ref.invalidate(
+                              getPackageListProvider(
+                                0,
+                                limit,
+                                search: searchQuery,
+                                sort: sortBy,
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.refresh, color: MyColor.hijauaccent),
+                          tooltip: 'Refresh',
+                        ),
+                        MButtonWeb(
+                          ontap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => const DialogCreatePackage(),
+                            );
+                          },
+                          teks: "Tambah",
+                          icon: Icons.add,
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 20),
                   state.when(
@@ -118,8 +137,8 @@ class _PackageReferencePageState extends ConsumerState<PackageReferencePage> {
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

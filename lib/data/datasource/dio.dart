@@ -59,6 +59,7 @@ class DioClient {
               }
             }
           } else {
+            
             return handler.next(error);
           }
         },

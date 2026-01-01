@@ -297,7 +297,7 @@ class MButtonMobile extends StatelessWidget {
                       teks,
                       style: GoogleFonts.robotoFlex(
                         color: Colors.white,
-                        fontSize: 8,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -307,7 +307,7 @@ class MButtonMobile extends StatelessWidget {
                       teks,
                       style: GoogleFonts.robotoFlex(
                         color: Colors.white,
-                        fontSize: 8,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

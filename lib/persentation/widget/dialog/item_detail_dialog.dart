@@ -231,18 +231,21 @@ class ItemDetailText extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 20,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            textSub,
-            style: GoogleFonts.robotoFlex(
-              color: MyColor.abuinactivetulisan,
-              fontWeight: FontWeight.w200,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              textSub,
+              style: GoogleFonts.robotoFlex(
+                color: MyColor.abuinactivetulisan,
+                fontWeight: FontWeight.w200,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

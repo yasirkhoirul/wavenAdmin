@@ -59,21 +59,24 @@ class _MainContentState extends State<MainContent> {
       ),
     ];
     
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        HeaderPage(icon: MyIcon.icondashboard, judul: "Schedule",),
-        LBUttonMobile(ontap: (){
-          context.go('/client');
-        }, teks: "Tambah Booking"),
-        SizedBox(
-          height: MediaQuery.of(context).size.width>700?700:1200,
-          child: MediaQuery.of(context).size.width>700? Row(
-            mainAxisSize: MainAxisSize.min,
-            children: maincalendar,
-          ):Column(children: maincalendar,),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HeaderPage(icon: MyIcon.icondashboard, judul: "Schedule",),
+          LBUttonMobile(ontap: (){
+            context.go('/client');
+          }, teks: "Tambah Booking"),
+          SizedBox(
+            height: MediaQuery.of(context).size.width>700?700:1200,
+            child: MediaQuery.of(context).size.width>700? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: maincalendar,
+            ):Column(children: maincalendar,),
+          ),
+        ],
+      ),
     );
   }
 }

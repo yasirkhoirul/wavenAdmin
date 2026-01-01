@@ -11,7 +11,7 @@ class CreateTransactionRequest {
   final String paymentMethod;
   
   @JsonKey(name: 'amount')
-  final double amount;
+  final int amount;
 
   final String platform;
   const CreateTransactionRequest({
@@ -67,9 +67,9 @@ class TransactionDetail {
   @JsonKey(name: 'gateway_transaction_id')
   final String? gatewayTransactionId;
   @JsonKey(name: 'total_amount')
-  final double totalAmount;
+  final int totalAmount;
   @JsonKey(name: 'paid_amount')
-  final double paidAmount;
+  final int paidAmount;
   final String? currency;
   @JsonKey(name: 'payment_method')
   final String paymentMethod;

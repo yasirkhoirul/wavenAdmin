@@ -13,6 +13,7 @@ import 'package:wavenadmin/persentation/riverpod/state/universitas_list_state.da
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
 import 'package:wavenadmin/persentation/widget/dialog/university_form_dialog.dart';
+import 'package:wavenadmin/persentation/widget/footer_tabel.dart';
 import 'package:wavenadmin/persentation/widget/header_page.dart';
 import 'package:wavenadmin/persentation/widget/outlined_searchbar.dart';
 import 'package:wavenadmin/persentation/widget/tabelcontent.dart';
@@ -53,30 +54,45 @@ class _UniversitasReferencePageState
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: OutlinedSearcchBar(
-                          onSubmitted: (value) {
-                            setState(() {
-                              searchController.text = value;
-                            });
-                          },
-                          controller: searchController,
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      spacing: 16,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: OutlinedSearcchBar(
+                            onSubmitted: (value) {
+                              setState(() {
+                                searchController.text = value;
+                              });
+                            },
+                            controller: searchController,
+                          ),
                         ),
-                      ),
-                      MButtonWeb(
-                        ontap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => DialogTambahUniv(),
-                          );
-                        },
-                        teks: "Tambah",
-                        icon: Icons.add,
-                      ),
-                    ],
+                        IconButton(
+                          onPressed: () {
+                            ref.invalidate(
+                              getUniversityListProvider(
+                                0, limit,search: searchController.text,sort: sortBy
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.refresh, color: MyColor.hijauaccent),
+                          tooltip: 'Refresh',
+                        ),
+                        MButtonWeb(
+                          ontap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => DialogTambahUniv(),
+                            );
+                          },
+                          teks: "Tambah",
+                          icon: Icons.add,
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 20),
                   state.when(
@@ -179,14 +195,7 @@ class _UniversitasReferencePageState
                         ),
                       );
                     }
-                    if (value == "Edit") {
-                      showDialog(
-                        context: context,
-                        builder: (context) => Center(
-                          child: UniversityFormDialog(universityId: e.value.id),
-                        ),
-                      );
-                    }
+                    
                     if (value == "Hapus") {
                       showDialog(
                         context: context,
@@ -245,7 +254,7 @@ class _UniversitasReferencePageState
                       );
                     }
                   },
-                  itemBuilder: (context) => ["Detail", "Edit", "Hapus"]
+                  itemBuilder: (context) => ["Detail", "Hapus"]
                       .map(
                         (action) =>
                             PopupMenuItem(value: action, child: Text(action)),
