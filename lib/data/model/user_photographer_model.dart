@@ -46,6 +46,7 @@ class UserPhotographerModel {
   @JsonKey(name: 'is_active')
   final bool isActive;
 
+  @JsonKey(name: 'gear')
   final String? gears;
   final String? instagram;
   final String? location;

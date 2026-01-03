@@ -62,7 +62,7 @@ class GetListAddonsNotifier extends _$GetListAddonsNotifier{
   }
 
   // Method untuk search dengan debouncing 2 detik
-  void onSearch(int page, int limit, {String? search}) {
+  void onSearch(int pages, int limit, {String? search}) {
     // Cancel timer sebelumnya jika ada
     _debounceTimer?.cancel();
     
@@ -70,7 +70,7 @@ class GetListAddonsNotifier extends _$GetListAddonsNotifier{
       state = const AsyncLoading();
       final response = await AsyncValue.guard(() async {
         final usecase = ref.read(getListAddons);
-        return await usecase.execute(page, limit, search: search);
+        return await usecase.execute(pages, limit, search: search);
       });
       state = response;
     });

@@ -1,12 +1,12 @@
 import 'package:wavenadmin/common/constant.dart';
-import 'package:wavenadmin/data/datasource/remote_data.dart';
+import 'package:wavenadmin/data/datasource/photographer_remote_data_source.dart';
 import 'package:wavenadmin/data/model/photographer_booking_model.dart';
 import 'package:wavenadmin/data/model/photographer_detail_model.dart';
 import 'package:wavenadmin/data/model/photographer_payment_model.dart';
 import 'package:wavenadmin/domain/repository/photographer_payment_repository.dart';
 
 class PhotographerPaymentRepositoryImpl implements PhotographerPaymentRepository {
-  final RemoteData remoteData;
+  final PhotographerRemoteDataSource remoteData;
 
   PhotographerPaymentRepositoryImpl({required this.remoteData});
 

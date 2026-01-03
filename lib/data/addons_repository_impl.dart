@@ -1,4 +1,4 @@
-import 'package:wavenadmin/data/datasource/remote_data.dart';
+import 'package:wavenadmin/data/datasource/addon_remote_data_source.dart';
 import 'package:wavenadmin/data/model/addon_detail_model.dart';
 import 'package:wavenadmin/domain/entity/addon_detail.dart';
 import 'package:wavenadmin/domain/entity/addons_dropdown.dart';
@@ -6,7 +6,7 @@ import 'package:wavenadmin/domain/entity/list_addons.dart';
 import 'package:wavenadmin/domain/repository/addons_repository.dart';
 
 class AddonsRepositoryImpl implements AddonsRepository{
-  final RemoteData remoteData;
+  final AddonRemoteDataSource remoteData;
   const AddonsRepositoryImpl(this.remoteData);
   @override
   Future<ListAddons> getListAddons(int page, int limit, {String? search})async {

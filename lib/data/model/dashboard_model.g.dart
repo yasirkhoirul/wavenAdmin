@@ -12,8 +12,6 @@ DashboardResponse _$DashboardResponseFromJson(Map<String, dynamic> json) =>
       DashboardModel.fromJson(json['data'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$DashboardResponseToJson(DashboardResponse instance) =>
-    <String, dynamic>{'message': instance.message, 'data': instance.data};
 
 KeyValueItem _$KeyValueItemFromJson(Map<String, dynamic> json) => KeyValueItem(
   key: json['Key'] as String,

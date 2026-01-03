@@ -1,12 +1,12 @@
 import 'package:wavenadmin/common/constant.dart';
-import 'package:wavenadmin/data/datasource/remote_data.dart';
+import 'package:wavenadmin/data/datasource/university_remote_data_source.dart';
 import 'package:wavenadmin/data/model/university_detail_model.dart';
 import 'package:wavenadmin/domain/entity/universitas_list.dart';
 import 'package:wavenadmin/domain/entity/university_detail.dart';
 import 'package:wavenadmin/domain/repository/referensi_repository.dart';
 
 class ReferensiRepositoryImpl implements ReferensiRepository {
-  final RemoteData remoteData;
+  final UniversityRemoteDataSource remoteData;
 
   ReferensiRepositoryImpl(this.remoteData);
 

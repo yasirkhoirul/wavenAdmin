@@ -84,12 +84,12 @@ class DropDownAddons extends ConsumerWidget {
                     ref
                         .read(
                           getListAddonsProvider(
-                            1,
+                            0,
                             100,
                             search: filter,
                           ).notifier,
                         )
-                        .onSearch(1, 100, search: filter);
+                        .onSearch(0, 100, search: filter);
                   }
                   return addonsData.addons;
                 },

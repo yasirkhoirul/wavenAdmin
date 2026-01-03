@@ -480,7 +480,7 @@ class _DialogTambahBookingState extends ConsumerState<DialogTambahBooking> {
   }
 
   Widget _buildAddonsDropdown(WidgetRef ref, BookingFormState state, BookingForm notifier) {
-    final addonsState = ref.watch(getListAddonsProvider(1, 100));
+    final addonsState = ref.watch(getListAddonsProvider(0, 100));
     
     return addonsState.when(
       data: (data) {

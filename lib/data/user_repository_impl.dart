@@ -1,5 +1,6 @@
 import 'package:wavenadmin/common/constant.dart';
-import 'package:wavenadmin/data/datasource/remote_data.dart';
+import 'package:wavenadmin/data/datasource/user_remote_data_source.dart';
+import 'package:wavenadmin/data/datasource/photographer_remote_data_source.dart';
 import 'package:wavenadmin/data/model/admin_detail_model.dart';
 import 'package:wavenadmin/data/model/create_fotografer_request.dart';
 import 'package:wavenadmin/data/model/delete_batch_user_model.dart';
@@ -14,38 +15,27 @@ import 'package:wavenadmin/domain/entity/user_list_data.dart';
 import 'package:wavenadmin/domain/repository/user_repositoty.dart';
 
 class UserRepositoryImpl implements UserRepositoty {
-  final RemoteData remoteData;
-  const UserRepositoryImpl(this.remoteData);
+  final UserRemoteDataSource remoteData;
+  final PhotographerRemoteDataSource photographerRemoteData;
+  const UserRepositoryImpl(this.remoteData, this.photographerRemoteData);
 
   @override
   Future<UserDataWrapperEntity> getListUser(int page, int limit, {String? search, Sort? sort,SortUser? sortBy}) async{
-    try {
-      final responsedata = await remoteData.getListUser(page, limit,search: search,sort: sort,sortBy: sortBy);
-      final data =  responsedata.toEntity();
-      return data;
-    } catch (e) {
-      rethrow;
-    }
+    final responsedata = await remoteData.getListUser(page, limit,search: search,sort: sort,sortBy: sortBy);
+    final data =  responsedata.toEntity();
+    return data;
   }
   
   @override
   Future<UserAdminWrapper> getListUserAdmin(int page, int limit, {String? search, Sort? sort,SortAdmin? sortAdmin}) async{
-    try {
-      final responseData = await remoteData.getListUserAdmin(page, limit,search: search,sort: sort,sortAdmin: sortAdmin);
-      return responseData.toWrapper();
-    } catch (e) {
-      rethrow;
-    }
+    final responseData = await remoteData.getListUserAdmin(page, limit,search: search,sort: sort,sortAdmin: sortAdmin);
+    return responseData.toWrapper();
   }
 
   @override
   Future<DetailAdmin> getDetailAdmin(String idAdmin) async{
-    try {
-      final response = await remoteData.getUserAdminDetail(idAdmin);
-      return response.data.toEntity();
-    } catch (e) {
-      rethrow;
-    }
+    final response = await remoteData.getUserAdminDetail(idAdmin);
+    return response.data.toEntity();
   }
   
   @override
@@ -79,22 +69,14 @@ class UserRepositoryImpl implements UserRepositoty {
 
   @override
   Future<String> putDetailFotografer(DetailFotografer payload, String idFotografer) async{
-    try {
-      final response = await remoteData.putDetailFotografer(UserDetailFotograferModel.fromEntity(payload), idFotografer);
-      return response;
-    } catch (e) {
-      rethrow;
-    }
+    final response = await remoteData.putDetailFotografer(UserDetailFotograferModel.fromEntity(payload), idFotografer);
+    return response;
   }
   
   @override
   Future<DetailFotografer> getDetailFotografer(String idFotografer) async{
-    try {
-      final response = await remoteData.getDetailUserFotografer(idFotografer);
-      return response.data.toEntity();
-    } catch (e) {
-      rethrow;
-    }
+    final response = await remoteData.getDetailUserFotografer(idFotografer);
+    return response.data.toEntity();
   }
   
   @override
@@ -105,39 +87,23 @@ class UserRepositoryImpl implements UserRepositoty {
   
   @override
   Future<PhotographerDropdown> getPhotographerDropdown(int page, int limit, {String? search}) async {
-    try {
-      final response = await remoteData.getPhotographerDropdown(page, limit, search: search);
-      return response.toEntity();
-    } catch (e) {
-      rethrow;
-    }
+    final response = await photographerRemoteData.getPhotographerDropdown(page, limit, search: search);
+    return response.toEntity();
   }
   
   @override
   Future<String> createFotografer(UserFotografer data,String username,String password,String email) async{
-    try {
-      final payload = CreateFotograferRequest.fromEntity(data, username: username, password: password, email: email);
-      return await remoteData.createFotografer(payload);
-    } catch (e) {
-      rethrow;
-    }
+    final payload = CreateFotograferRequest.fromEntity(data, username: username, password: password, email: email);
+    return await remoteData.createFotografer(payload);
   }
 
   @override
   Future<String> deleteUser(String userId) async {
-    try {
-      return await remoteData.deleteUser(userId);
-    } catch (e) {
-      rethrow;
-    }
+    return await remoteData.deleteUser(userId);
   }
 
   @override
   Future<DeleteBatchUserResponse> deleteBatchUser(List<String> userIds) async {
-    try {
-      return await remoteData.deleteBatchUser(userIds);
-    } catch (e) {
-      rethrow;
-    }
+    return await remoteData.deleteBatchUser(userIds);
   }
 }

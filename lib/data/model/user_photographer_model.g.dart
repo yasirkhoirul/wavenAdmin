@@ -35,7 +35,7 @@ UserPhotographerModel _$UserPhotographerModelFromJson(
   accountNumber: json['account_number'] as String?,
   bankAccount: json['bank_account'] as String?,
   feePerHour: (json['fee_per_hour'] as num?)?.toInt(),
-  gears: json['gears'] as String?,
+  gears: json['gear'] as String?,
   instagram: json['instagram'] as String?,
   location: json['location'] as String?,
   isActive: json['is_active'] as bool,
@@ -51,7 +51,7 @@ Map<String, dynamic> _$UserPhotographerModelToJson(
   'bank_account': instance.bankAccount,
   'fee_per_hour': instance.feePerHour,
   'is_active': instance.isActive,
-  'gears': instance.gears,
+  'gear': instance.gears,
   'instagram': instance.instagram,
   'location': instance.location,
 };

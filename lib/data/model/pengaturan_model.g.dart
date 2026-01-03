@@ -12,11 +12,7 @@ PengaturanModel _$PengaturanModelFromJson(Map<String, dynamic> json) =>
       PengaturanData.fromJson(json['data'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$PengaturanModelToJson(PengaturanModel instance) =>
-    <String, dynamic>{'message': instance.message, 'data': instance.data};
 
 PengaturanData _$PengaturanDataFromJson(Map<String, dynamic> json) =>
     PengaturanData(json['is_active'] as bool);
 
-Map<String, dynamic> _$PengaturanDataToJson(PengaturanData instance) =>
-    <String, dynamic>{'is_active': instance.isActive};

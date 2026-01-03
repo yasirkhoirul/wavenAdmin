@@ -383,7 +383,7 @@ class _DialogDetailBookingState extends ConsumerState<DialogDetailBooking> {
     final stateVerify = ref.watch(verifyBookingProvider);
     final stateUploadOri = ref.watch(uploadPhotoResultProvider);
     final stateUploadEdit = ref.watch(uploadEditedPhotoProvider);
-    final stateAddons = ref.watch(getListAddonsProvider(1, 100, search: ''));
+    final stateAddons = ref.watch(getListAddonsProvider(0, 100, search: ''));
     final stateFotografer = ref.watch(
       getPhotographerDropdownProvider(1, 100, search: ''),
     );

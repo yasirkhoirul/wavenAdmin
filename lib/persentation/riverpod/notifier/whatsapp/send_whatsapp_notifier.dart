@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wavenadmin/injection.dart';
-import 'package:wavenadmin/data/datasource/remote_data.dart';
+import 'package:wavenadmin/data/datasource/pengaturan_remote_data_source.dart';
 
 part 'send_whatsapp_notifier.g.dart';
 
@@ -14,7 +14,7 @@ class SendWhatsappNotifier extends _$SendWhatsappNotifier {
   Future<void> sendMessage(String target, String message) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final remoteData = locator<RemoteData>();
+      final remoteData = locator<PengaturanRemoteDataSource>();
       final response = await remoteData.sendWhatsappMessage(target, message);
       return response.message;
     });

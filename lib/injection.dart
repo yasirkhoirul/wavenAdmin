@@ -8,7 +8,15 @@ import 'package:wavenadmin/data/booking_repository_impl.dart';
 import 'package:wavenadmin/data/dashboard_repository_impl.dart';
 import 'package:wavenadmin/data/datasource/dio.dart';
 import 'package:wavenadmin/data/datasource/local_data.dart';
-import 'package:wavenadmin/data/datasource/remote_data.dart';
+import 'package:wavenadmin/data/datasource/addon_remote_data_source.dart';
+import 'package:wavenadmin/data/datasource/auth_remote_data_source.dart';
+import 'package:wavenadmin/data/datasource/booking_remote_data_source.dart';
+import 'package:wavenadmin/data/datasource/dashboard_remote_data_source.dart';
+import 'package:wavenadmin/data/datasource/package_remote_data_source.dart';
+import 'package:wavenadmin/data/datasource/pengaturan_remote_data_source.dart';
+import 'package:wavenadmin/data/datasource/photographer_remote_data_source.dart';
+import 'package:wavenadmin/data/datasource/university_remote_data_source.dart';
+import 'package:wavenadmin/data/datasource/user_remote_data_source.dart';
 import 'package:wavenadmin/data/package_repository_impl.dart';
 import 'package:wavenadmin/data/pengaturan_repository_impl.dart';
 import 'package:wavenadmin/data/referensi_repository_impl.dart';
@@ -163,7 +171,7 @@ Future<void> init(GetIt locator)async{
   
   //repository
   locator.registerLazySingleton<AuthRepository>(() => AuthRepositoryimpl(locator(), localData: locator()),);
-  locator.registerLazySingleton<UserRepositoty>(() => UserRepositoryImpl(locator()),);
+  locator.registerLazySingleton<UserRepositoty>(() => UserRepositoryImpl(locator(), locator()),);
   locator.registerLazySingleton<BookingRepository>(() => BookingRepositoryImpl(locator()),);
   locator.registerLazySingleton<AddonsRepository>(() =>AddonsRepositoryImpl(locator()) ,);
   locator.registerLazySingleton<PackageRepository>(() => PackageRepositoryImpl(locator()),);
@@ -175,7 +183,15 @@ Future<void> init(GetIt locator)async{
   locator.registerLazySingleton<DasboardRepository>(() => DashboardRepositoryImpl(locator()),);
 
   //datasource
-  locator.registerLazySingleton<RemoteData>(() =>RemoteDataImpl(locator(), locator()) ,);
+  locator.registerLazySingleton<AddonRemoteDataSource>(() => AddonRemoteDataSourceImpl(locator()),);
+  locator.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl(locator(), locator()),);
+  locator.registerLazySingleton<BookingRemoteDataSource>(() => BookingRemoteDataSourceImpl(locator()),);
+  locator.registerLazySingleton<DashboardRemoteDataSource>(() => DashboardRemoteDataSourceImpl(locator()),);
+  locator.registerLazySingleton<PackageRemoteDataSource>(() => PackageRemoteDataSourceImpl(locator()),);
+  locator.registerLazySingleton<PengaturanRemoteDataSource>(() => PengaturanRemoteDataSourceImpl(locator()),);
+  locator.registerLazySingleton<PhotographerRemoteDataSource>(() => PhotographerRemoteDataSourceImpl(locator()),);
+  locator.registerLazySingleton<UniversityRemoteDataSource>(() => UniversityRemoteDataSourceImpl(locator()),);
+  locator.registerLazySingleton<UserRemoteDataSource>(() => UserRemoteDataSourceImpl(locator()),);
   locator.registerLazySingleton<LocalData>(() =>LocalDataImpl(locator()) ,);
   locator.registerLazySingleton(() => FileMoverLocalDataSource(locator()),);
 

@@ -5,7 +5,6 @@ import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wavenadmin/common/constant.dart';
-import 'package:wavenadmin/common/deep_link_handler.dart';
 import 'package:wavenadmin/data/model/create_booking_request_model.dart';
 import 'package:wavenadmin/domain/entity/detail_user.dart';
 import 'package:wavenadmin/domain/entity/list_addons.dart';
