@@ -5,7 +5,7 @@
 ![Flutter](https://img.shields.io/badge/Flutter-3.10.0+-02569B?logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.10.0+-0175C2?logo=dart&logoColor=white)
 ![License](https://img.shields.io/badge/license-Private-red)
-![Tests](https://img.shields.io/badge/tests-42%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-118%20passing-brightgreen)
 
 ---
 
@@ -48,6 +48,8 @@
 - Filter berdasarkan status
 - Booking detail information
 - Calendar view untuk jadwal booking
+- 💳 **Integrasi Midtrans** untuk pembayaran booking
+- 🔗 **Deep Linking** untuk akses langsung ke detail booking dari notifikasi/link eksternal
 
 ### 🎓 University Management
 - CRUD operations untuk data universitas
@@ -64,7 +66,16 @@
 - Role management
 - User activity tracking
 
-### 📊 Dashboard & Analytics
+### � File Mover (Multi-Platform)
+- **Android & Windows support** untuk bulk file transfer
+- Smart folder navigation dengan file picker
+- Preview file sebelum dipindahkan
+- Automatic fallback dari rename ke copy operation
+- Scoped storage compliance untuk Android 10+
+- History tracking untuk semua file operations
+- Error handling dengan detailed reporting
+
+### �📊 Dashboard & Analytics
 - Visual charts menggunakan `fl_chart`
 - Real-time statistics
 - Interactive calendar dengan `syncfusion_flutter_calendar`
@@ -74,7 +85,50 @@
 
 ## 📸 Screenshots
 
-> Tambahkan screenshots aplikasi Anda di sini
+### 🎥 Demo Video
+
+#### File Mover Feature (Android & Windows)
+![File Mover Demo](assets/gif/filemoverdemo.gif)
+
+**Fitur:**
+- Bulk file transfer dengan preview
+- Support multiple file extensions (.jpg, .JPG, .ARW)
+- Real-time status monitoring
+- History tracking
+- Error handling
+
+---
+
+#### Payment Gateway Integration (Midtrans)
+![Payment Gateway Demo](assets/gif/paymentgatewaydemo.gif)
+
+**Fitur:**
+- Midtrans payment integration
+- Real-time transaction tracking
+- Payment verification
+- Deep linking support untuk payment callback
+
+---
+
+### 📱 App Screenshots
+
+#### Authentication & Login
+![Login Page](assets/screenshot/loginpage.png)
+
+#### Dashboard
+![Dashboard](assets/screenshot/dashboardpage.png)
+
+#### Booking Management
+![Booking Management](assets/screenshot/BookingPage.png)
+
+#### Menu Navigation
+![Menu Navigation](assets/screenshot/menunav.jpg)
+
+#### Schedule / Calendar
+![Schedule Page](assets/screenshot/schedulepage.png)
+
+#### User Management
+![User Management](assets/screenshot/usermanagement.jpg)
 
 ---
 
@@ -123,9 +177,10 @@
 - **app_links**: `^6.3.3` - Deep linking
 
 ### File & Media
-- **file_picker**: `^10.3.7` - File selection
+- **file_picker**: `^10.3.7` - File selection untuk File Mover
 - **image_picker**: `^1.2.1` - Image selection
 - **permission_handler**: `^12.0.1` - Permission management
+- **device_info_plus**: `^9.1.2` - Device info untuk Android version detection
 
 ### Dev Dependencies
 - **flutter_test**: Testing framework
@@ -673,6 +728,36 @@ flutter run
 ### Issue: JWT Token Expired
 
 **Solution**: Implement auto refresh token mechanism di dio interceptor atau logout dan login kembali.
+
+### Issue: File Mover - Permission Denied (Android 10+)
+
+**Error**: `PathAccessException: Cannot copy file to '/storage/emulated/0/...'`
+
+**Penyebab**: Scoped Storage restrictions di Android 10+
+
+**Solution**:
+1. Ensure permissions di `AndroidManifest.xml`:
+```xml
+<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+
+2. Request permission saat runtime (automatic di code)
+
+3. Gunakan SAF (Storage Access Framework) - code sudah handle dengan file_picker
+
+4. Untuk testing, gunakan Documents/Download folder
+
+### Issue: File Mover - File Not Found
+
+**Error**: File yang dicari tidak ada di folder sumber
+
+**Solution**:
+1. Verify path folder sumber (use file picker, jangan manual input)
+2. Check file extension (.jpg, .JPG, .ARW)
+3. Lihat preview dialog untuk confirm file availability
+4. Check file permissions - file harus readable
 
 ---
 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:wavenadmin/common/color.dart';
 import 'package:wavenadmin/domain/entity/file_mover_history.dart';
 import 'package:wavenadmin/domain/usecase/save_file_mover_history.dart';
@@ -52,8 +53,23 @@ class _FileMoverPageState extends State<FileMoverPage> {
   Future<bool> _requestStoragePermission() async {
     if (!_isAndroid) return true; // Desktop tidak perlu permission
 
-    final status = await Permission.storage.request();
+    // Android 11+ (API 30+) gunakan MANAGE_EXTERNAL_STORAGE
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    if (androidInfo.version.sdkInt >= 30) {
+      final manageStatus = await Permission.manageExternalStorage.request();
+      if (manageStatus.isDenied) {
+        _updateStatus('❌ Kelola semua file permission ditolak');
+        return false;
+      } else if (manageStatus.isPermanentlyDenied) {
+        _updateStatus('❌ Permission tidak bisa diakses. Buka Settings.');
+        openAppSettings();
+        return false;
+      }
+      return true;
+    }
     
+    // Android 10 dan dibawah
+    final status = await Permission.storage.request();
     if (status.isDenied) {
       _updateStatus('❌ Storage permission ditolak');
       return false;
@@ -443,16 +459,20 @@ class _FileMoverPageState extends State<FileMoverPage> {
               continue;
             }
 
+            // Try rename first (faster, same partition)
             await entity.rename(newPath);
             successCount++;
           } catch (e) {
             try {
+              // Fallback: copy + delete (cross-partition)
               final String newPath = p.join(destPath, targetFileName);
               await entity.copy(newPath);
               await entity.delete();
               successCount++;
             } catch (copyError) {
-              failedFiles.add("$targetFileName (Gagal: $copyError)");
+              // More detailed error message
+              String errorMsg = _parseErrorMessage(copyError.toString());
+              failedFiles.add("$targetFileName (Gagal: $errorMsg)");
             }
           }
         }
@@ -478,6 +498,22 @@ class _FileMoverPageState extends State<FileMoverPage> {
 
     _updateStatus("Proses Selesai.");
     _showResultDialog(successCount, failedFiles, notFoundFiles);
+  }
+
+  String _parseErrorMessage(String error) {
+    // Simplify error messages untuk user
+    if (error.contains('Operation not permitted')) {
+      return 'Izin akses ditolak (cek folder permissions)';
+    } else if (error.contains('No such file or directory')) {
+      return 'File atau folder tidak ditemukan';
+    } else if (error.contains('Permission denied')) {
+      return 'Izin ditolak (cek storage permissions)';
+    } else if (error.contains('Read-only file system')) {
+      return 'Folder bersifat read-only';
+    } else {
+      // Return shortened error
+      return error.length > 50 ? '${error.substring(0, 50)}...' : error;
+    }
   }
 
   void _updateStatus(String msg) {

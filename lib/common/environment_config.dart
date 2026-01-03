@@ -1,7 +1,7 @@
 class EnvironmentConfig {
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://103.23.199.188:5000/',
+    defaultValue: 'https://waven-development.site/',
   );
   
   static const int apiTimeout = int.fromEnvironment(
