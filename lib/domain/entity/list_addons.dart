@@ -5,6 +5,8 @@ class ListAddons {
   final int page;
   final int limit;
   final List<Addon> addons;
+  final bool isReached;
+  final int highestpage;
 
   ListAddons({
     this.message = '',
@@ -13,6 +15,8 @@ class ListAddons {
     this.page = 0,
     this.limit = 0,
     this.addons = const [],
+    this.isReached = false,
+    this.highestpage = 1
   });
 
   ListAddons copyWith({
@@ -22,6 +26,8 @@ class ListAddons {
     int? page,
     int? limit,
     List<Addon>? addons,
+    int? highestpage,
+    bool? isReached
   }) {
     return ListAddons(
       message: message ?? this.message,
@@ -30,6 +36,17 @@ class ListAddons {
       page: page ?? this.page,
       limit: limit ?? this.limit,
       addons: addons ?? this.addons,
+      highestpage: highestpage?? this.highestpage,
+      isReached: isReached??this.isReached
+    );
+  }
+  ListAddons appendMode({
+    
+    List<Addon>? addons,
+    
+  }) {
+    return copyWith(
+      addons: [...this.addons,...addons??[]]
     );
   }
 }

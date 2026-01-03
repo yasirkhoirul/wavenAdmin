@@ -61,215 +61,218 @@ class _FotograferReferencePageState
     return SingleChildScrollView(
       child: SizedBox(
         height: 1200,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            HeaderPage(
-              judul: "Photographer Payment",
-              icon: MyIcon.iconusers,
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                children: [
-                  MediaQuery.of(context).size.width < 700
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 12,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Flexible(
-                                  child: OutlinedSearcchBar(
-                                    onSubmitted: (value) {
-                                      Logger().d("Search: $value");
-                                      setState(() {
-                                        searchQuery = value;
-                                      });
-                                    },
-                                    controller: searchController,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                IconButton(
-                                  onPressed: () {
-                                    ref.invalidate(
-                                      photographerPaymentProvider(
-                                        0,
-                                        limit,
-                                        search: searchQuery,
-                                        startTime: startTime,
-                                        endTime: endTime,
-                                        sortBy: sortBy,
-                                        sort: isAsc ? Sort.asc : Sort.desc,
-                                      ),
-                                    );
-                                  },
-                                  icon: Icon(Icons.refresh,
-                                      color: MyColor.hijauaccent),
-                                  tooltip: 'Refresh',
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Flexible(
-                                  child: _buildDateInput(
-                                    label: "Start Date",
-                                    date: startTime,
-                                    onTap: () async {
-                                      final picked = await showDatePicker(
-                                        context: context,
-                                        initialDate:
-                                            startTime ?? DateTime.now(),
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2100),
-                                      );
-                                      if (picked != null) {
-                                        setState(() {
-                                          startTime = picked;
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Flexible(
-                                  child: _buildDateInput(
-                                    label: "End Date",
-                                    date: endTime,
-                                    onTap: () async {
-                                      final picked = await showDatePicker(
-                                        context: context,
-                                        initialDate: endTime ?? DateTime.now(),
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2100),
-                                      );
-                                      if (picked != null) {
-                                        setState(() {
-                                          endTime = picked;
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Flexible(
-                              child: OutlinedSearcchBar(
-                                onSubmitted: (value) {
-                                  Logger().d("Search: $value");
-                                  setState(() {
-                                    searchQuery = value;
-                                  });
-                                },
-                                controller: searchController,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            IconButton(
-                              onPressed: () {
-                                ref.invalidate(
-                                  photographerPaymentProvider(
-                                    0,
-                                    limit,
-                                    search: searchQuery,
-                                    startTime: startTime,
-                                    endTime: endTime,
-                                    sortBy: sortBy,
-                                    sort: isAsc ? Sort.asc : Sort.desc,
-                                  ),
-                                );
-                              },
-                              icon: Icon(Icons.refresh,
-                                  color: MyColor.hijauaccent),
-                              tooltip: 'Refresh',
-                            ),
-                            const SizedBox(width: 16),
-                            _buildDateInput(
-                              label: "Start Date",
-                              date: startTime,
-                              onTap: () async {
-                                final picked = await showDatePicker(
-                                  context: context,
-                                  initialDate: startTime ?? DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (picked != null) {
-                                  setState(() {
-                                    startTime = picked;
-                                  });
-                                }
-                              },
-                            ),
-                            const SizedBox(width: 16),
-                            _buildDateInput(
-                              label: "End Date",
-                              date: endTime,
-                              onTap: () async {
-                                final picked = await showDatePicker(
-                                  context: context,
-                                  initialDate: endTime ?? DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (picked != null) {
-                                  setState(() {
-                                    endTime = picked;
-                                  });
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                  const SizedBox(height: 20),
-                  state.requestState == RequestState.loading
-                      ? SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.8127,
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
-                      : state.requestState == RequestState.error
-                          ? Center(
-                              child: Column(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeaderPage(
+                judul: "Photographer Payment",
+                icon: MyIcon.iconreferensi,
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  children: [
+                    MediaQuery.of(context).size.width < 700
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 12,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Text('Error: ${state.message}'),
-                                  ElevatedButton(
+                                  Flexible(
+                                    child: OutlinedSearcchBar(
+                                      onSubmitted: (value) {
+                                        Logger().d("Search: $value");
+                                        setState(() {
+                                          searchQuery = value;
+                                        });
+                                      },
+                                      controller: searchController,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  IconButton(
                                     onPressed: () {
-                                      ref
-                                          .read(
-                                            photographerPaymentProvider(
-                                              0,
-                                              limit,
-                                              search: searchQuery,
-                                              startTime: startTime,
-                                              endTime: endTime,
-                                              sortBy: sortBy,
-                                              sort: isAsc ? Sort.asc : Sort.desc,
-                                            ).notifier,
-                                          )
-                                          .refresh();
+                                      ref.invalidate(
+                                        photographerPaymentProvider(
+                                          0,
+                                          limit,
+                                          search: searchQuery,
+                                          startTime: startTime,
+                                          endTime: endTime,
+                                          sortBy: sortBy,
+                                          sort: isAsc ? Sort.asc : Sort.desc,
+                                        ),
+                                      );
                                     },
-                                    child: const Text('Retry'),
+                                    icon: Icon(Icons.refresh,
+                                        color: MyColor.hijauaccent),
+                                    tooltip: 'Refresh',
                                   ),
                                 ],
                               ),
-                            )
-                          : _buildTable(context, state),
-                ],
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Flexible(
+                                    child: _buildDateInput(
+                                      label: "Start Date",
+                                      date: startTime,
+                                      onTap: () async {
+                                        final picked = await showDatePicker(
+                                          context: context,
+                                          initialDate:
+                                              startTime ?? DateTime.now(),
+                                          firstDate: DateTime(2000),
+                                          lastDate: DateTime(2100),
+                                        );
+                                        if (picked != null) {
+                                          setState(() {
+                                            startTime = picked;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Flexible(
+                                    child: _buildDateInput(
+                                      label: "End Date",
+                                      date: endTime,
+                                      onTap: () async {
+                                        final picked = await showDatePicker(
+                                          context: context,
+                                          initialDate: endTime ?? DateTime.now(),
+                                          firstDate: DateTime(2000),
+                                          lastDate: DateTime(2100),
+                                        );
+                                        if (picked != null) {
+                                          setState(() {
+                                            endTime = picked;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                child: OutlinedSearcchBar(
+                                  onSubmitted: (value) {
+                                    Logger().d("Search: $value");
+                                    setState(() {
+                                      searchQuery = value;
+                                    });
+                                  },
+                                  controller: searchController,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              IconButton(
+                                onPressed: () {
+                                  ref.invalidate(
+                                    photographerPaymentProvider(
+                                      0,
+                                      limit,
+                                      search: searchQuery,
+                                      startTime: startTime,
+                                      endTime: endTime,
+                                      sortBy: sortBy,
+                                      sort: isAsc ? Sort.asc : Sort.desc,
+                                    ),
+                                  );
+                                },
+                                icon: Icon(Icons.refresh,
+                                    color: MyColor.hijauaccent),
+                                tooltip: 'Refresh',
+                              ),
+                              const SizedBox(width: 16),
+                              _buildDateInput(
+                                label: "Start Date",
+                                date: startTime,
+                                onTap: () async {
+                                  final picked = await showDatePicker(
+                                    context: context,
+                                    initialDate: startTime ?? DateTime.now(),
+                                    firstDate: DateTime(2000),
+                                    lastDate: DateTime(2100),
+                                  );
+                                  if (picked != null) {
+                                    setState(() {
+                                      startTime = picked;
+                                    });
+                                  }
+                                },
+                              ),
+                              const SizedBox(width: 16),
+                              _buildDateInput(
+                                label: "End Date",
+                                date: endTime,
+                                onTap: () async {
+                                  final picked = await showDatePicker(
+                                    context: context,
+                                    initialDate: endTime ?? DateTime.now(),
+                                    firstDate: DateTime(2000),
+                                    lastDate: DateTime(2100),
+                                  );
+                                  if (picked != null) {
+                                    setState(() {
+                                      endTime = picked;
+                                    });
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                    const SizedBox(height: 20),
+                    state.requestState == RequestState.loading
+                        ? SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.8127,
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        : state.requestState == RequestState.error
+                            ? Center(
+                                child: Column(
+                                  children: [
+                                    Text('Error: ${state.message}'),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        ref
+                                            .read(
+                                              photographerPaymentProvider(
+                                                0,
+                                                limit,
+                                                search: searchQuery,
+                                                startTime: startTime,
+                                                endTime: endTime,
+                                                sortBy: sortBy,
+                                                sort: isAsc ? Sort.asc : Sort.desc,
+                                              ).notifier,
+                                            )
+                                            .refresh();
+                                      },
+                                      child: const Text('Retry'),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : _buildTable(context, state),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

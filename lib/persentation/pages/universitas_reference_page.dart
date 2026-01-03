@@ -29,7 +29,7 @@ class UniversitasReferencePage extends ConsumerStatefulWidget {
 class _UniversitasReferencePageState
     extends ConsumerState<UniversitasReferencePage> {
   final TextEditingController searchController = TextEditingController();
-  int limit = 2;
+  int limit = 10;
   bool isAsc = true;
   Sort? sortBy;
 
@@ -45,82 +45,85 @@ class _UniversitasReferencePageState
     return SingleChildScrollView(
       child: SizedBox(
         height: 1200,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            HeaderPage(judul: "Referensi Universitas", icon: MyIcon.iconusers),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      spacing: 16,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: OutlinedSearcchBar(
-                            onSubmitted: (value) {
-                              setState(() {
-                                searchController.text = value;
-                              });
-                            },
-                            controller: searchController,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            ref.invalidate(
-                              getUniversityListProvider(
-                                0, limit,search: searchController.text,sort: sortBy
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.refresh, color: MyColor.hijauaccent),
-                          tooltip: 'Refresh',
-                        ),
-                        MButtonWeb(
-                          ontap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => DialogTambahUniv(),
-                            );
-                          },
-                          teks: "Tambah",
-                          icon: Icons.add,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  state.when(
-                    data: (data) => _buildTable(context, data),
-                    loading: () => SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8127,
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                    error: (error, stack) => Center(
-                      child: Column(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeaderPage(judul: "Referensi Universitas", icon: MyIcon.iconreferensi),
+              
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        spacing: 16,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Error: $error'),
-                          ElevatedButton(
+                          Flexible(
+                            child: OutlinedSearcchBar(
+                              onSubmitted: (value) {
+                                setState(() {
+                                  searchController.text = value;
+                                });
+                              },
+                              controller: searchController,
+                            ),
+                          ),
+                          IconButton(
                             onPressed: () {
                               ref.invalidate(
-                                getUniversityListProvider(1, limit),
+                                getUniversityListProvider(
+                                  0, limit,search: searchController.text,sort: sortBy
+                                ),
                               );
                             },
-                            child: Text('Retry'),
+                            icon: Icon(Icons.refresh, color: MyColor.hijauaccent),
+                            tooltip: 'Refresh',
+                          ),
+                          MButtonWeb(
+                            ontap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => DialogTambahUniv(),
+                              );
+                            },
+                            teks: "Tambah",
+                            icon: Icons.add,
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
+                    
+                    state.when(
+                      data: (data) => _buildTable(context, data),
+                      loading: () => SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.8127,
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                      error: (error, stack) => Center(
+                        child: Column(
+                          children: [
+                            Text('Error: $error'),
+                            ElevatedButton(
+                              onPressed: () {
+                                ref.invalidate(
+                                  getUniversityListProvider(1, limit),
+                                );
+                              },
+                              child: Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -1,10 +1,12 @@
 import 'dart:typed_data';
 
+import 'package:image_picker/image_picker.dart';
 import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/model/create_package_model.dart';
 import 'package:wavenadmin/data/model/package_detail_model.dart';
 import 'package:wavenadmin/domain/entity/package_dropdown.dart';
 import 'package:wavenadmin/domain/entity/package_list.dart';
+import 'package:wavenadmin/domain/entity/porto_list.dart';
 
 abstract class PackageRepository {
   Future<PackageDropdown> getPackageDropdown(int page, int limit, {String? search});
@@ -13,4 +15,7 @@ abstract class PackageRepository {
   Future<String> updatePackage(Uint8List image,String idPackage,PackageDetailData payload);
   Future<CreatePackageResponse> createPackage(CreatePackageRequest request, Uint8List imageFile);
   Future<DeletePackageResponse> deletePackage(String packageId);
+  Future<String> deletePorto(String portoId);
+  Future<String> addPorto(XFile image,String packageId);
+  Future<PortoList> getListPorto(String packageId);
 }

@@ -51,7 +51,7 @@ final class GetListAddonsNotifierProvider
 }
 
 String _$getListAddonsNotifierHash() =>
-    r'aa5e5d35254b8e2aecb5c3ee5f387f1cb7e08257';
+    r'019eb5a3b0a9f17557b7a4128a5fd28c372e61ee';
 
 final class GetListAddonsNotifierFamily extends $Family
     with

@@ -95,12 +95,18 @@ class MainScaffoldDrawer extends StatelessWidget {
                   onTap: () => statefulNavigationShell.goBranch(9),
                   aset: MyIcon.iconreferensi,
                 ),
+                ItemSideNavigation(
+                  judul: "Addons",
+                  isActive: statefulNavigationShell.currentIndex == 10,
+                  onTap: () => statefulNavigationShell.goBranch(10),
+                  aset: MyIcon.iconreferensi,
+                ),
               ],
             ),
             ItemSideNavigation(
               judul: "Setting",
-              isActive: statefulNavigationShell.currentIndex == 10,
-              onTap: () => statefulNavigationShell.goBranch(10),
+              isActive: statefulNavigationShell.currentIndex == 11,
+              onTap: () => statefulNavigationShell.goBranch(11),
               aset: MyIcon.iconpengaturan,
             ),
             ItemSideNavigation(
@@ -205,12 +211,18 @@ class SideNavigation extends StatelessWidget {
                   onTap: () => statefulNavigationShell.goBranch(9),
                   aset: MyIcon.iconreferensi,
                 ),
+                ItemSideNavigation(
+                  judul: "Addons",
+                  isActive: statefulNavigationShell.currentIndex == 10,
+                  onTap: () => statefulNavigationShell.goBranch(10),
+                  aset: MyIcon.iconreferensi,
+                ),
               ],
             ),
             ItemSideNavigation(
               judul: "Setting",
-              isActive: statefulNavigationShell.currentIndex == 10,
-              onTap: () => statefulNavigationShell.goBranch(10),
+              isActive: statefulNavigationShell.currentIndex == 11,
+              onTap: () => statefulNavigationShell.goBranch(11),
               aset: MyIcon.iconpengaturan,
             ),
             ItemSideNavigation(

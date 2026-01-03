@@ -477,7 +477,7 @@ class _AdminFormDialogState extends ConsumerState<AdminFormDialog> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  
                   Expanded(
                     child: adminDetailAsync is! AsyncValue<DetailAdmin>
                         ? adminDetailAsync.when(

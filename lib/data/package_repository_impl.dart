@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 
 import 'package:wavenadmin/common/constant.dart';
@@ -7,6 +8,7 @@ import 'package:wavenadmin/data/model/create_package_model.dart';
 import 'package:wavenadmin/data/model/package_detail_model.dart';
 import 'package:wavenadmin/domain/entity/package_dropdown.dart';
 import 'package:wavenadmin/domain/entity/package_list.dart';
+import 'package:wavenadmin/domain/entity/porto_list.dart';
 import 'package:wavenadmin/domain/repository/package_repository.dart';
 
 class PackageRepositoryImpl implements PackageRepository {
@@ -116,6 +118,36 @@ class PackageRepositoryImpl implements PackageRepository {
     try {
       final response = await remoteData.deletePackage(packageId);
       return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> addPorto(XFile image,String packageId) async{
+    try {
+      final response = await remoteData.addPorto(image,packageId);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> deletePorto(String portoId) async{
+    try {
+      final response = await remoteData.deletePorto(portoId);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<PortoList> getListPorto(String packageId)async {
+    try {
+      final response = await remoteData.getListPorto(packageId);
+      return response.toEntity();
     } catch (e) {
       rethrow;
     }

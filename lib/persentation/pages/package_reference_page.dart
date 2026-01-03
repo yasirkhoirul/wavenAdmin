@@ -17,6 +17,7 @@ import 'package:wavenadmin/persentation/riverpod/notifier/package/create_package
 import 'package:wavenadmin/persentation/riverpod/notifier/package/delete_package_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/package/get_package_detial_notifier.dart';
 import 'package:wavenadmin/persentation/riverpod/notifier/package/get_package_list_notifier.dart';
+import 'package:wavenadmin/persentation/riverpod/notifier/porto/porto_mutation.dart';
 import 'package:wavenadmin/persentation/riverpod/state/package_list_state.dart';
 import 'package:wavenadmin/persentation/widget/button.dart';
 import 'package:wavenadmin/persentation/widget/dialog/item_detail_dialog.dart';
@@ -65,7 +66,7 @@ class _PackageReferencePageState extends ConsumerState<PackageReferencePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HeaderPage(judul: "Referensi Paket", icon: MyIcon.iconusers),
+              HeaderPage(judul: "Referensi Paket", icon: MyIcon.iconreferensi),
               SizedBox(height: 20),
               Column(
                 children: [
@@ -189,6 +190,14 @@ class _PackageReferencePageState extends ConsumerState<PackageReferencePage> {
               DataCell(
                 PopupMenuButton(
                   onSelected: (value) {
+                    if (value == "Manage Porto") {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return DialogPorto(packageId: e.value.id);
+                        },
+                      );
+                    }
                     if (value == "Detail") {
                       showDialog(
                         context: context,
@@ -217,8 +226,7 @@ class _PackageReferencePageState extends ConsumerState<PackageReferencePage> {
                             TextButton(
                               onPressed: () async {
                                 Navigator.pop(dialogContext);
-                                
-                               
+
                                 BuildContext? loadingDialogContext;
                                 showDialog(
                                   context: context,
@@ -236,17 +244,18 @@ class _PackageReferencePageState extends ConsumerState<PackageReferencePage> {
                                     );
                                   },
                                 );
-                                
+
                                 try {
                                   await ref
                                       .read(deletePackageProvider.notifier)
                                       .deletePackage(e.value.id);
-                                  
+
                                   // Close loading dialog using stored context
-                                  if (loadingDialogContext != null && loadingDialogContext!.mounted) {
+                                  if (loadingDialogContext != null &&
+                                      loadingDialogContext!.mounted) {
                                     Navigator.pop(loadingDialogContext!);
                                   }
-                                  
+
                                   // Success - show message and refresh list
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -259,10 +268,11 @@ class _PackageReferencePageState extends ConsumerState<PackageReferencePage> {
                                   }
                                 } catch (e) {
                                   // Close loading dialog on error
-                                  if (loadingDialogContext != null && loadingDialogContext!.mounted) {
+                                  if (loadingDialogContext != null &&
+                                      loadingDialogContext!.mounted) {
                                     Navigator.pop(loadingDialogContext!);
                                   }
-                                  
+
                                   // Show error message
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -284,12 +294,15 @@ class _PackageReferencePageState extends ConsumerState<PackageReferencePage> {
                       );
                     }
                   },
-                  itemBuilder: (context) => ["Detail", "Edit", "Hapus"]
-                      .map(
-                        (action) =>
-                            PopupMenuItem(value: action, child: Text(action)),
-                      )
-                      .toList(),
+                  itemBuilder: (context) =>
+                      ["Detail", "Edit", "Hapus", "Manage Porto"]
+                          .map(
+                            (action) => PopupMenuItem(
+                              value: action,
+                              child: Text(action),
+                            ),
+                          )
+                          .toList(),
                 ),
               ),
               DataCell(
@@ -379,6 +392,220 @@ class _PackageReferencePageState extends ConsumerState<PackageReferencePage> {
   }
 }
 
+class DialogPorto extends ConsumerStatefulWidget {
+  final String packageId;
+
+  const DialogPorto({super.key, required this.packageId});
+
+  @override
+  ConsumerState<DialogPorto> createState() => _DialogPortoState();
+}
+
+class _DialogPortoState extends ConsumerState<DialogPorto> {
+ 
+  void _deleteImage(String id) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Konfirmasi Hapus'),
+        content: const Text('Apakah Anda yakin ingin menghapus gambar ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () {
+              context.pop();
+              ref.read(portoMutationProvider(widget.packageId).notifier).deletePortoOne(id);
+            },
+            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addImage() async {
+    final imagePicker = ImagePicker();
+    final data = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (data != null) {
+      ref.read(portoMutationProvider(widget.packageId).notifier).addPortoOne(data);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(portoMutationProvider(widget.packageId));
+    return Center(
+      child: Card(
+        color: MyColor.abuDialog,
+        child: SizedBox(
+          height: 800,
+          width: 900,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Manage Portfolio",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: _addImage,
+                          icon: Icon(
+                            Icons.add_photo_alternate,
+                            color: MyColor.hijauaccent,
+                          ),
+                          tooltip: 'Tambah Gambar',
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                state.when(
+                  data: (data) => Expanded(
+                    child: data.portfolios.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.photo_library_outlined,
+                                  size: 80,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Belum ada portfolio',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 16,
+                                  mainAxisSpacing: 16,
+                                  childAspectRatio: 1,
+                                ),
+                            itemCount: data.portfolios.length,
+                            itemBuilder: (context, index) {
+                              final image = data.portfolios[index];
+                              return _PortfolioImageItem(
+                                id: image.id,
+                                url: image.url,
+                                onDelete: () => _deleteImage(image.id),
+                              );
+                            },
+                          ),
+                  ),
+                  error: (Object error, StackTrace stackTrace) {
+                    return Column(
+                      children: [
+                        Text(error.toString()),
+                        MButtonMobile(ontap: (){
+                          ref.invalidate(portoMutationProvider(widget.packageId));
+                        }, teks: "Coba Lagi")
+                      ],
+                    );
+                  },
+                  loading: () {
+                    return Center(child: CircularProgressIndicator(),);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PortfolioImageItem extends StatelessWidget {
+  final String id;
+  final String url;
+  final VoidCallback onDelete;
+
+  const _PortfolioImageItem({
+    required this.id,
+    required this.url,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: MyColor.abudalamcontainer, width: 1),
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: CachedNetworkImage(
+              imageUrl: url,
+              fit: BoxFit.cover,
+              placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => Container(
+                color: Colors.grey[800],
+                child: const Icon(
+                  Icons.broken_image,
+                  size: 50,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onDelete,
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 20),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class DialogDetail extends ConsumerStatefulWidget {
   final String idPackage;
 
@@ -446,7 +673,6 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              
               spacing: 10,
               children: [
                 Row(
@@ -464,9 +690,8 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                 state.when(
                   data: (data) {
                     init(data.data);
-            
-                    return Expanded(
 
+                    return Expanded(
                       child: SingleChildScrollView(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -495,10 +720,12 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                                               BorderRadiusGeometry.circular(15),
                                           child: CachedNetworkImage(
                                             imageUrl: data.data.bannerUrl,
-                                            errorWidget: (context, url, error) =>
-                                                Icon(Icons.error),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Icon(Icons.error),
                                             placeholder: (context, url) => Center(
-                                              child: CircularProgressIndicator(),
+                                              child:
+                                                  CircularProgressIndicator(),
                                             ),
                                             fit: BoxFit.cover,
                                           ),
@@ -539,18 +766,22 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                               SizedBox(height: 10),
                               // Benefit Section
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
                                       'Benefit/Addon',
-                                      style: Theme.of(context).textTheme.titleMedium,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium,
                                     ),
                                   ),
                                   IconButton(
                                     onPressed: () {
-                                      final controller = TextEditingController();
+                                      final controller =
+                                          TextEditingController();
                                       showDialog(
                                         context: context,
                                         builder: (context) => AlertDialog(
@@ -568,13 +799,18 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                if (controller.text.isNotEmpty) {
+                                                if (controller
+                                                    .text
+                                                    .isNotEmpty) {
                                                   setState(() {
-                                                    benefits.add(PackageBenefit(
-                                                      id: '',
-                                                      type: 'include',
-                                                      description: controller.text,
-                                                    ));
+                                                    benefits.add(
+                                                      PackageBenefit(
+                                                        id: '',
+                                                        type: 'include',
+                                                        description:
+                                                            controller.text,
+                                                      ),
+                                                    );
                                                   });
                                                 }
                                                 context.pop();
@@ -585,7 +821,10 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                                         ),
                                       );
                                     },
-                                    icon: Icon(Icons.add_circle, color: MyColor.hijauaccent),
+                                    icon: Icon(
+                                      Icons.add_circle,
+                                      color: MyColor.hijauaccent,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -594,7 +833,9 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                               if (benefits.isNotEmpty)
                                 Container(
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey.shade300),
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: ListView.builder(
@@ -604,8 +845,9 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                                     itemBuilder: (context, index) {
                                       final benefit = benefits[index];
                                       final isIncluded =
-                                          benefit.type.toUpperCase() == 'INCLUDE';
-                                      
+                                          benefit.type.toUpperCase() ==
+                                          'INCLUDE';
+
                                       return ListTile(
                                         title: Text(benefit.description),
                                         trailing: Row(
@@ -615,11 +857,15 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                                               value: isIncluded,
                                               onChanged: (value) {
                                                 setState(() {
-                                                  benefits[index] = PackageBenefit(
-                                                    id: benefit.id,
-                                                    description: benefit.description,
-                                                    type: value ? 'INCLUDE' : 'EXCLUDE',
-                                                  );
+                                                  benefits[index] =
+                                                      PackageBenefit(
+                                                        id: benefit.id,
+                                                        description:
+                                                            benefit.description,
+                                                        type: value
+                                                            ? 'INCLUDE'
+                                                            : 'EXCLUDE',
+                                                      );
                                                 });
                                               },
                                             ),
@@ -629,7 +875,10 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                                                   benefits.removeAt(index);
                                                 });
                                               },
-                                              icon: Icon(Icons.delete, color: Colors.red),
+                                              icon: Icon(
+                                                Icons.delete,
+                                                color: Colors.red,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -652,25 +901,29 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                                   final title = judulController.text;
                                   final descriptionText = this.description.text;
                                   final priceText = priceController.text;
-                                      
+
                                   // Validasi
                                   if (title.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Judul tidak boleh kosong'),
+                                        content: Text(
+                                          'Judul tidak boleh kosong',
+                                        ),
                                       ),
                                     );
                                     return;
                                   }
-                                      
+
                                   final price = int.tryParse(priceText);
                                   if (price == null) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Harga harus angka')),
+                                      SnackBar(
+                                        content: Text('Harga harus angka'),
+                                      ),
                                     );
                                     return;
                                   }
-                                      
+
                                   if (descriptionText.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -681,7 +934,7 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                                     );
                                     return;
                                   }
-                                      
+
                                   final packageData = PackageDetailData(
                                     id: state.value!.data.id,
                                     title: title,
@@ -699,9 +952,10 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                                           ),
                                         )
                                         .toList(),
-                                    gambarDetail: state.value!.data.gambarDetail,
+                                    gambarDetail:
+                                        state.value!.data.gambarDetail,
                                   );
-                                      
+
                                   ref
                                       .read(
                                         getPackageDetialProvider(
@@ -721,7 +975,9 @@ class _DialogDetailState extends ConsumerState<DialogDetail> {
                   },
                   error: (error, stackTrace) =>
                       Center(child: Text(error.toString())),
-                  loading: () => Expanded(child: Center(child: CircularProgressIndicator())),
+                  loading: () => Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
                 ),
               ],
             ),
@@ -736,7 +992,8 @@ class DialogCreatePackage extends ConsumerStatefulWidget {
   const DialogCreatePackage({super.key});
 
   @override
-  ConsumerState<DialogCreatePackage> createState() => _DialogCreatePackageState();
+  ConsumerState<DialogCreatePackage> createState() =>
+      _DialogCreatePackageState();
 }
 
 class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
@@ -765,9 +1022,7 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
         title: const Text('Tambah Benefit'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'Deskripsi benefit',
-          ),
+          decoration: const InputDecoration(hintText: 'Deskripsi benefit'),
         ),
         actions: [
           TextButton(
@@ -778,10 +1033,12 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
             onPressed: () {
               if (controller.text.isNotEmpty) {
                 setState(() {
-                  benefits.add(CreatePackageBenefit(
-                    type: 'include',
-                    description: controller.text,
-                  ));
+                  benefits.add(
+                    CreatePackageBenefit(
+                      type: 'include',
+                      description: controller.text,
+                    ),
+                  );
                 });
               }
               context.pop();
@@ -848,10 +1105,14 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
                               width: 500,
                               child: image == null
                                   ? Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.add_photo_alternate,
-                                            size: 50, color: Colors.grey),
+                                        Icon(
+                                          Icons.add_photo_alternate,
+                                          size: 50,
+                                          color: Colors.grey,
+                                        ),
                                         SizedBox(height: 10),
                                         Text('Pilih Gambar'),
                                       ],
@@ -883,7 +1144,10 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
                               ),
                               IconButton(
                                 onPressed: addBenefit,
-                                icon: Icon(Icons.add_circle, color: MyColor.hijauaccent),
+                                icon: Icon(
+                                  Icons.add_circle,
+                                  color: MyColor.hijauaccent,
+                                ),
                               ),
                             ],
                           ),
@@ -902,7 +1166,7 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
                                   final benefit = benefits[index];
                                   final isIncluded =
                                       benefit.type.toUpperCase() == 'INCLUDE';
-                                  
+
                                   return ListTile(
                                     title: Text(benefit.description),
                                     trailing: Row(
@@ -912,10 +1176,14 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
                                           value: isIncluded,
                                           onChanged: (value) {
                                             setState(() {
-                                              benefits[index] = CreatePackageBenefit(
-                                                description: benefit.description,
-                                                type: value ? 'include' : 'exclude',
-                                              );
+                                              benefits[index] =
+                                                  CreatePackageBenefit(
+                                                    description:
+                                                        benefit.description,
+                                                    type: value
+                                                        ? 'include'
+                                                        : 'exclude',
+                                                  );
                                             });
                                           },
                                         ),
@@ -925,7 +1193,10 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
                                               benefits.removeAt(index);
                                             });
                                           },
-                                          icon: Icon(Icons.delete, color: Colors.red),
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -948,7 +1219,7 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
                               final title = judulController.text;
                               final descriptionText = description.text;
                               final priceText = priceController.text;
-                              
+
                               // Validasi
                               if (title.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -958,7 +1229,7 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
                                 );
                                 return;
                               }
-                              
+
                               if (image == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -967,31 +1238,35 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
                                 );
                                 return;
                               }
-                              
+
                               final price = int.tryParse(priceText);
                               if (price == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Harga harus angka')),
-                                );
-                                return;
-                              }
-                              
-                              if (descriptionText.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Deskripsi tidak boleh kosong'),
+                                    content: Text('Harga harus angka'),
                                   ),
                                 );
                                 return;
                               }
-                              
+
+                              if (descriptionText.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Deskripsi tidak boleh kosong',
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+
                               final request = CreatePackageRequest(
                                 title: title,
                                 description: descriptionText,
                                 price: price,
                                 benefits: benefits,
                               );
-                              
+
                               // Show loading dialog and capture its context
                               BuildContext? loadingDialogContext;
                               showDialog(
@@ -1010,19 +1285,20 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
                                   );
                                 },
                               );
-                              
+
                               try {
                                 await ref
                                     .read(createPackageProvider.notifier)
                                     .createPackage(request, image!);
-                                
+
                                 // Close loading dialog using its own context
-                                if (loadingDialogContext != null && loadingDialogContext!.mounted) {
+                                if (loadingDialogContext != null &&
+                                    loadingDialogContext!.mounted) {
                                   Navigator.pop(loadingDialogContext!);
                                 }
-                                
+
                                 if (!mounted) return;
-                                
+
                                 // Success - show message and refresh
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -1030,18 +1306,19 @@ class _DialogCreatePackageState extends ConsumerState<DialogCreatePackage> {
                                     backgroundColor: Colors.green,
                                   ),
                                 );
-                                
+
                                 // Invalidate package list to refresh
                                 ref.invalidate(getPackageListProvider);
-                                
+
                                 // Close create dialog
                                 context.pop();
                               } catch (e) {
                                 // Close loading dialog on error
-                                if (loadingDialogContext != null && loadingDialogContext!.mounted) {
+                                if (loadingDialogContext != null &&
+                                    loadingDialogContext!.mounted) {
                                   Navigator.pop(loadingDialogContext!);
                                 }
-                                
+
                                 if (mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(

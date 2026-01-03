@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wavenadmin/domain/usecase/create_admin.dart';
+import 'package:wavenadmin/domain/usecase/create_porto.dart';
 import 'package:wavenadmin/domain/usecase/create_transaction_usecase.dart';
 import 'package:wavenadmin/domain/usecase/create_univ.dart';
 import 'package:wavenadmin/domain/usecase/delete_admin.dart';
 import 'package:wavenadmin/domain/usecase/delete_batch_user.dart';
 import 'package:wavenadmin/domain/usecase/delete_fotografer.dart';
+import 'package:wavenadmin/domain/usecase/delete_porto.dart';
 import 'package:wavenadmin/domain/usecase/delete_univ.dart';
 import 'package:wavenadmin/domain/usecase/delete_user.dart';
 import 'package:wavenadmin/domain/usecase/get_dashboard.dart';
@@ -18,6 +20,7 @@ import 'package:wavenadmin/domain/usecase/get_list_photographer.dart';
 import 'package:wavenadmin/domain/usecase/get_list_schedule.dart';
 import 'package:wavenadmin/domain/usecase/get_package_dropdown.dart';
 import 'package:wavenadmin/domain/usecase/get_photographer_dropdown.dart';
+import 'package:wavenadmin/domain/usecase/get_porto.dart';
 import 'package:wavenadmin/domain/usecase/get_universitas_list.dart';
 import 'package:wavenadmin/domain/usecase/get_university_dropdown.dart';
 import 'package:wavenadmin/domain/usecase/put_detail_admin.dart';
@@ -140,4 +143,13 @@ final getListScheduleUseCase = Provider<GetListSchedule>((ref) {
 
 final getDashboardProviderUseCase = Provider<GetDashboard>((ref) {
   return locator<GetDashboard>();
+},);
+final getListPOrtoPorvider = Provider<GetPorto>((ref) {
+  return locator<GetPorto>();
+},);
+final deletePortoProvider = Provider<DeletePorto>((ref) {
+  return locator<DeletePorto>();
+},);
+final createPortoProvider = Provider<CreatePorto>((ref) {
+  return locator<CreatePorto>();
 },);

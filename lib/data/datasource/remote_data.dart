@@ -8,6 +8,7 @@ import 'package:wavenadmin/common/constant.dart';
 import 'package:wavenadmin/data/datasource/dio.dart';
 import 'package:wavenadmin/data/model/admin_detail_model.dart';
 import 'package:wavenadmin/data/model/addons_dropdown_model.dart';
+import 'package:wavenadmin/data/model/addon_detail_model.dart';
 import 'package:wavenadmin/data/model/booking_model.dart';
 import 'package:wavenadmin/data/model/create_fotografer_request.dart';
 import 'package:wavenadmin/data/model/create_package_model.dart';
@@ -23,6 +24,7 @@ import 'package:wavenadmin/data/model/photographer_payment_model.dart';
 import 'package:wavenadmin/data/model/package_detail_model.dart';
 import 'package:wavenadmin/data/model/package_dropdown_model.dart';
 import 'package:wavenadmin/data/model/package_list_model.dart';
+import 'package:wavenadmin/data/model/porto_list_model.dart';
 import 'package:wavenadmin/data/model/schedule_model.dart';
 import 'package:wavenadmin/data/model/send_whatsapp_request_model.dart';
 import 'package:wavenadmin/data/model/universitas_list_model.dart';
@@ -109,6 +111,10 @@ abstract class RemoteData {
   Future<UserFotograferListResponse> getListPhotographer(int page, int limit, {String? search,Sort? sort,SortPhotographer?  sortBy});
   Future<BookingListResponse> getListBooking(int page, int limit, {String? search, Sort? sort, SortBooking? sortBy});
   Future<ListAddonsResponse> getListAddons(int page, int limit, {String? search});
+  Future<AddonDetailResponse> getAddonDetail(String addonId);
+  Future<String> updateAddon(String addonId, UpdateAddonRequest request);
+  Future<CreateAddonResponse> createAddon(CreateAddonRequest request);
+  Future<DeleteAddonResponse> deleteAddon(String addonId);
   Future<AddonsDropdownResponse> getAddonsDropdown(int page, int limit, {String? search});
   Future<PackageDropdownResponse> getPackageDropdown(int page, int limit, {String? search});
   Future<PackageDetailResponse> getPackageDetail(String packageId);
@@ -168,6 +174,9 @@ abstract class RemoteData {
   Future<DashboardResponse> getDashboard();
   Future<String> deleteUser(String userId);
   Future<DeleteBatchUserResponse> deleteBatchUser(List<String> userIds);
+  Future<PortoListResponse> getListPorto(String packageId);
+  Future<String> deletePorto(String portoId);
+  Future<String> addPorto(XFile image,String packageId);
 }
 
 class RemoteDataImpl implements RemoteData {
@@ -179,7 +188,7 @@ class RemoteDataImpl implements RemoteData {
   @override
   Future<Token> login(String email, String password) async {
     try {
-      final uri = Uri.parse('${baseurl}v1/auth/login');
+      final uri = Uri.parse('${baseurl}v1/admin/auth/login');
       final String basicAuth =
           'Basic ${base64Encode(utf8.encode('$email:$password'))}';
       final response = await client.post(
@@ -639,13 +648,72 @@ class RemoteDataImpl implements RemoteData {
       queryParameters: {
         'page':page,
         'limit': limit,
-        if(search!=null)'search':search
+        if(search!=null)'search':search,
+        'status':"all"
       }
       );
       if (response.statusCode != 200) {
         throw AppException(response.statusCode.toString());
       }
       return ListAddonsResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<AddonDetailResponse> getAddonDetail(String addonId) async {
+    try {
+      final response = await dio.dio.get('v1/admin/addons/$addonId');
+      if (response.statusCode != 200) {
+        throw AppException(response.data['message']);
+      }
+      return AddonDetailResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<String> updateAddon(String addonId, UpdateAddonRequest request) async {
+    try {
+      final response = await dio.dio.put(
+        'v1/admin/addons/$addonId',
+        data: request.toJson(),
+      );
+      if (response.statusCode != 200) {
+        throw AppException(response.data['message']);
+      }
+      return response.data['message'];
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<CreateAddonResponse> createAddon(CreateAddonRequest request) async {
+    try {
+      final response = await dio.dio.post(
+        'v1/admin/addons',
+        data: request.toJson(),
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw AppException(response.data['message']);
+      }
+      return CreateAddonResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+
+  @override
+  Future<DeleteAddonResponse> deleteAddon(String addonId) async {
+    try {
+      final response = await dio.dio.delete('v1/admin/addons/$addonId');
+      if (response.statusCode != 200) {
+        throw AppException(response.data['message']);
+      }
+      return DeleteAddonResponse.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }
@@ -1186,6 +1254,55 @@ class RemoteDataImpl implements RemoteData {
         throw AppException('Failed to delete batch users');
       }
       return DeleteBatchUserResponse.fromJson(response.data);
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<String> addPorto(XFile image,String packageId) async{
+    try {
+      final formData = FormData();
+      final List<int> imageData = await image.readAsBytes();
+      formData.files.add(MapEntry(
+        "image", MultipartFile.fromBytes(imageData, filename: "image.png")));
+
+      formData.fields.add(MapEntry("data", jsonEncode({
+        'package_id':packageId
+      })));
+      final response = await dio.dio.post("v1/admin/master/portfolios",data: formData);
+      if(response.statusCode!=201){
+        throw AppException(response.data['message']);
+      }
+      return response.data['message'];
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<String> deletePorto(String portoId) async{
+    try {
+      final response = await dio.dio.delete("v1/admin/master/portfolios/$portoId");
+      if(response.statusCode!=200){
+        throw AppException(response.data['message']);
+      }
+      return response.data['message'];
+    } catch (e) {
+      throw AppException(_friendlyErrorMessage(e));
+    }
+  }
+  
+  @override
+  Future<PortoListResponse> getListPorto(String packageId) async{
+    try {
+      final response = await dio.dio.get("v1/admin/master/portfolios",queryParameters: {
+        'package':packageId
+      });
+      if(response.statusCode!=200){
+        throw AppException(response.data['message']);
+      }
+      return PortoListResponse.fromJson(response.data);
     } catch (e) {
       throw AppException(_friendlyErrorMessage(e));
     }

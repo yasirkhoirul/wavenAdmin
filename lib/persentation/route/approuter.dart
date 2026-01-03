@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:wavenadmin/common/deep_link_handler.dart';
 import 'package:wavenadmin/persentation/cubit/auth_cubit.dart';
+import 'package:wavenadmin/persentation/pages/addon_reference_page.dart';
 import 'package:wavenadmin/persentation/pages/fotografer_reference_page.dart';
 import 'package:wavenadmin/persentation/pages/package_reference_page.dart';
 import 'package:wavenadmin/persentation/pages/payment_result_page.dart';
@@ -145,6 +146,14 @@ class Approuter {
                 GoRoute(
                   path: '/fotograferReferensi',
                   builder: (context, state) => const FotograferReferencePage(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/addonsReferensi',
+                  builder: (context, state) => const AddonReferencePage(),
                 ),
               ],
             ),
